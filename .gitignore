@@ -2,3 +2,5 @@ target/
 bin/
 .classpath
 /.idea/
+/mystic-minigames.iml
+/.project

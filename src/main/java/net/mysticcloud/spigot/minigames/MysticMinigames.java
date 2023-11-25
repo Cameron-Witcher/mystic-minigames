@@ -11,6 +11,8 @@ public class MysticMinigames extends JavaPlugin {
 
     public void onEnable() {
 
+        MessageUtils.log("test");
+
     }
 
     public void onDisable() {

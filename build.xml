@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="${basedir}" default="createjar" basedir=".">
+	<basename file="${basedir}" property="project.projectname" />
+	<property name="project.downloadlocation" value="/var/www/downloads/plugins" />
+	<target name="prepareCompile">
+		<exec executable="git" outputproperty="git.message" failifexecutionfails="false" errorproperty="git.error">
+			<arg value="log" />
+			<arg value="-1" />
+			<arg value="--pretty=%B" />
+		</exec>
+		<condition property="git.install" value="true" else="false">
+			<and>
+				<contains string="${git.message}" substring="#release" />
+			</and>
+		</condition>
+		<echo message="Preparing compilation." />
+		<echo message="Git message: ${git.message}" />
+		<echo message="Install: ${git.install}" />
+	</target>
+
+	<target name="compile" depends="prepareCompile" if="${git.install}">
+		<echo message="Running Install" />
+		<exec dir="." executable="sh">
+			<arg line="-c 'mvn clean install'" />
+		</exec>
+	</target>
+
+	<target name="testCompile" depends="prepareCompile" unless="${git.install}">
+		<echo message="Running Test Install" />
+		<exec dir="." executable="sh">
+			<arg line="-c 'mvn clean -DskipTests test-compile jar:test-jar install'" />
+		</exec>
+	</target>
+
+	<target name="createjar" description="Create a jar for the project" depends="compile, testCompile">
+		<condition property="file.suffix" value="_in-dev" else="">
+			<and>
+				<equals arg1="${git.install}" arg2="false" />
+			</and>
+		</condition>
+		<echo message="Finished compiling. Finalizing publication..." />
+	</target>
+
+	<target name="publishIndev" depends="createjar" unless="${git.install}">
+		<echo message="Combining zips" />
+		<exec dir="./target" executable="sh">
+			<arg line="-c 'mkdir prepare'" />
+		</exec>
+		<exec dir="./target" executable="sh">
+			<arg line="-c 'cd prepare; unzip -uo ../${project.projectname}-tests.jar'" />
+		</exec>
+		<exec dir="./target" executable="sh">
+			<arg line="-c 'cd prepare; unzip -u ../${project.projectname}.jar'" />
+		</exec>
+		<exec dir="./target" executable="sh">
+			<arg line="-c 'jar -cvf comb.jar -C prepare .'" />
+		</exec>
+		<copy file="target/${project.projectname}.jar" tofile="${project.downloadlocation}/${project.projectname}.jar" overwrite="true" />
+		<copy file="target/comb.jar" tofile="target/${project.projectname}.jar" overwrite="true" />
+	</target>
+
+
+	<target name="publish" depends="publishIndev">
+		<echo message="Finished. Coping final jar (${project.projectname}${file.suffix}.jar) to ${project.downloadlocation}" />
+		<copy file="target/${project.projectname}.jar" tofile="${project.downloadlocation}/${project.projectname}${file.suffix}.jar" overwrite="true" />
+	</target>
+</project>

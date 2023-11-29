@@ -34,7 +34,7 @@
 		<dependency>
 			<groupId>com.github.Cameron-Witcher</groupId>
 			<artifactId>mystic-core</artifactId>
-			<version>0.0.1-SNAPSHOT-R02</version>
+			<version>0.0.3-R04-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 

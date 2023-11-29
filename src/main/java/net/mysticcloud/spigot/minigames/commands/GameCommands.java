@@ -30,7 +30,7 @@ public class GameCommands implements CommandExecutor {
             }
             if(args[0].equalsIgnoreCase("create")){
                 //Syntax: /game create <game> <arena> [teams]
-                if (args.length >= 2){
+                if (args.length <= 2){
                     sender.sendMessage(MessageUtils.prefixes("game") + "Usage: /game create <game> <arena> [teams]");
                     return true;
                 }

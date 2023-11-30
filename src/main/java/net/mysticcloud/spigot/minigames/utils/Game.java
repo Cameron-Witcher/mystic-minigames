@@ -65,10 +65,15 @@ public class Game {
         if (arena.getWorld() == null) {
             player.sendMessage(MessageUtils.prefixes("game") + "Generating world... Please wait.");
 
+            Bukkit.broadcastMessage("1");
             arena.startGeneration();
-            task = Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+            Bukkit.broadcastMessage("2");
+            task = Bukkit.getScheduler().runTaskLaterAsynchronously(Utils.getPlugin(), () -> {
+                Bukkit.broadcastMessage("3");
                 controller.generate();
+                Bukkit.broadcastMessage("4");
                 JSONArray save = RegionUtils.getSave("lobby");
+                Bukkit.broadcastMessage("5");
                 Location loc = new Location(arena.getWorld(), arena.getLength() / 2, arena.getHeight() + 1, arena.getWidth() / 2);
                 for (int i = 0; i < save.length(); i++) {
                     JSONObject data = save.getJSONObject(i);
@@ -218,7 +223,7 @@ public class Game {
 
         @Override
         public void run() {
-            if (task == null || Bukkit.getScheduler().isCurrentlyRunning(task.getTaskId())) {
+            if (task == null || !Bukkit.getScheduler().isCurrentlyRunning(task.getTaskId())) {
                 player.teleport(lobby);
                 players.put(player.getUniqueId(), Team.NONE);
                 sendMessage("&3" + player.getName() + "&e has joined! (&3" + players.size() + "&e/&3" + maxPlayers + "&e)");

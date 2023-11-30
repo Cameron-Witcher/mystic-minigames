@@ -39,6 +39,13 @@ public class GameCommands implements CommandExecutor {
                 Game game = GameManager.createGame(args[1], new Arena(args[2]), args.length == 4 ? Integer.parseInt(args[3]) : -1);
 
             }
+            if (args[0].equalsIgnoreCase("list")) {
+                String s = "";
+                for(Game game : GameManager.getGames().values())
+                    s = s == "" ? game.getName() : s + ", " + game.getName();
+                sender.sendMessage(MessageUtils.prefixes("game") + "Current games are: " + s);
+
+            }
             if (args[0].equalsIgnoreCase("join")) {
                 if(sender instanceof Player){
                     if (args.length == 1) {

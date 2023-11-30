@@ -3,6 +3,7 @@ package net.mysticcloud.spigot.minigames.commands;
 import net.mysticcloud.spigot.core.commands.listeners.AdminCommandTabCompleter;
 import net.mysticcloud.spigot.core.utils.MessageUtils;
 import net.mysticcloud.spigot.minigames.MysticMinigames;
+import net.mysticcloud.spigot.minigames.commands.listeners.GameCommandTabCompleter;
 import net.mysticcloud.spigot.minigames.utils.Game;
 import net.mysticcloud.spigot.minigames.utils.GameManager;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
@@ -16,7 +17,7 @@ public class GameCommands implements CommandExecutor {
         for (String s : cmd) {
             PluginCommand com = plugin.getCommand(s);
             com.setExecutor(this);
-            com.setTabCompleter(new AdminCommandTabCompleter());
+            com.setTabCompleter(new GameCommandTabCompleter());
         }
     }
 

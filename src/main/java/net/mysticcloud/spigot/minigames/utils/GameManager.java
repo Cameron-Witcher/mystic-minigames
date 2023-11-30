@@ -49,7 +49,6 @@ public class GameManager {
     }
 
 
-
     public static void saveGame(Game game) {
 
         File file = new File(gameDir.getPath() + "/" + game.getName() + "-" + game.getArena().getName() + ".game");
@@ -89,10 +88,10 @@ public class GameManager {
 
     public static Game createGame(String gameName, Arena arena, int teams, JSONObject data) {
         Game game;
-        if(data == null) data = new JSONObject("{}");
+        if (data == null) data = new JSONObject("{}");
         switch (gameName.toLowerCase()) {
             case "ctw":
-                game = new CTW(new Arena(data.getString("arena")), data.getInt("teams"));
+                game = new CTW(arena, teams);
                 break;
             default:
                 game = null;

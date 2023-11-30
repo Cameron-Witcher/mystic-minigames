@@ -39,6 +39,7 @@ public class Game {
     public Game(String gameName, Arena arena) {
         this.gameName = gameName;
         this.arena = arena;
+        arena.startGeneration();
     }
 
     protected void setTeams(int i) {
@@ -64,9 +65,6 @@ public class Game {
         BukkitTask task = null;
         if (arena.getWorld() == null) {
             player.sendMessage(MessageUtils.prefixes("game") + "Generating world... Please wait.");
-
-            Bukkit.broadcastMessage("1");
-            arena.startGeneration();
             Bukkit.broadcastMessage("2");
             task = Bukkit.getScheduler().runTaskLaterAsynchronously(Utils.getPlugin(), () -> {
                 Bukkit.broadcastMessage("3");

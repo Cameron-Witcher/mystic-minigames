@@ -48,11 +48,7 @@ public class GameManager {
         }
     }
 
-    public static Game createGame(String gameName, Arena arena, int teams) {
-        Game game = createGame(gameName, arena, teams, null);
-        saveGame(game);
-        return game;
-    }
+
 
     public static void saveGame(Game game) {
 
@@ -85,8 +81,15 @@ public class GameManager {
         return games;
     }
 
+    public static Game createGame(String gameName, Arena arena, int teams) {
+        Game game = createGame(gameName, arena, teams, null);
+        saveGame(game);
+        return game;
+    }
+
     public static Game createGame(String gameName, Arena arena, int teams, JSONObject data) {
         Game game;
+        if(data == null) data = new JSONObject("{}");
         switch (gameName.toLowerCase()) {
             case "ctw":
                 game = new CTW(new Arena(data.getString("arena")), data.getInt("teams"));
@@ -96,7 +99,7 @@ public class GameManager {
                 break;
         }
         games.put(game.getName() + "-" + game.getArena().getName(), game);
-        return new Game("", null);
+        return game;
     }
 
     public static Game getGame(String name) {

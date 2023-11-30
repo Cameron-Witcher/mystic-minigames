@@ -58,7 +58,7 @@ public class Game {
 
     public boolean addPlayer(UUID uid) {
         if (players.size() >= maxPlayers || !gameState.acceptingPlayers()) return false;
-        Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+        Bukkit.getScheduler().runTaskLaterAsynchronously(Utils.getPlugin(), () -> {
             Player player = Bukkit.getPlayer(uid);
             if (arena.getWorld() == null) {
                 player.sendMessage(MessageUtils.prefixes("game") + "Generating world... Please wait.");

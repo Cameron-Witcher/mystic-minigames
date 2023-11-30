@@ -61,7 +61,9 @@ public class Game {
         Player player = Bukkit.getPlayer(uid);
         if (arena.getWorld() == null) {
             player.sendMessage(MessageUtils.prefixes("game") + "Generating world... Please wait.");
-            generate();
+            Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+                generate();
+            }, 0);
         }
         player.teleport(lobby);
         players.put(uid, Team.NONE);
@@ -183,12 +185,12 @@ public class Game {
         }
     }
 
-    private class CountdownTimer implements Runnable{
+    private class CountdownTimer implements Runnable {
 
         long date;
         int timer;
 
-        CountdownTimer(long date, int timer){
+        CountdownTimer(long date, int timer) {
             this.timer = timer;
             this.date = date;
         }
@@ -199,10 +201,9 @@ public class Game {
                 date = new Date().getTime();
                 sendMessage(MessageUtils.colorize("&3Starting in " + timer + " second" + (timer == 1 ? "" : "s") + "!"));
                 timer = timer - 1;
-                if(timer != 0){
+                if (timer != 0) {
                     Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), this, 1);
-                } else
-                    startGame();
+                } else startGame();
             }
         }
     }

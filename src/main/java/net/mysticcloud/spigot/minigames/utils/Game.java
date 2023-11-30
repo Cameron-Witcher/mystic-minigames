@@ -95,7 +95,7 @@ public class Game {
             }, 0);
             generated = true;
         }
-        Bukkit.getScheduler().runTaskLaterAsynchronously(Utils.getPlugin(), new JoinRunnable(player, task), 0);
+        Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new JoinRunnable(player, task), 0);
 
 
         return true;

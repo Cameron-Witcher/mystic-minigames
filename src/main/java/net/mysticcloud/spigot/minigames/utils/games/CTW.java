@@ -8,8 +8,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Structure;
+import org.bukkit.entity.Player;
 import org.json2.JSONArray;
 import org.json2.JSONObject;
+
+import java.util.Map;
+import java.util.UUID;
 
 public class CTW extends Game {
     public CTW(Arena arena, int teams) {
@@ -22,6 +26,17 @@ public class CTW extends Game {
             public void start() {
 
                 Team.sort(getPlayers(), getTeams());
+                for (Map.Entry<UUID, Team> e : getPlayers().entrySet()) {
+                    Player player = Bukkit.getPlayer(e.getKey());
+                    switch (e.getValue()) {
+                        case RED:
+                            player.teleport((Location) getData().get("red_spawn"));
+                            break;
+                        case BLUE:
+                            player.teleport((Location) getData().get("blue_spawn"));
+                            break;
+                    }
+                }
                 //Teleport players to team spawns
             }
 
@@ -53,8 +68,12 @@ public class CTW extends Game {
                         Location bloc = loc.clone().add(data.getInt("x"), data.getInt("y"), data.getInt("z"));
                         JSONObject sdata = data.getJSONObject("structure_data");
                         switch (sdata.getString("structure")) {
-                            case "ctw:redteam_spawn":
-
+                            case "ctw:red_spawn":
+                                data.put("red_spawn", bloc);
+                                break;
+                            case "ctw:blue_spawn":
+                                data.put("blue_spawn", bloc);
+                                break;
                         }
                     }
                 }

@@ -36,11 +36,16 @@ public class Game {
     private GameController controller = null;
     private boolean generated = false;
     private Location lobby = null;
+    private JSONObject data = new JSONObject("{}");
 
     public Game(String gameName, Arena arena) {
         this.gameName = gameName;
         this.arena = arena;
         arena.startGeneration();
+    }
+
+    public JSONObject getData() {
+        return data;
     }
 
     protected void setTeams(int i) {
@@ -160,6 +165,7 @@ public class Game {
         json.put("game", gameName);
         json.put("arena", arena.getName());
         if (teams > 1) json.put("teams", teams);
+        json.put("extra", data);
         return json;
     }
 

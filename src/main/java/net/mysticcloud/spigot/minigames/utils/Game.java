@@ -232,9 +232,10 @@ public class Game {
                 date = new Date().getTime();
                 sendMessage(MessageUtils.colorize("&3Starting in " + timer + " second" + (timer == 1 ? "" : "s") + "!"));
                 timer = timer - 1;
-                if (timer != 0) {
-                    Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), this, 1);
-                } else startGame();
+
+            } else startGame();
+            if (timer != 0) {
+                Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), this, 1);
             }
         }
     }

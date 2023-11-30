@@ -154,6 +154,7 @@ public class Game {
     }
 
     public void close() {
+        generated = false;
         arena.clear();
     }
 

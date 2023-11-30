@@ -31,10 +31,10 @@ public class GameCommandTabCompleter implements TabCompleter {
     public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
         List<String> completions = new ArrayList<>();
         if (cmd.getName().equalsIgnoreCase("game")) {
-            if (args.length == 0)
+            if (args.length == 1)
                 StringUtil.copyPartialMatches(args[0], new ArrayList<>(cmds.keySet()), completions);
 
-            if (args.length >= 1) {
+            if (args.length >= 2) {
                 if(args[0].equalsIgnoreCase("edit")){
                     cmds.put("edit", new ArrayList<>(GameManager.getGames().keySet()));
                 }

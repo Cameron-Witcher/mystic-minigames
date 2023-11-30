@@ -2,8 +2,10 @@ package net.mysticcloud.spigot.minigames.utils;
 
 import net.mysticcloud.spigot.core.utils.CoreUtils;
 import net.mysticcloud.spigot.core.utils.MessageUtils;
+import net.mysticcloud.spigot.core.utils.regions.RegionUtils;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.WorldCreator;
 import org.bukkit.block.Block;
@@ -53,6 +55,8 @@ public class Game {
 
     public boolean addPlayer(UUID uid) {
         if (players.size() >= maxPlayers || !gameState.acceptingPlayers()) return false;
+        if (arena.getWorld() == null)
+            generate();
         //trash code for tests
         players.put(uid, Team.NONE);
         sendMessage("&3" + Bukkit.getPlayer(uid).getName() + "&e has joined! (&3" + players.size() + "&e/&3" + maxPlayers + "&e)");
@@ -75,6 +79,7 @@ public class Game {
     public void generate() {
         arena.startGeneration();
         controller.generate();
+        RegionUtils.pasteSave("lobby", new Location(arena.getWorld(), arena.getLength() / 2, arena.getHeight() + 1, arena.getWidth() / 2));
     }
 
 
@@ -108,8 +113,7 @@ public class Game {
         JSONObject json = new JSONObject("{}");
         json.put("game", gameName);
         json.put("arena", arena.getName());
-        if (teams > 1)
-            json.put("teams", teams);
+        if (teams > 1) json.put("teams", teams);
         return json;
     }
 

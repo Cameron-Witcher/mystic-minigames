@@ -13,6 +13,7 @@ import java.util.Date;
 public class Arena {
     String name;
     World world = null;
+    int length = 0, width = 0, height = 0;
 
     public Arena(String name) {
         this.name = name;
@@ -33,6 +34,27 @@ public class Arena {
         Bukkit.getServer().unloadWorld(world, true);
         deleteWorld(world.getWorldFolder());
         world = null;
+        length = 0;
+        height = 0;
+        width = 0;
+    }
+
+    public void setDimentions(int length, int width, int height) {
+        this.length = length;
+        this.height = height;
+        this.width = width;
+    }
+
+    public int getLength() {
+        return length;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
     }
 
     private boolean deleteWorld(File path) {

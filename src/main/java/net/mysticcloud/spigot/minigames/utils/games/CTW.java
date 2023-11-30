@@ -40,19 +40,25 @@ public class CTW extends Game {
             public void generate() {
                 JSONArray save = RegionUtils.getSave(arena.getName());
                 Location loc = new Location(arena.getWorld(), 0, 0, 0);
+                int length = 0, width = 0, height = 0;
                 for (int i = 0; i < save.length(); i++) {
                     JSONObject data = save.getJSONObject(i);
+                    if (data.getInt("x") > length) length = data.getInt("x");
+                    if (data.getInt("y") > height) height = data.getInt("y");
+                    if (data.getInt("z") > width) width = data.getInt("z");
+
                     if (!Bukkit.createBlockData(data.getString("data")).getMaterial().equals(Material.STRUCTURE_BLOCK)) {
                         loc.clone().add(data.getInt("x"), data.getInt("y"), data.getInt("z")).getBlock().setBlockData(Bukkit.createBlockData(data.getString("data")));
                     } else {
                         Location bloc = loc.clone().add(data.getInt("x"), data.getInt("y"), data.getInt("z"));
                         JSONObject sdata = data.getJSONObject("structure_data");
-                        switch(sdata.getString("structure")){
+                        switch (sdata.getString("structure")) {
                             case "ctw:redteam_spawn":
 
                         }
                     }
                 }
+                arena.setDimentions(length, width, height);
                 //Do shit
             }
         });

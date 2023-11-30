@@ -36,14 +36,12 @@ public class GameCommandTabCompleter implements TabCompleter {
                 StringUtil.copyPartialMatches(args[0], new ArrayList<>(cmds.keySet()), completions);
 
             if (args.length >= 2) {
-                if (args[0].equalsIgnoreCase("edit")) {
+                if (args[0].equalsIgnoreCase("edit"))
                     cmds.put("edit", new ArrayList<>(GameManager.getGames().keySet()));
-                    return completions;
-                }
-                if (args[0].equalsIgnoreCase("join")) {
+
+                if (args[0].equalsIgnoreCase("join"))
                     cmds.put("join", new ArrayList<>(GameManager.getGames().keySet()));
-                    return completions;
-                }
+
                 for (String s : cmds.keySet()) {
                     if (args[0].equalsIgnoreCase(s)) {
                         StringUtil.copyPartialMatches(args[1], cmds.get(s), completions);

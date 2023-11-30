@@ -34,6 +34,7 @@ public class Game {
     private int minPlayers = 2;
     private int maxPlayers = 10;
     private GameController controller = null;
+    private boolean generated = false;
     private Location lobby = null;
 
     public Game(String gameName, Arena arena) {
@@ -63,7 +64,7 @@ public class Game {
 
         Player player = Bukkit.getPlayer(uid);
         BukkitTask task = null;
-        if (arena.getWorld() == null) {
+        if (!generated) {
             player.sendMessage(MessageUtils.prefixes("game") + "Generating world... Please wait.");
             Bukkit.broadcastMessage("2");
             task = Bukkit.getScheduler().runTaskLaterAsynchronously(Utils.getPlugin(), () -> {
@@ -91,6 +92,7 @@ public class Game {
                     }
                 }
             }, 0);
+            generated = true;
         }
         Bukkit.getScheduler().runTaskLaterAsynchronously(Utils.getPlugin(), new JoinRunnable(player, task), 0);
 

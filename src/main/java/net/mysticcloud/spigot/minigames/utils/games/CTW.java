@@ -69,10 +69,10 @@ public class CTW extends Game {
                         JSONObject sdata = data.getJSONObject("structure_data");
                         switch (sdata.getString("structure")) {
                             case "ctw:red_spawn":
-                                data.put("red_spawn", bloc);
+                                getData().put("red_spawn", bloc);
                                 break;
                             case "ctw:blue_spawn":
-                                data.put("blue_spawn", bloc);
+                                getData().put("blue_spawn", bloc);
                                 break;
                         }
                     }

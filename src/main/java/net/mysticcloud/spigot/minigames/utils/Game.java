@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class Game {
     private String gameName;
@@ -81,6 +82,19 @@ public class Game {
             sendMessage(team, message);
     }
 
+    public void startGame() {
+        lobby = null;
+        JSONArray save = RegionUtils.getSave("lobby");
+        Location loc = new Location(arena.getWorld(), arena.getLength() / 2, arena.getHeight() + 1, arena.getWidth() / 2);
+        for (int i = 0; i < save.length(); i++) {
+            JSONObject data = save.getJSONObject(i);
+            loc.clone().add(data.getInt("x"), data.getInt("y"), data.getInt("z")).getBlock().setType(Material.AIR);
+
+        }
+
+        controller.start();
+    }
+
     public void generate() {
         arena.startGeneration();
         controller.generate();
@@ -93,6 +107,7 @@ public class Game {
                 loc.clone().add(data.getInt("x"), data.getInt("y"), data.getInt("z")).getBlock().setBlockData(Bukkit.createBlockData(data.getString("data")));
             } else {
                 Location bloc = loc.clone().add(data.getInt("x"), data.getInt("y"), data.getInt("z"));
+                bloc.getBlock().setType(Material.AIR);
                 JSONObject sdata = data.getJSONObject("structure_data");
                 switch (sdata.getString("structure")) {
                     case "lobby:spawn":
@@ -102,9 +117,6 @@ public class Game {
                 }
             }
         }
-
-        //Do shit
-        RegionUtils.pasteSave("lobby", new Location(arena.getWorld(), arena.getLength() / 2, arena.getHeight() + 1, arena.getWidth() / 2));
     }
 
 
@@ -147,7 +159,7 @@ public class Game {
     }
 
 
-    static class GameState {
+    class GameState {
 
         boolean lobbyOpen = true;
         boolean gameRunning = false;
@@ -163,8 +175,35 @@ public class Game {
         }
 
         public void startCountdown() {
-            if (!countdown) countdown = true;
+            if (!countdown) {
+                countdown = true;
+                Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new CountdownTimer(new Date().getTime(), 10), 0);
+            }
 
+        }
+    }
+
+    private class CountdownTimer implements Runnable{
+
+        long date;
+        int timer;
+
+        CountdownTimer(long date, int timer){
+            this.timer = timer;
+            this.date = date;
+        }
+
+        @Override
+        public void run() {
+            if (new Date().getTime() - date >= TimeUnit.MILLISECONDS.convert(1, TimeUnit.SECONDS)) {
+                date = new Date().getTime();
+                sendMessage(MessageUtils.colorize("&3Starting in " + timer + " second" + (timer == 1 ? "" : "s") + "!"));
+                timer = timer - 1;
+                if(timer != 0){
+                    Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), this, 1);
+                } else
+                    startGame();
+            }
         }
     }
 

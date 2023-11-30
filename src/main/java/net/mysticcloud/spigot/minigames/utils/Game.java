@@ -64,11 +64,32 @@ public class Game {
         BukkitTask task = null;
         if (arena.getWorld() == null) {
             player.sendMessage(MessageUtils.prefixes("game") + "Generating world... Please wait.");
+
+            arena.startGeneration();
             task = Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
-                generate();
+                controller.generate();
+                JSONArray save = RegionUtils.getSave("lobby");
+                Location loc = new Location(arena.getWorld(), arena.getLength() / 2, arena.getHeight() + 1, arena.getWidth() / 2);
+                for (int i = 0; i < save.length(); i++) {
+                    JSONObject data = save.getJSONObject(i);
+
+                    if (!Bukkit.createBlockData(data.getString("data")).getMaterial().equals(Material.STRUCTURE_BLOCK)) {
+                        loc.clone().add(data.getInt("x"), data.getInt("y"), data.getInt("z")).getBlock().setBlockData(Bukkit.createBlockData(data.getString("data")));
+                    } else {
+                        Location bloc = loc.clone().add(data.getInt("x"), data.getInt("y"), data.getInt("z"));
+                        bloc.getBlock().setType(Material.AIR);
+                        JSONObject sdata = data.getJSONObject("structure_data");
+                        switch (sdata.getString("structure")) {
+                            case "lobby:spawn":
+                                lobby = bloc;
+                                break;
+
+                        }
+                    }
+                }
             }, 0);
         }
-        Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new JoinRunnable(player, task), 0);
+        Bukkit.getScheduler().runTaskLaterAsynchronously(Utils.getPlugin(), new JoinRunnable(player, task), 0);
 
 
         return true;
@@ -205,7 +226,7 @@ public class Game {
                     gameState.startCountdown();
 
                 }
-            } else Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), this, 0);
+            } else Bukkit.getScheduler().runTaskLaterAsynchronously(Utils.getPlugin(), this, 0);
         }
     }
 

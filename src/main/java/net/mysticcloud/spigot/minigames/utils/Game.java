@@ -66,7 +66,6 @@ public class Game {
         BukkitTask task = null;
         if (!generated) {
             player.sendMessage(MessageUtils.prefixes("game") + "Generating world... Please wait.");
-            Bukkit.broadcastMessage("2");
             Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new GenerateRunnable(Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
                 controller.generate();
             }, 0), () -> {
@@ -223,10 +222,12 @@ public class Game {
         CountdownTimer(long date, int timer) {
             this.timer = timer;
             this.date = date;
+            Bukkit.broadcastMessage("Test 1");
         }
 
         @Override
         public void run() {
+            Bukkit.broadcastMessage("Now: " + new Date().getTime() + " Then: " + date + " Goal: " + TimeUnit.MILLISECONDS.convert(1, TimeUnit.SECONDS));
             if (new Date().getTime() - date >= TimeUnit.MILLISECONDS.convert(1, TimeUnit.SECONDS)) {
                 date = new Date().getTime();
                 sendMessage(MessageUtils.colorize("&3Starting in " + timer + " second" + (timer == 1 ? "" : "s") + "!"));

@@ -227,8 +227,8 @@ public class Game {
 
         @Override
         public void run() {
-            Bukkit.broadcastMessage("Now: " + new Date().getTime() + " Then: " + date + " Goal: " + TimeUnit.MILLISECONDS.convert(1, TimeUnit.SECONDS));
-            if (new Date().getTime() - date >= TimeUnit.MILLISECONDS.convert(1, TimeUnit.SECONDS)) {
+            Bukkit.broadcastMessage("Now: " + new Date().getTime() + " Then: " + date + " Result: " + (new Date().getTime() - date) + " Goal: " + TimeUnit.SECONDS.convert(1, TimeUnit.MILLISECONDS));
+            if (new Date().getTime() - date >= TimeUnit.SECONDS.convert(1, TimeUnit.MILLISECONDS)) {
                 date = new Date().getTime();
                 sendMessage(MessageUtils.colorize("&3Starting in " + timer + " second" + (timer == 1 ? "" : "s") + "!"));
                 timer = timer - 1;

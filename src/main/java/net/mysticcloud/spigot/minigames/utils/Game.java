@@ -82,7 +82,6 @@ public class Game {
                         JSONObject sdata = data.getJSONObject("structure_data");
                         switch (sdata.getString("structure")) {
                             case "lobby:spawn":
-                                Bukkit.broadcastMessage("Lobby set!");
                                 lobby = bloc;
                                 break;
 
@@ -93,7 +92,6 @@ public class Game {
             generated = true;
         }
         Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new GenerateRunnable(task, () -> {
-            Bukkit.broadcastMessage("Task is null or task isn't running");
             player.teleport(lobby);
             players.put(player.getUniqueId(), Team.NONE);
             sendMessage("&3" + player.getName() + "&e has joined! (&3" + players.size() + "&e/&3" + maxPlayers + "&e)");
@@ -222,21 +220,19 @@ public class Game {
         CountdownTimer(long date, int timer) {
             this.timer = timer;
             this.date = date;
-            Bukkit.broadcastMessage("Test 1");
         }
 
         @Override
         public void run() {
-            Bukkit.broadcastMessage("Now: " + new Date().getTime() + " Then: " + date + " Result: " + (new Date().getTime() - date) + " Goal: " + TimeUnit.MILLISECONDS.convert(1, TimeUnit.SECONDS));
             if (new Date().getTime() - date >= TimeUnit.MILLISECONDS.convert(1, TimeUnit.SECONDS)) {
                 date = new Date().getTime();
                 sendMessage(MessageUtils.colorize("&3Starting in " + timer + " second" + (timer == 1 ? "" : "s") + "!"));
                 timer = timer - 1;
 
-            } else startGame();
+            }
             if (timer != 0) {
                 Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), this, 1);
-            }
+            } else startGame();
         }
     }
 

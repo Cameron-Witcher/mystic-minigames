@@ -58,20 +58,21 @@ public class Game {
 
     public boolean addPlayer(UUID uid) {
         if (players.size() >= maxPlayers || !gameState.acceptingPlayers()) return false;
-        Player player = Bukkit.getPlayer(uid);
-        if (arena.getWorld() == null) {
-            player.sendMessage(MessageUtils.prefixes("game") + "Generating world... Please wait.");
-            Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+        Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+            Player player = Bukkit.getPlayer(uid);
+            if (arena.getWorld() == null) {
+                player.sendMessage(MessageUtils.prefixes("game") + "Generating world... Please wait.");
                 generate();
-            }, 0);
-        }
-        player.teleport(lobby);
-        players.put(uid, Team.NONE);
-        sendMessage("&3" + player.getName() + "&e has joined! (&3" + players.size() + "&e/&3" + maxPlayers + "&e)");
-        if (players.size() >= minPlayers && !gameState.countdown()) {
-            gameState.startCountdown();
+            }
+            player.teleport(lobby);
+            players.put(uid, Team.NONE);
+            sendMessage("&3" + player.getName() + "&e has joined! (&3" + players.size() + "&e/&3" + maxPlayers + "&e)");
+            if (players.size() >= minPlayers && !gameState.countdown()) {
+                gameState.startCountdown();
 
-        }
+            }
+        }, 0);
+
         return true;
     }
 

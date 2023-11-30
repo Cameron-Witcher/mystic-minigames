@@ -180,6 +180,7 @@ public class Game {
         public void startCountdown() {
             if (!countdown) {
                 countdown = true;
+                sendMessage("Starting countdown");
                 Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new CountdownTimer(new Date().getTime(), 10), 0);
             }
 

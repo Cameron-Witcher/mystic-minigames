@@ -67,12 +67,10 @@ public class Game {
         if (!generated) {
             player.sendMessage(MessageUtils.prefixes("game") + "Generating world... Please wait.");
             Bukkit.broadcastMessage("2");
-            task = Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
-                Bukkit.broadcastMessage("3");
+            Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new GenerateRunnable(Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
                 controller.generate();
-                Bukkit.broadcastMessage("4");
+            }, 0), () -> {
                 JSONArray save = RegionUtils.getSave("lobby");
-                Bukkit.broadcastMessage("5");
                 Location loc = new Location(arena.getWorld(), arena.getLength() / 2, arena.getHeight() + 1, arena.getWidth() / 2);
                 for (int i = 0; i < save.length(); i++) {
                     JSONObject data = save.getJSONObject(i);
@@ -92,10 +90,19 @@ public class Game {
                         }
                     }
                 }
-            }, 0);
+            }), 0);
             generated = true;
         }
-        Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new JoinRunnable(player, task), 0);
+        Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new GenerateRunnable(task, () -> {
+            Bukkit.broadcastMessage("Task is null or task isn't running");
+            player.teleport(lobby);
+            players.put(player.getUniqueId(), Team.NONE);
+            sendMessage("&3" + player.getName() + "&e has joined! (&3" + players.size() + "&e/&3" + maxPlayers + "&e)");
+            if (players.size() >= minPlayers && !gameState.countdown()) {
+                gameState.startCountdown();
+
+            }
+        }), 0);
 
 
         return true;
@@ -189,27 +196,21 @@ public class Game {
         }
     }
 
-    private class JoinRunnable implements Runnable {
-
-        Player player;
+    private class GenerateRunnable implements Runnable {
         BukkitTask task;
+        Runnable run;
 
-        JoinRunnable(Player player, BukkitTask task) {
-            this.player = player;
+        GenerateRunnable(BukkitTask task, Runnable run) {
+            this.run = run;
             this.task = task;
         }
+
 
         @Override
         public void run() {
             if (task == null || !Bukkit.getScheduler().isCurrentlyRunning(task.getTaskId())) {
-                Bukkit.broadcastMessage("Task is null or task isn't running");
-                player.teleport(lobby);
-                players.put(player.getUniqueId(), Team.NONE);
-                sendMessage("&3" + player.getName() + "&e has joined! (&3" + players.size() + "&e/&3" + maxPlayers + "&e)");
-                if (players.size() >= minPlayers && !gameState.countdown()) {
-                    gameState.startCountdown();
+                run.run();
 
-                }
             } else Bukkit.getScheduler().runTaskLaterAsynchronously(Utils.getPlugin(), this, 0);
         }
     }

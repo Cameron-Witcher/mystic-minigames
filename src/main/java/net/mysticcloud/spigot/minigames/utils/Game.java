@@ -32,6 +32,7 @@ public class Game {
     private int minPlayers = 2;
     private int maxPlayers = 10;
     private GameController controller = null;
+    private Location lobby = null;
 
     public Game(String gameName, Arena arena) {
         this.gameName = gameName;
@@ -61,6 +62,7 @@ public class Game {
             player.sendMessage(MessageUtils.prefixes("game") + "Generating world... Please wait.");
             generate();
         }
+        player.teleport(lobby);
         players.put(uid, Team.NONE);
         sendMessage("&3" + player.getName() + "&e has joined! (&3" + players.size() + "&e/&3" + maxPlayers + "&e)");
         if (players.size() >= minPlayers && !gameState.countdown()) {
@@ -82,6 +84,26 @@ public class Game {
     public void generate() {
         arena.startGeneration();
         controller.generate();
+        JSONArray save = RegionUtils.getSave("lobby");
+        Location loc = new Location(arena.getWorld(), arena.getLength() / 2, arena.getHeight() + 1, arena.getWidth() / 2);
+        for (int i = 0; i < save.length(); i++) {
+            JSONObject data = save.getJSONObject(i);
+
+            if (!Bukkit.createBlockData(data.getString("data")).getMaterial().equals(Material.STRUCTURE_BLOCK)) {
+                loc.clone().add(data.getInt("x"), data.getInt("y"), data.getInt("z")).getBlock().setBlockData(Bukkit.createBlockData(data.getString("data")));
+            } else {
+                Location bloc = loc.clone().add(data.getInt("x"), data.getInt("y"), data.getInt("z"));
+                JSONObject sdata = data.getJSONObject("structure_data");
+                switch (sdata.getString("structure")) {
+                    case "lobby:spawn":
+                        lobby = bloc;
+                        break;
+
+                }
+            }
+        }
+
+        //Do shit
         RegionUtils.pasteSave("lobby", new Location(arena.getWorld(), arena.getLength() / 2, arena.getHeight() + 1, arena.getWidth() / 2));
     }
 

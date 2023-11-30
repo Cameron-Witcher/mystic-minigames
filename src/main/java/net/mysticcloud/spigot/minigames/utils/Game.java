@@ -67,7 +67,7 @@ public class Game {
         if (!generated) {
             player.sendMessage(MessageUtils.prefixes("game") + "Generating world... Please wait.");
             Bukkit.broadcastMessage("2");
-            task = Bukkit.getScheduler().runTaskLaterAsynchronously(Utils.getPlugin(), () -> {
+            task = Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
                 Bukkit.broadcastMessage("3");
                 controller.generate();
                 Bukkit.broadcastMessage("4");

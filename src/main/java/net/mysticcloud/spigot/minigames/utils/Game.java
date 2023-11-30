@@ -67,7 +67,6 @@ public class Game {
             task = Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
                 generate();
             }, 0);
-            generate();
         }
         Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new JoinRunnable(player, task), 0);
 

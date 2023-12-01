@@ -47,7 +47,7 @@ public class CTW extends Game {
                     spawnPlayer(Bukkit.getPlayer(uid));
                 }
                 for (Team team : teamAssignments.values()) {
-                    Location loc = ((Location) getData().get(team.name().toLowerCase() + "_flag")).clone().add(0, 1, 0);
+                    Location loc = ((Location) getData().get(team.name().toLowerCase() + "_flag")).clone().add(0, 1.51, 0);
                     Item item = loc.getWorld().dropItem(loc, new ItemStack(Material.valueOf(team.name() + "_WOOL")));
                     item.setUnlimitedLifetime(true);
                     item.setMetadata("flag", new FixedMetadataValue(Utils.getPlugin(), team));
@@ -175,7 +175,7 @@ public class CTW extends Game {
 
     public void pickupFlag(Player player, Item item) {
         GamePlayer gamePlayer = getPlayer(player.getUniqueId());
-        Team team = (Team) item.getMetadata("team").get(0).value();
+        Team team = (Team) item.getMetadata("flag").get(0).value();
         sendMessage(MessageUtils.colorize(gamePlayer.getTeam().chatColor() + "&l" + player.getName() + "&r &ehas stolen the " + team.chatColor() + "&l" + team.name() + "&r&e flag!"));
         player.getEquipment().setHelmet(item.getItemStack());
         item.remove();

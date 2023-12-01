@@ -1,14 +1,14 @@
 package net.mysticcloud.spigot.minigames.listeners;
 
-import net.mysticcloud.spigot.core.MysticCore;
 import net.mysticcloud.spigot.core.utils.MessageUtils;
+import net.mysticcloud.spigot.minigames.MysticMinigames;
 import net.mysticcloud.spigot.minigames.utils.Game;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 public class ChatListener implements Listener {
-    public ChatListener(MysticCore plugin) {
+    public ChatListener(MysticMinigames plugin) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 

@@ -13,7 +13,7 @@ public class Utils {
 
         CoreUtils.addPalpitation(() -> {
             for (Game game : GameManager.getGames().values()) {
-                if (game.getController().check()) game.getController().end();
+                if (game.getController().check()) game.end();
             }
         });
     }

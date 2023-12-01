@@ -78,6 +78,8 @@ public class Game {
         }
         players.clear();
         close();
+        GameManager.removeGame(gameName + "-" + arena.getName());
+        GameManager.createGame(gameName, arena, teams, data);
     }
 
     public boolean addPlayer(UUID uid) {

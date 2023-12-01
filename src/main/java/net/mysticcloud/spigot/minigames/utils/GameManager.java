@@ -106,4 +106,7 @@ public class GameManager {
     }
 
 
+    public static void removeGame(String name) {
+        games.remove(name);
+    }
 }

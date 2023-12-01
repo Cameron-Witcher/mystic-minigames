@@ -1,5 +1,6 @@
 package net.mysticcloud.spigot.minigames.utils.games.arenas;
 
+import net.mysticcloud.spigot.core.utils.MessageUtils;
 import net.mysticcloud.spigot.core.utils.misc.EmptyChunkGenerator;
 import net.mysticcloud.spigot.core.utils.regions.RegionUtils;
 import org.bukkit.Bukkit;
@@ -32,7 +33,7 @@ public class Arena {
 
     public void clear() {
         Bukkit.getServer().unloadWorld(world, true);
-        deleteWorld(world.getWorldFolder());
+        MessageUtils.log("Deleted world: " + deleteWorld(world.getWorldFolder()));
         world = null;
         length = 0;
         height = 0;

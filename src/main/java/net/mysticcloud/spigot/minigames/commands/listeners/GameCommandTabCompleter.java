@@ -23,6 +23,7 @@ public class GameCommandTabCompleter implements TabCompleter {
         cmds.put("edit", new ArrayList<>());
         cmds.put("list", new ArrayList<>());
         cmds.put("join", new ArrayList<>());
+        cmds.put("leave", new ArrayList<>());
         cmds.put("help", new ArrayList<>(cmds.keySet()));
 
 

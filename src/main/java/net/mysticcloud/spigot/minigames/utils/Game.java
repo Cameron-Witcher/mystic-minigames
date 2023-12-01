@@ -68,6 +68,7 @@ public class Game {
     public void removePlayer(UUID uid){
         players.remove(uid);
         Bukkit.getPlayer(uid).teleport(Bukkit.getWorlds().get(0).getSpawnLocation());
+        Bukkit.getPlayer(uid).removeMetadata("game", Utils.getPlugin());
 
         if(/*win state*/true){
             end();

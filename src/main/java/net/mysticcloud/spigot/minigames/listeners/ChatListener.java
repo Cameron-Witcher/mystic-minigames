@@ -36,7 +36,13 @@ public class ChatListener implements Listener {
         Game game = e.getPlayer().hasMetadata("game") ? (Game) e.getPlayer().getMetadata("game").get(0).value() : null;
         Game.GamePlayer player = game == null ? null : game.getPlayer(e.getPlayer().getUniqueId());
 
-        MessageUtils.log("[CHAT] " + (game == null ? "[" + game.getName() + "-" + game.getArena().getName() + "] " + (player.getTeam().equals(Team.NONE) ? "" : "[" + player.getTeam().name() + "] ") : "") + e.getPlayer().getName() + ": " + e.getMessage());
+        MessageUtils.log("[CHAT] " +
+                (game != null ?
+                        "[" + game.getName() + "-" + game.getArena().getName() + "] " +
+                                (player.getTeam().equals(Team.NONE) ?
+                                "" :
+                                "[" + player.getTeam().name() + "] ") :
+                        "") + e.getPlayer().getName() + ": " + e.getMessage());
         e.setCancelled(true);
     }
 }

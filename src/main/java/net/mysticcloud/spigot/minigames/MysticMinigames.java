@@ -3,6 +3,7 @@ package net.mysticcloud.spigot.minigames;
 
 import net.mysticcloud.spigot.minigames.commands.GameCommands;
 import net.mysticcloud.spigot.minigames.listeners.ChatListener;
+import net.mysticcloud.spigot.minigames.listeners.DeathListener;
 import net.mysticcloud.spigot.minigames.utils.Game;
 import net.mysticcloud.spigot.minigames.utils.GameManager;
 import net.mysticcloud.spigot.minigames.utils.Utils;
@@ -17,6 +18,7 @@ public class MysticMinigames extends JavaPlugin {
 
 
         new ChatListener(this);
+        new DeathListener(this);
         new GameCommands(this, "game");
 
     }

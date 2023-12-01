@@ -177,7 +177,16 @@ public class Game {
         GamePlayer gamePlayer = players.get(player.getUniqueId());
         gamePlayer.setLives(gamePlayer.getLives() - 1);
         player.setHealth(player.getHealthScale());
-        if (gamePlayer.getLives() > 0) spawnPlayer(player);
+        if (gamePlayer.getLives() > 0) {
+            player.setGameMode(GameMode.SPECTATOR);
+            Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new CountdownRunnable(3, (timer)->{
+                player.sendTitle("","Respawning in " + timer + " second" + (timer == 1 ? "" : "s"), 0,25,50);
+            }, () -> {
+                player.setGameMode(GameMode.SURVIVAL);
+                spawnPlayer(player);
+            }), 0);
+            spawnPlayer(player);
+        }
         if (gamePlayer.getLives() == 0) {
             setSpectator(player);
         }
@@ -284,7 +293,11 @@ public class Game {
         public void startCountdown() {
             if (!countdown) {
                 countdown = true;
-                Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new CountdownTimer(new Date().getTime(), 10), 0);
+                Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new CountdownRunnable(10, (int t) -> {
+                    sendMessage(MessageUtils.colorize("&3Starting in " + t + " second" + (t == 1 ? "" : "s") + "!"));
+                }, () -> {
+                    startGame();
+                }), 0);
             }
 
         }
@@ -317,28 +330,37 @@ public class Game {
         }
     }
 
-    private class CountdownTimer implements Runnable {
+    private class CountdownRunnable implements Runnable {
 
         long date;
         int timer;
+        Runnable finish;
+        TimerRunnable tick;
 
-        CountdownTimer(long date, int timer) {
+        CountdownRunnable(int timer, TimerRunnable tick, Runnable finish) {
             this.timer = timer;
-            this.date = date;
+            this.date = new Date().getTime();
+            this.finish = finish;
+            this.tick = tick;
         }
 
         @Override
         public void run() {
             if (new Date().getTime() - date >= TimeUnit.MILLISECONDS.convert(1, TimeUnit.SECONDS)) {
                 date = new Date().getTime();
-                sendMessage(MessageUtils.colorize("&3Starting in " + timer + " second" + (timer == 1 ? "" : "s") + "!"));
+                tick.go(timer);
                 timer = timer - 1;
 
             }
             if (timer != 0) {
                 Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), this, 1);
-            } else startGame();
+            } else finish.run();
         }
+
+    }
+
+    private interface TimerRunnable {
+        public abstract void go(int timer);
     }
 
     protected interface GameController {

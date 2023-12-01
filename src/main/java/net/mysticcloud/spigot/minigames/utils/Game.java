@@ -207,6 +207,7 @@ public class Game {
     }
 
     protected void spawnPlayer(Player player) {
+        player.getInventory().clear();
         GamePlayer gamePlayer = getPlayer(player.getUniqueId());
         player.setHealth(player.getHealthScale());
         for (Spawn spawn : spawns)

@@ -116,6 +116,10 @@ public class CTW extends Game {
                                 getData().put("red_flag", bloc);
                                 bloc.getBlock().setType(Material.OAK_FENCE);
                                 break;
+                            case "ctw:blue_flag":
+                                getData().put("blue_flag", bloc);
+                                bloc.getBlock().setType(Material.OAK_FENCE);
+                                break;
                         }
                     }
                 }
@@ -140,17 +144,17 @@ public class CTW extends Game {
 
         LeatherArmorMeta shirtMeta = (LeatherArmorMeta) shirt.getItemMeta();
         shirtMeta.setColor(team.getDyeColor());
-        hat.setItemMeta(shirtMeta);
+        shirt.setItemMeta(shirtMeta);
 
         LeatherArmorMeta pantsMeta = (LeatherArmorMeta) pants.getItemMeta();
         pantsMeta.setColor(team.getDyeColor());
-        hat.setItemMeta(pantsMeta);
+        pants.setItemMeta(pantsMeta);
 
         LeatherArmorMeta shoesMeta = (LeatherArmorMeta) shoes.getItemMeta();
         shoesMeta.setColor(team.getDyeColor());
-        hat.setItemMeta(shoesMeta);
+        shoes.setItemMeta(shoesMeta);
 
-        player.getEquipment().setArmorContents(new ItemStack[]{hat, shirt, pants, shoes});
+        player.getEquipment().setArmorContents(new ItemStack[]{shoes, pants, shirt, hat});
 
         player.getInventory().addItem(new ItemStack(Material.BOW), new ItemStack(Material.IRON_SWORD), new ItemStack(Material.IRON_AXE), new ItemStack(Material.IRON_SHOVEL), new ItemStack(Material.IRON_PICKAXE), new ItemStack(Material.OAK_PLANKS, 64), new ItemStack(Material.OAK_PLANKS, 64), new ItemStack(Material.ARROW, 64), new ItemStack(Material.BREAD, 64));
 

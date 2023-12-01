@@ -47,11 +47,8 @@ public class CTW extends Game {
                     spawnPlayer(Bukkit.getPlayer(uid));
                 }
                 for (Team team : teamAssignments.values()) {
-                    Location loc = ((Location) getData().get(team.name().toLowerCase() + "_flag")).clone().add(0, 1.51, 0);
-                    Item item = loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.valueOf(team.name() + "_WOOL")));
-                    item.setUnlimitedLifetime(true);
-                    item.setMetadata("flag", new FixedMetadataValue(Utils.getPlugin(), team));
-                    flags.put(team, item);
+                    dropFlag(team, ((Location) getData().get(team.name().toLowerCase() + "_flag")));
+
                 }
             }
 
@@ -129,6 +126,13 @@ public class CTW extends Game {
         });
     }
 
+    private void dropFlag(Team team, Location loc) {
+        Item item = loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.valueOf(team.name() + "_WOOL")));
+        item.setUnlimitedLifetime(true);
+        item.setMetadata("flag", new FixedMetadataValue(Utils.getPlugin(), team));
+        flags.put(team, item);
+    }
+
     @Override
     protected void spawnPlayer(Player player) {
         super.spawnPlayer(player);
@@ -194,6 +198,8 @@ public class CTW extends Game {
         player.getEquipment().setHelmet(hat);
 
         player.removeMetadata("flag", Utils.getPlugin());
+
+        dropFlag(flag, ((Location) getData().get(flag.name().toLowerCase() + "_flag")));
 
     }
 }

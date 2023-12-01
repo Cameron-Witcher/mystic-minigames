@@ -185,7 +185,6 @@ public class Game {
                 player.setGameMode(GameMode.SURVIVAL);
                 spawnPlayer(player);
             }), 0);
-            spawnPlayer(player);
         }
         if (gamePlayer.getLives() == 0) {
             setSpectator(player);

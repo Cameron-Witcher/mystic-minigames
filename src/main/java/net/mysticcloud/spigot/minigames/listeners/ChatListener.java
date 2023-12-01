@@ -28,11 +28,15 @@ public class ChatListener implements Listener {
 
         } else {
             for (Player player : Bukkit.getOnlinePlayers())
-                if (!player.hasMetadata("game")) player.sendMessage(e.getFormat());
+                if (!player.hasMetadata("game"))
+                    player.sendMessage(MessageUtils.colorize("&7" + e.getPlayer().getName() + "&f: &7") + e.getMessage());
 
         }
 
-        MessageUtils.log((e.getPlayer().hasMetadata("game") ? "[" + ((Game) e.getPlayer().getMetadata("game").get(0).value()).getName() + "-" + ((Game) e.getPlayer().getMetadata("game").get(0).value()).getArena().getName() + "] " : "") + e.getFormat());
+        Game game = e.getPlayer().hasMetadata("game") ? (Game) e.getPlayer().getMetadata("game").get(0).value() : null;
+        Game.GamePlayer player = game == null ? null : game.getPlayer(e.getPlayer().getUniqueId());
+
+        MessageUtils.log("[CHAT] " + (game == null ? "[" + game.getName() + "-" + game.getArena().getName() + "] " + (player.getTeam().equals(Team.NONE) ? "" : "[" + player.getTeam().name() + "] ") : "") + e.getPlayer().getName() + ": " + e.getMessage());
         e.setCancelled(true);
     }
 }

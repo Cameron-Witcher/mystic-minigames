@@ -62,7 +62,11 @@ public class Game {
     }
 
     public void removePlayer(UUID uid) {
-        players.remove(uid);
+        removePlayer(uid, true);
+    }
+
+    public void removePlayer(UUID uid, boolean list) {
+        if (list) players.remove(uid);
         Player player = Bukkit.getPlayer(uid);
         player.teleport(Bukkit.getWorlds().get(0).getSpawnLocation());
         player.removeMetadata("game", Utils.getPlugin());
@@ -74,7 +78,7 @@ public class Game {
         controller.end();
 
         for (UUID uid : players.keySet()) {
-            Bukkit.getPlayer(uid).teleport(Bukkit.getWorlds().get(0).getSpawnLocation());
+            removePlayer(uid, false);
         }
         players.clear();
         close();

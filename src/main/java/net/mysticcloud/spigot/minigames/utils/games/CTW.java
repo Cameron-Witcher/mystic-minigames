@@ -100,7 +100,6 @@ public class CTW extends Game {
 
     @Override
     public void kill(Player player, EntityDamageEvent.DamageCause cause) {
-        super.kill(player, cause);
         GamePlayer gamePlayer = getPlayer(player.getUniqueId());
         Entity damager = player.hasMetadata("last_damager") ? Bukkit.getEntity((UUID) player.getMetadata("last_damager").get(0).value()) : null;
         switch (cause) {
@@ -108,5 +107,6 @@ public class CTW extends Game {
                 sendMessage((gamePlayer.getTeam().equals(Team.NONE) ? "&3" : gamePlayer.getTeam().chatColor()) + player.getName() + "&e was killed" + (damager == null ? "!" : " by " + (getPlayer(damager.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : getPlayer(damager.getUniqueId()).getTeam().chatColor()) + damager.getName() + "&e!"));
                 break;
         }
+        super.kill(player, cause);
     }
 }

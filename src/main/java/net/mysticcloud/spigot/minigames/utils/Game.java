@@ -337,7 +337,7 @@ public class Game {
 
     public class GamePlayer {
         Team team = Team.NONE;
-        int lives = 1;
+        int lives = 3;
         UUID uid;
 
         GamePlayer(UUID uid) {

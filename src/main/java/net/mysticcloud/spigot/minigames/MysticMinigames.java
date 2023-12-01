@@ -22,7 +22,7 @@ public class MysticMinigames extends JavaPlugin {
     public void onDisable() {
 
         for (Game game : GameManager.getGames().values()) {
-            game.close();
+            game.end();
             GameManager.saveGame(game);
         }
 

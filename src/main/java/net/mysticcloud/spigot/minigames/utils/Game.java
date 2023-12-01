@@ -11,6 +11,7 @@ import org.bukkit.WorldCreator;
 import org.bukkit.block.Block;
 import org.bukkit.block.Structure;
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 import org.json2.JSONArray;
@@ -64,6 +65,26 @@ public class Game {
         this.controller = controller;
     }
 
+    public void removePlayer(UUID uid){
+        players.remove(uid);
+        Bukkit.getPlayer(uid).teleport(Bukkit.getWorlds().get(0).getSpawnLocation());
+
+        if(/*win state*/true){
+            end();
+        }
+    }
+
+    public void end() {
+
+        controller.end();
+
+        for(UUID uid : players.keySet()){
+            Bukkit.getPlayer(uid).teleport(Bukkit.getWorlds().get(0).getSpawnLocation());
+        }
+        players.clear();
+        close();
+    }
+
     public boolean addPlayer(UUID uid) {
         if (players.size() >= maxPlayers || !gameState.acceptingPlayers()) return false;
 
@@ -98,6 +119,7 @@ public class Game {
         }
         Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new GenerateRunnable(task, () -> {
             player.teleport(lobby);
+            player.setMetadata("game", new FixedMetadataValue(Utils.getPlugin(), this));
             players.put(player.getUniqueId(), Team.NONE);
             sendMessage("&3" + player.getName() + "&e has joined! (&3" + players.size() + "&e/&3" + maxPlayers + "&e)");
             if (players.size() >= minPlayers && !gameState.countdown()) {

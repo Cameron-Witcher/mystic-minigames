@@ -25,7 +25,7 @@ public class CTW extends Game {
         setMaxPlayers(teams * 4);
         setController(new GameController() {
 
-            Map<Team, List<UUID>> teamListMap = new HashMap<>();
+            Map<Team, ArrayList<UUID>> teamListMap = new HashMap<>();
 
             @Override
             public void start() {
@@ -41,7 +41,8 @@ public class CTW extends Game {
                 teamListMap.clear();
                 for (GamePlayer player : getPlayers().values()) {
                     if (player.getTeam().equals(Team.NONE) || player.getTeam().equals(Team.SPECTATOR)) continue;
-                    if (teamListMap.containsKey(player.getTeam())) teamListMap.put(player.getTeam(), new ArrayList<>());
+                    if (!teamListMap.containsKey(player.getTeam()))
+                        teamListMap.put(player.getTeam(), new ArrayList<>());
                     Bukkit.broadcastMessage(player.getTeam().name());
                     teamListMap.get(player.getTeam()).add(player.getUUID());
                 }
@@ -50,6 +51,7 @@ public class CTW extends Game {
 
                 //check scores and timer
             }
+
 
             @Override
             public void end() {

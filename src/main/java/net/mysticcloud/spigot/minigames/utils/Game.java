@@ -37,8 +37,8 @@ public class Game {
     public Game(String gameName, Arena arena) {
         this.gameName = gameName;
         this.arena = arena;
-        arena.startGeneration();
         data.put("spawns", new JSONArray());
+        generate();
     }
 
     public JSONObject getData() {
@@ -93,30 +93,6 @@ public class Game {
         BukkitTask task = null;
         if (!generated) {
             player.sendMessage(MessageUtils.prefixes("game") + "Generating world... Please wait.");
-            Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new GenerateRunnable(Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
-                controller.generate();
-            }, 0), () -> {
-                JSONArray save = RegionUtils.getSave("lobby");
-                Location loc = new Location(arena.getWorld(), arena.getLength() / 2, arena.getHeight() + 1, arena.getWidth() / 2);
-                for (int i = 0; i < save.length(); i++) {
-                    JSONObject data = save.getJSONObject(i);
-
-                    if (!Bukkit.createBlockData(data.getString("data")).getMaterial().equals(Material.STRUCTURE_BLOCK)) {
-                        loc.clone().add(data.getInt("x"), data.getInt("y"), data.getInt("z")).getBlock().setBlockData(Bukkit.createBlockData(data.getString("data")));
-                    } else {
-                        Location bloc = loc.clone().add(data.getInt("x"), data.getInt("y"), data.getInt("z"));
-                        bloc.getBlock().setType(Material.AIR);
-                        JSONObject sdata = data.getJSONObject("structure_data");
-                        switch (sdata.getString("structure")) {
-                            case "lobby:spawn":
-                                lobby = bloc;
-                                break;
-
-                        }
-                    }
-                }
-            }), 0);
-            generated = true;
         }
         Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new GenerateRunnable(task, () -> {
             player.teleport(lobby);
@@ -230,6 +206,40 @@ public class Game {
                 player.teleport(spawn.getLocation());
                 break;
             }
+    }
+
+    public void generate() {
+        arena.startGeneration();
+        Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new GenerateRunnable(Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new GenerateRunnable(Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+            arena.startGeneration();
+        }, 1), () -> {
+            controller.generate();
+        }), 1), () -> {
+            generateLobby();
+        }), 1);
+        generated = true;
+    }
+
+    private void generateLobby() {
+        JSONArray save = RegionUtils.getSave("lobby");
+        Location loc = new Location(arena.getWorld(), arena.getLength() / 2, arena.getHeight() + 1, arena.getWidth() / 2);
+        for (int i = 0; i < save.length(); i++) {
+            JSONObject data = save.getJSONObject(i);
+
+            if (!Bukkit.createBlockData(data.getString("data")).getMaterial().equals(Material.STRUCTURE_BLOCK)) {
+                loc.clone().add(data.getInt("x"), data.getInt("y"), data.getInt("z")).getBlock().setBlockData(Bukkit.createBlockData(data.getString("data")));
+            } else {
+                Location bloc = loc.clone().add(data.getInt("x"), data.getInt("y"), data.getInt("z"));
+                bloc.getBlock().setType(Material.AIR);
+                JSONObject sdata = data.getJSONObject("structure_data");
+                switch (sdata.getString("structure")) {
+                    case "lobby:spawn":
+                        lobby = bloc;
+                        break;
+
+                }
+            }
+        }
     }
 
     public class Spawn {

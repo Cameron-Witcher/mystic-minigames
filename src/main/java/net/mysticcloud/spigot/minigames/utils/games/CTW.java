@@ -78,7 +78,19 @@ public class CTW extends Game {
 
             @Override
             public void end() {
-                //Divvy rewards and send messages
+                int z = getTeamScores().size();
+                for (Map.Entry<Team, Integer> entry : sortTeamScores().entrySet()) {
+                    if (z == 1) {
+                        sendMessage(entry.getKey().chatColor() + entry.getKey().name() + "&7 has won!");
+                        sendMessage(entry.getKey(), MessageUtils.prefixes("game") + "Your team came in first! You'll get 10 points for every kill plus 30 for winning!");
+                        for (GamePlayer player : getPlayers().values()) {
+                            if (player.getTeam().equals(entry.getKey()))
+                                Bukkit.getPlayer(player.getUUID()).sendMessage(MessageUtils.prefixes("game") + "You scored " + (30 + (10 * getScore(Bukkit.getPlayer(player.getUUID())))));
+                        }
+                    }
+                    z = z - 1;
+                    //Divvy rewards and send messages
+                }
             }
 
             @Override

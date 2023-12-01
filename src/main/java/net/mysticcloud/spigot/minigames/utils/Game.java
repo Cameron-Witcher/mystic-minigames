@@ -139,6 +139,55 @@ public class Game {
         return teamScores.get(team);
     }
 
+    public Map<Team, Integer> getTeamScores() {
+        return teamScores;
+    }
+
+    public Map<UUID, Integer> getPlayerScores() {
+        return playerScores;
+    }
+
+    public LinkedHashMap<Team, Integer> sortTeamScores() {
+        List<Map.Entry<Team, Integer>> list = new LinkedList<Map.Entry<Team, Integer>>(teamScores.entrySet());
+        Collections.sort(list, new Comparator<Map.Entry<Team, Integer>>() {
+
+            @Override
+            public int compare(Map.Entry<Team, Integer> o1, Map.Entry<Team, Integer> o2) {
+                // TODO Auto-generated method stub
+                return (o1.getValue()).compareTo(o2.getValue());
+            }
+        });
+
+        LinkedHashMap<Team, Integer> temp = new LinkedHashMap<>();
+        for (Map.Entry<Team, Integer> aa : list) {
+            temp.put(aa.getKey(), aa.getValue());
+        }
+
+        return temp;
+
+    }
+
+    public LinkedHashMap<UUID, Integer> sortPlayerScores() {
+        List<Map.Entry<UUID, Integer>> list = new LinkedList<Map.Entry<UUID, Integer>>(playerScores.entrySet());
+        Collections.sort(list, new Comparator<Map.Entry<UUID, Integer>>() {
+
+            @Override
+            public int compare(Map.Entry<UUID, Integer> o1, Map.Entry<UUID, Integer> o2) {
+                // TODO Auto-generated method stub
+                return (o1.getValue()).compareTo(o2.getValue());
+            }
+        });
+
+        LinkedHashMap<UUID, Integer> temp = new LinkedHashMap<>();
+        for (Map.Entry<UUID, Integer> aa : list) {
+            temp.put(aa.getKey(), aa.getValue());
+        }
+
+        return temp;
+
+    }
+
+
     public GameState getGameState() {
         return gameState;
     }
@@ -209,7 +258,7 @@ public class Game {
         player.setHealth(player.getHealthScale());
         if (gamePlayer.getLives() > 0) {
             player.setGameMode(GameMode.SPECTATOR);
-            player.teleport(player.getLocation().clone().add(0,Math.abs(player.getLocation().getY())+50, 0));
+            player.teleport(player.getLocation().clone().add(0, Math.abs(player.getLocation().getY()) + 50, 0));
             Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new CountdownRunnable(3, (timer) -> {
                 player.sendTitle("", ChatColor.RED + "Respawning in " + timer + " second" + (timer == 1 ? "" : "s"), 0, 25, 50);
             }, () -> {

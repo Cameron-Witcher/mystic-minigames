@@ -21,6 +21,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.util.Vector;
 import org.json2.JSONArray;
 import org.json2.JSONObject;
 
@@ -128,6 +129,7 @@ public class CTW extends Game {
 
     private void dropFlag(Team team, Location loc) {
         Item item = loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.valueOf(team.name() + "_WOOL")));
+        item.setVelocity(new Vector(0, 0, 0));
         item.setUnlimitedLifetime(true);
         item.setMetadata("flag", new FixedMetadataValue(Utils.getPlugin(), team));
         flags.put(team, item);

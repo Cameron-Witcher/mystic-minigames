@@ -1,5 +1,8 @@
 package net.mysticcloud.spigot.minigames.utils.games;
 
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.mysticcloud.spigot.core.utils.MessageUtils;
 import net.mysticcloud.spigot.core.utils.regions.RegionUtils;
 import net.mysticcloud.spigot.minigames.utils.Team;
@@ -41,6 +44,7 @@ public class CTW extends Game {
                 teamListMap.clear();
                 for (GamePlayer player : getPlayers().values()) {
                     if (player.getTeam().equals(Team.NONE) || player.getTeam().equals(Team.SPECTATOR)) continue;
+                    Bukkit.getPlayer(player.getUUID()).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + "Lives: " + player.getLives()));
                     if (!teamListMap.containsKey(player.getTeam()))
                         teamListMap.put(player.getTeam(), new ArrayList<>());
                     teamListMap.get(player.getTeam()).add(player.getUUID());

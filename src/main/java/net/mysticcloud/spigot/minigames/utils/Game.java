@@ -179,8 +179,8 @@ public class Game {
         player.setHealth(player.getHealthScale());
         if (gamePlayer.getLives() > 0) {
             player.setGameMode(GameMode.SPECTATOR);
-            Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new CountdownRunnable(3, (timer)->{
-                player.sendTitle("",ChatColor.RED + "Respawning in " + timer + " second" + (timer == 1 ? "" : "s"), 0,25,50);
+            Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new CountdownRunnable(3, (timer) -> {
+                player.sendTitle("", ChatColor.RED + "Respawning in " + timer + " second" + (timer == 1 ? "" : "s"), 0, 25, 50);
             }, () -> {
                 player.setGameMode(GameMode.SURVIVAL);
                 spawnPlayer(player);
@@ -348,13 +348,16 @@ public class Game {
         @Override
         public void run() {
             if (new Date().getTime() - date >= TimeUnit.MILLISECONDS.convert(1, TimeUnit.SECONDS)) {
+                if (timer == 0) {
+                    finish.run();
+                    return;
+                }
                 date = new Date().getTime();
                 tick();
 
             }
-            if (timer != 0) {
-                Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), this, 1);
-            } else finish.run();
+            if (timer != 0) Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), this, 1);
+
         }
 
         private void tick() {

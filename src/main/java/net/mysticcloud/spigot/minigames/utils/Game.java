@@ -356,7 +356,7 @@ public class Game {
                 tick();
 
             }
-            if (timer != 0) Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), this, 1);
+            Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), this, 1);
 
         }
 

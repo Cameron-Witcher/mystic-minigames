@@ -1,5 +1,6 @@
 package net.mysticcloud.spigot.minigames.utils.games;
 
+import net.mysticcloud.spigot.core.utils.MessageUtils;
 import net.mysticcloud.spigot.core.utils.regions.RegionUtils;
 import net.mysticcloud.spigot.minigames.utils.Team;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
@@ -8,7 +9,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Structure;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.json2.JSONArray;
 import org.json2.JSONObject;
 
@@ -24,18 +27,10 @@ public class CTW extends Game {
         setController(new GameController() {
             @Override
             public void start() {
-                for (Map.Entry<UUID, Team> e : Team.sort(getPlayers().keySet(), getTeams(), CTW.this).entrySet()) {
-                    Player player = Bukkit.getPlayer(e.getKey());
-                    switch (e.getValue()) {
-                        case RED:
-                            player.teleport((Location) getData().get("red_spawn"));
-                            break;
-                        case BLUE:
-                            player.teleport((Location) getData().get("blue_spawn"));
-                            break;
-                    }
+                Team.sort(getPlayers().keySet(), getTeams(), CTW.this);
+                for (UUID uid : getPlayers().keySet()) {
+                    spawnPlayer(Bukkit.getPlayer(uid));
                 }
-                //Teleport players to team spawns
             }
 
             @Override
@@ -66,11 +61,23 @@ public class CTW extends Game {
                         Location bloc = loc.clone().add(data.getInt("x"), data.getInt("y"), data.getInt("z"));
                         JSONObject sdata = data.getJSONObject("structure_data");
                         switch (sdata.getString("structure")) {
+                            case "spawn:red":
                             case "ctw:red_spawn":
-                                getData().put("red_spawn", bloc);
+                                addSpawn(new Spawn(bloc, Team.RED));
                                 break;
+                            case "spawn:blue":
                             case "ctw:blue_spawn":
-                                getData().put("blue_spawn", bloc);
+                                addSpawn(new Spawn(bloc, Team.BLUE));
+                                break;
+                            case "spawn:green":
+                                addSpawn(new Spawn(bloc, Team.GREEN));
+                                break;
+                            case "spawn:yellow":
+                                addSpawn(new Spawn(bloc, Team.YELLOW));
+                                break;
+                            case "spawn:none":
+                            case "location:spawn":
+                                addSpawn(new Spawn(bloc, Team.NONE));
                                 break;
                         }
                     }
@@ -79,5 +86,17 @@ public class CTW extends Game {
                 //Do shit
             }
         });
+    }
+
+    @Override
+    public void kill(Player player, EntityDamageEvent.DamageCause cause) {
+        super.kill(player, cause);
+        GamePlayer gamePlayer = getPlayer(player.getUniqueId());
+        Entity damager = player.hasMetadata("last_damager") ? Bukkit.getEntity((UUID) player.getMetadata("last_damager").get(0).value()) : null;
+        switch (cause) {
+            default:
+                sendMessage((gamePlayer.getTeam().equals(Team.NONE) ? "&3" : gamePlayer.getTeam().chatColor()) + player.getName() + "&e was killed" + (damager == null ? "!" : " by " + (getPlayer(damager.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : getPlayer(damager.getUniqueId()).getTeam().chatColor()) + damager.getName() + "&e!"));
+                break;
+        }
     }
 }

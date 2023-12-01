@@ -33,7 +33,10 @@ public class DeathListener implements Listener {
     @EventHandler
     public void onPlayerDeath(EntityDamageEvent e) {
         if (e.getEntity() instanceof Player && e.getEntity().hasMetadata("game")) {
+            Game game = (Game) e.getEntity().getMetadata("game").get(0).value();
+            if (!game.getGameState().hasStarted()) e.setCancelled(true);
             if (((Player) e.getEntity()).getHealth() - e.getFinalDamage() <= 0) {
+                e.setCancelled(true);
                 ((Game) e.getEntity().getMetadata("game").get(0).value()).kill((Player) e.getEntity());
 
             }

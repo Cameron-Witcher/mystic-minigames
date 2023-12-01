@@ -4,13 +4,11 @@ import net.mysticcloud.spigot.core.utils.CoreUtils;
 import net.mysticcloud.spigot.core.utils.MessageUtils;
 import net.mysticcloud.spigot.core.utils.regions.RegionUtils;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.WorldCreator;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Structure;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
@@ -20,29 +18,27 @@ import org.json2.JSONObject;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class Game {
-    private String gameName;
-    private Arena arena;
+    private final String gameName;
+    private final Arena arena;
     private final GameState gameState = new GameState();
-    Map<UUID, GamePlayer> players = new HashMap<>();
-    private int teams = 0;
-    private int minPlayers = 2;
-    private int maxPlayers = 10;
+    private final List<Spawn> spawns = new ArrayList<>();
+    private final JSONObject data = new JSONObject("{}");
+    private final Map<UUID, GamePlayer> players = new HashMap<>();
+    private int teams = 0, minPlayers = 2, maxPlayers = 10;
     private GameController controller = null;
     private boolean generated = false;
     private Location lobby = null;
-    private JSONObject data = new JSONObject("{}");
+
 
     public Game(String gameName, Arena arena) {
         this.gameName = gameName;
         this.arena = arena;
         arena.startGeneration();
+        data.put("spawns", new JSONArray());
     }
 
     public JSONObject getData() {
@@ -69,10 +65,6 @@ public class Game {
         players.remove(uid);
         Bukkit.getPlayer(uid).teleport(Bukkit.getWorlds().get(0).getSpawnLocation());
         Bukkit.getPlayer(uid).removeMetadata("game", Utils.getPlugin());
-
-        if (/*win state*/true) {
-            end();
-        }
     }
 
     public void end() {
@@ -197,16 +189,63 @@ public class Game {
         return controller;
     }
 
-    public void kill(Player player) {
+    public void kill(Player player, EntityDamageEvent.DamageCause cause) {
         GamePlayer gamePlayer = players.get(player.getUniqueId());
         gamePlayer.setLives(gamePlayer.getLives() - 1);
         player.setHealth(player.getHealthScale());
-        if (teams > 1 && gamePlayer.getLives() > 0)
-            player.teleport((Location) getData().get(getPlayers().get(player.getUniqueId()).getTeam().name().toLowerCase() + "_spawn"));
+        if (gamePlayer.getLives() > 0)
+            spawnPlayer(player);
+        if (gamePlayer.getLives() == 0) {
+            setSpectator(player);
+        }
+    }
+
+    private void setSpectator(Player player) {
+        player.setGameMode(GameMode.SPECTATOR);
+        getPlayer(player.getUniqueId()).setTeam(Team.SPECTATOR);
+        if (player.getLocation().getY() < 0)
+            player.teleport(player.getLocation().clone().add(0, Math.abs(player.getLocation().getY()) + 50, 0));
     }
 
     public GamePlayer getPlayer(UUID uid) {
         return players.get(uid);
+    }
+
+    public void addSpawn(Spawn spawn) {
+        spawns.add(spawn);
+    }
+
+    protected void spawnPlayer(Player player) {
+        GamePlayer gamePlayer = getPlayer(player.getUniqueId());
+        player.setHealth(player.getHealthScale());
+        for (Spawn spawn : spawns)
+            if (spawn.getTeam().equals(gamePlayer.getTeam())) {
+                player.teleport(spawn.getLocation());
+                break;
+            }
+    }
+
+    public class Spawn {
+        Location location;
+        Team team;
+
+        public Spawn(Location location) {
+            this.location = location;
+            this.team = Team.NONE;
+        }
+
+        public Spawn(Location location, Team team) {
+            this.team = team;
+            this.location = location;
+        }
+
+        public Team getTeam() {
+            return team;
+        }
+
+        public Location getLocation() {
+            return location.clone();
+        }
     }
 
 
@@ -297,8 +336,8 @@ public class Game {
     }
 
     public class GamePlayer {
-        Team team;
-        int lives;
+        Team team = Team.NONE;
+        int lives = 1;
         UUID uid;
 
         GamePlayer(UUID uid) {

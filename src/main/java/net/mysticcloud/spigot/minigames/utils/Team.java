@@ -3,25 +3,26 @@ package net.mysticcloud.spigot.minigames.utils;
 import net.mysticcloud.spigot.core.utils.MessageUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
+import org.bukkit.Color;
 
 import java.util.*;
 
 public enum Team {
-    RED(ChatColor.RED), BLUE(ChatColor.BLUE), GREEN(ChatColor.GREEN), YELLOW(ChatColor.YELLOW), NONE(ChatColor.RESET), SPECTATOR(ChatColor.RESET);
+    RED(ChatColor.RED, Color.RED), BLUE(ChatColor.BLUE, Color.BLUE), GREEN(ChatColor.GREEN, Color.GREEN), YELLOW(ChatColor.YELLOW, Color.YELLOW), NONE(ChatColor.RESET, Color.WHITE), SPECTATOR(ChatColor.RESET, Color.WHITE);
 
     final ChatColor chatColor;
+    final Color dyeColor;
 
-    Team(ChatColor chatColor) {
+    Team(ChatColor chatColor, Color dyeColor) {
         this.chatColor = chatColor;
+        this.dyeColor = dyeColor;
     }
 
     public static List<Team> getTeamsFromMax(int maxTeams) {
         List<Team> teams = new ArrayList<>();
         int i = 0;
         for (Team team : values()) {
-            if (i >= maxTeams)
-                break;
+            if (i >= maxTeams) break;
             teams.add(team);
             i = i + 1;
         }
@@ -36,11 +37,10 @@ public enum Team {
             players.put(uid, teamArray[i]);
             Bukkit.getPlayer(uid).sendMessage(MessageUtils.colorize("&eYou're on the " + teamArray[i].chatColor + "&l" + teamArray[i].name() + "&r&e team!"));
             i = i + 1;
-            if (i >= teams)
-                i = 0;
+            if (i >= teams) i = 0;
 
         }
-        for(Map.Entry<UUID, Team> e : players.entrySet()){
+        for (Map.Entry<UUID, Team> e : players.entrySet()) {
             game.getPlayer(e.getKey()).setTeam(e.getValue());
         }
         return players;
@@ -48,5 +48,9 @@ public enum Team {
 
     public ChatColor chatColor() {
         return chatColor;
+    }
+
+    public Color getDyeColor() {
+        return dyeColor;
     }
 }

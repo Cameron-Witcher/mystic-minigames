@@ -6,6 +6,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.mysticcloud.spigot.core.utils.MessageUtils;
 import net.mysticcloud.spigot.core.utils.regions.RegionUtils;
 import net.mysticcloud.spigot.minigames.utils.Team;
+import net.mysticcloud.spigot.minigames.utils.Utils;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
 import net.mysticcloud.spigot.minigames.utils.Game;
 import org.bukkit.Bukkit;
@@ -13,14 +14,23 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Structure;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.json2.JSONArray;
 import org.json2.JSONObject;
 
 import java.util.*;
 
 public class CTW extends Game {
+
+    Map<Team, Item> flags = new HashMap<>();
+
+
     public CTW(Arena arena, int teams) {
         super("CTW", arena);
         setTeams(teams);
@@ -32,9 +42,16 @@ public class CTW extends Game {
 
             @Override
             public void start() {
-                Team.sort(getPlayers().keySet(), getTeams(), CTW.this);
+                Map<UUID, Team> teamAssignments = Team.sort(getPlayers().keySet(), getTeams(), CTW.this);
                 for (UUID uid : getPlayers().keySet()) {
                     spawnPlayer(Bukkit.getPlayer(uid));
+                }
+                for (Team team : teamAssignments.values()) {
+                    Location loc = ((Location) getData().get(team.name().toLowerCase() + "_flag")).clone().add(0, 1, 0);
+                    Item item = loc.getWorld().dropItem(loc, new ItemStack(Material.valueOf(team.name() + "_WOOL")));
+                    item.setUnlimitedLifetime(true);
+                    item.setMetadata("flag", new FixedMetadataValue(Utils.getPlugin(), team));
+                    flags.put(team, item);
                 }
             }
 
@@ -95,6 +112,10 @@ public class CTW extends Game {
                             case "location:spawn":
                                 addSpawn(new Spawn(bloc, Team.NONE));
                                 break;
+                            case "ctw:red_flag":
+                                getData().put("red_flag", bloc);
+                                bloc.getBlock().setType(Material.OAK_FENCE);
+                                break;
                         }
                     }
                 }
@@ -102,6 +123,38 @@ public class CTW extends Game {
                 //Do shit
             }
         });
+    }
+
+    @Override
+    protected void spawnPlayer(Player player) {
+        super.spawnPlayer(player);
+        Team team = getPlayer(player.getUniqueId()).getTeam();
+        ItemStack hat = new ItemStack(Material.LEATHER_HELMET);
+        ItemStack shirt = new ItemStack(Material.LEATHER_CHESTPLATE);
+        ItemStack pants = new ItemStack(Material.LEATHER_LEGGINGS);
+        ItemStack shoes = new ItemStack(Material.LEATHER_BOOTS);
+
+        LeatherArmorMeta hatMeta = (LeatherArmorMeta) hat.getItemMeta();
+        hatMeta.setColor(team.getDyeColor());
+        hat.setItemMeta(hatMeta);
+
+        LeatherArmorMeta shirtMeta = (LeatherArmorMeta) shirt.getItemMeta();
+        shirtMeta.setColor(team.getDyeColor());
+        hat.setItemMeta(shirtMeta);
+
+        LeatherArmorMeta pantsMeta = (LeatherArmorMeta) pants.getItemMeta();
+        pantsMeta.setColor(team.getDyeColor());
+        hat.setItemMeta(pantsMeta);
+
+        LeatherArmorMeta shoesMeta = (LeatherArmorMeta) shoes.getItemMeta();
+        shoesMeta.setColor(team.getDyeColor());
+        hat.setItemMeta(shoesMeta);
+
+        player.getEquipment().setArmorContents(new ItemStack[]{hat, shirt, pants, shoes});
+
+        player.getInventory().addItem(new ItemStack(Material.BOW), new ItemStack(Material.IRON_SWORD), new ItemStack(Material.IRON_AXE), new ItemStack(Material.IRON_SHOVEL), new ItemStack(Material.IRON_PICKAXE), new ItemStack(Material.OAK_PLANKS, 64), new ItemStack(Material.OAK_PLANKS, 64), new ItemStack(Material.ARROW, 64), new ItemStack(Material.BREAD, 64));
+
+
     }
 
     @Override
@@ -114,5 +167,27 @@ public class CTW extends Game {
                 break;
         }
         super.kill(player, cause);
+    }
+
+    public void pickupFlag(Player player, Item item) {
+        GamePlayer gamePlayer = getPlayer(player.getUniqueId());
+        Team team = (Team) item.getMetadata("team").get(0).value();
+        sendMessage(MessageUtils.colorize(gamePlayer.getTeam().chatColor() + "&l" + player.getName() + "&r &ehas stolen the " + team.chatColor() + "&l" + team.name() + "&r&e flag!"));
+        player.getEquipment().setHelmet(item.getItemStack());
+        item.remove();
+        player.setMetadata("flag", new FixedMetadataValue(Utils.getPlugin(), team));
+    }
+
+    public void captureFlag(Player player, Team flag) {
+        GamePlayer gamePlayer = getPlayer(player.getUniqueId());
+        sendMessage(MessageUtils.colorize(gamePlayer.getTeam().chatColor() + "&l" + player.getName() + "&r &ehas captured the " + flag.chatColor() + "&l" + flag.name() + "&r&e flag!"));
+        ItemStack hat = new ItemStack(Material.LEATHER_HELMET);
+
+        LeatherArmorMeta hatMeta = (LeatherArmorMeta) hat.getItemMeta();
+        hatMeta.setColor(gamePlayer.getTeam().getDyeColor());
+        hat.setItemMeta(hatMeta);
+
+        player.getEquipment().setHelmet(hat);
+
     }
 }

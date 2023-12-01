@@ -359,5 +359,9 @@ public class Game {
         public void setLives(int lives) {
             this.lives = lives;
         }
+
+        public UUID getUUID() {
+            return uid;
+        }
     }
 }

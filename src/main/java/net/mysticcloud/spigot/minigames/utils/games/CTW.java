@@ -15,8 +15,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.json2.JSONArray;
 import org.json2.JSONObject;
 
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class CTW extends Game {
     public CTW(Arena arena, int teams) {
@@ -25,6 +24,8 @@ public class CTW extends Game {
         setMinPlayers(teams);
         setMaxPlayers(teams * 4);
         setController(new GameController() {
+
+            Map<Team, List<UUID>> teamListMap = new HashMap<>();
             @Override
             public void start() {
                 Team.sort(getPlayers().keySet(), getTeams(), CTW.this);
@@ -35,8 +36,17 @@ public class CTW extends Game {
 
             @Override
             public boolean check() {
+                if(!getGameState().hasStarted()) return false;
+                teamListMap.clear();
+                for(GamePlayer player : getPlayers().values()){
+                    if(player.getTeam().equals(Team.NONE) || player.getTeam().equals(Team.SPECTATOR)) continue;
+                    if(teamListMap.containsKey(player.getTeam()))
+                        teamListMap.put(player.getTeam(), new ArrayList<>());
+                    teamListMap.get(player.getTeam()).add(player.getUUID());
+                }
+                return teamListMap.size() == 1;
+
                 //check scores and timer
-                return false;
             }
 
             @Override

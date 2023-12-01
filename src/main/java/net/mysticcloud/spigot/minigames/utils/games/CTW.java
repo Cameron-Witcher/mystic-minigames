@@ -48,7 +48,7 @@ public class CTW extends Game {
                 }
                 for (Team team : teamAssignments.values()) {
                     Location loc = ((Location) getData().get(team.name().toLowerCase() + "_flag")).clone().add(0, 1.51, 0);
-                    Item item = loc.getWorld().dropItem(loc, new ItemStack(Material.valueOf(team.name() + "_WOOL")));
+                    Item item = loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.valueOf(team.name() + "_WOOL")));
                     item.setUnlimitedLifetime(true);
                     item.setMetadata("flag", new FixedMetadataValue(Utils.getPlugin(), team));
                     flags.put(team, item);
@@ -192,6 +192,8 @@ public class CTW extends Game {
         hat.setItemMeta(hatMeta);
 
         player.getEquipment().setHelmet(hat);
+
+        player.removeMetadata("flag", Utils.getPlugin());
 
     }
 }

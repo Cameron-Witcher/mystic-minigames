@@ -63,8 +63,10 @@ public class Game {
 
     public void removePlayer(UUID uid) {
         players.remove(uid);
-        Bukkit.getPlayer(uid).teleport(Bukkit.getWorlds().get(0).getSpawnLocation());
-        Bukkit.getPlayer(uid).removeMetadata("game", Utils.getPlugin());
+        Player player = Bukkit.getPlayer(uid);
+        player.teleport(Bukkit.getWorlds().get(0).getSpawnLocation());
+        player.removeMetadata("game", Utils.getPlugin());
+        player.setGameMode(GameMode.SURVIVAL);
     }
 
     public void end() {
@@ -193,8 +195,7 @@ public class Game {
         GamePlayer gamePlayer = players.get(player.getUniqueId());
         gamePlayer.setLives(gamePlayer.getLives() - 1);
         player.setHealth(player.getHealthScale());
-        if (gamePlayer.getLives() > 0)
-            spawnPlayer(player);
+        if (gamePlayer.getLives() > 0) spawnPlayer(player);
         if (gamePlayer.getLives() == 0) {
             setSpectator(player);
         }

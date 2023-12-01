@@ -131,7 +131,7 @@ public class CTW extends Game {
     private void dropFlag(Team team, Location loc) {
         World world = loc.getWorld();
         assert world != null;
-        Item item = world.dropItem(loc.clone().add(0, 1.51, 0), new ItemStack(Material.valueOf(team.name() + "_WOOL")));
+        Item item = world.dropItem(loc.clone().add(0.5, 1.51, 0.5), new ItemStack(Material.valueOf(team.name() + "_WOOL")));
         item.setVelocity(new Vector(0, 0, 0));
         item.setUnlimitedLifetime(true);
         item.setMetadata("flag", new FixedMetadataValue(Utils.getPlugin(), team));

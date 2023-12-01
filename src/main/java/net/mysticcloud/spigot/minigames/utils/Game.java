@@ -9,6 +9,8 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Structure;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
@@ -32,6 +34,8 @@ public class Game {
     private GameController controller = null;
     private boolean generated = false;
     private Location lobby = null;
+
+    private Map<UUID, ItemStack[]> inventoryList = new HashMap<>();
 
 
     public Game(String gameName, Arena arena) {
@@ -71,6 +75,8 @@ public class Game {
         player.teleport(Bukkit.getWorlds().get(0).getSpawnLocation());
         player.removeMetadata("game", Utils.getPlugin());
         player.setGameMode(GameMode.SURVIVAL);
+        player.getInventory().setContents(inventoryList.get(player.getUniqueId()));
+        inventoryList.remove(player.getUniqueId());
     }
 
     public void end() {
@@ -90,6 +96,7 @@ public class Game {
         if (players.size() >= maxPlayers || !gameState.acceptingPlayers()) return false;
 
         Player player = Bukkit.getPlayer(uid);
+        inventoryList.put(uid, player.getInventory().getContents());
         BukkitTask task = null;
         if (!generated) {
             player.sendMessage(MessageUtils.prefixes("game") + "Generating world... Please wait.");

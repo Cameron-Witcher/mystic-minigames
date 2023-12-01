@@ -34,7 +34,7 @@ public class DeathListener implements Listener {
         if (e.getEntity() instanceof Player && e.getEntity().hasMetadata("game")) {
             Bukkit.broadcastMessage("Damage: " + e.getDamage());
             Bukkit.broadcastMessage("Final Damage: " + e.getFinalDamage());
-            Bukkit.broadcastMessage("Health: " + ((Player) e.getEntity()).getHealthScale());
+            Bukkit.broadcastMessage("Health: " + ((Player) e.getEntity()).getHealth());
 //            if(((Player) e.getEntity()).getHealthScale() - e.getFinalDamage())
         }
     }

@@ -32,6 +32,9 @@ public class CTW extends Game {
 
     Map<Team, Item> flags = new HashMap<>();
 
+    int MAX_SCORE = 5;
+    int MAX_LIVES = 10;
+
 
     public CTW(Arena arena, int teams) {
         super("CTW", arena);
@@ -46,6 +49,7 @@ public class CTW extends Game {
             public void start() {
                 Map<UUID, Team> teamAssignments = Team.sort(getPlayers().keySet(), getTeams(), CTW.this);
                 for (UUID uid : getPlayers().keySet()) {
+                    getPlayer(uid).setMaxLives(MAX_LIVES);
                     spawnPlayer(Bukkit.getPlayer(uid));
                 }
                 for (Team team : teamAssignments.values()) {
@@ -60,7 +64,8 @@ public class CTW extends Game {
                 teamListMap.clear();
                 for (GamePlayer player : getPlayers().values()) {
                     if (player.getTeam().equals(Team.NONE) || player.getTeam().equals(Team.SPECTATOR)) continue;
-                    Bukkit.getPlayer(player.getUUID()).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + "Lives: " + player.getLives()));
+                    if (getScore(player.getTeam()) >= 3) return true;
+                    Bukkit.getPlayer(player.getUUID()).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + "Lives: " + player.getLives() + " | Team Score: " + getScore(player.getTeam()) + "/" + MAX_SCORE));
                     if (!teamListMap.containsKey(player.getTeam()))
                         teamListMap.put(player.getTeam(), new ArrayList<>());
                     teamListMap.get(player.getTeam()).add(player.getUUID());
@@ -192,8 +197,10 @@ public class CTW extends Game {
     }
 
     public void captureFlag(Player player, Team flag) {
+        score(player);
         GamePlayer gamePlayer = getPlayer(player.getUniqueId());
-        sendMessage(MessageUtils.colorize(gamePlayer.getTeam().chatColor() + "&l" + player.getName() + "&r &ehas captured the " + flag.chatColor() + "&l" + flag.name() + "&r&e flag!"));
+
+        sendMessage(MessageUtils.colorize(gamePlayer.getTeam().chatColor() + "&l" + player.getName() + "&r &ehas captured the " + flag.chatColor() + "&l" + flag.name() + "&r&e flag! (&7" + getScore(gamePlayer.getTeam()) + "/" + MAX_SCORE + "&e)"));
         ItemStack hat = new ItemStack(Material.LEATHER_HELMET);
 
         LeatherArmorMeta hatMeta = (LeatherArmorMeta) hat.getItemMeta();
@@ -205,6 +212,7 @@ public class CTW extends Game {
         player.removeMetadata("flag", Utils.getPlugin());
 
         dropFlag(flag, ((Location) getData().get(flag.name().toLowerCase() + "_flag")));
+
 
     }
 }

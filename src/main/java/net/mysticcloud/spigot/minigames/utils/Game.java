@@ -29,11 +29,14 @@ public class Game {
     private final GameState gameState = new GameState();
     private final List<Spawn> spawns = new ArrayList<>();
     private final JSONObject data = new JSONObject("{}");
+    private final Map<UUID, Integer> playerScores = new HashMap<>();
+    private final Map<Team, Integer> teamScores = new HashMap<>();
     private final Map<UUID, GamePlayer> players = new HashMap<>();
     private int teams = 0, minPlayers = 2, maxPlayers = 10;
     private GameController controller = null;
     private boolean generated = false;
     private Location lobby = null;
+
 
     private Map<UUID, ItemStack[]> inventoryList = new HashMap<>();
 
@@ -114,6 +117,26 @@ public class Game {
 
 
         return true;
+    }
+
+    public int score(Player player) {
+        return score(player, 1);
+    }
+
+    public int score(Player player, int amount) {
+        playerScores.put(player.getUniqueId(), getScore(player) + amount);
+        teamScores.put(getPlayer(player.getUniqueId()).getTeam(), getScore(getPlayer(player.getUniqueId()).getTeam()));
+        return playerScores.get(player.getUniqueId());
+    }
+
+    public int getScore(Player player) {
+        if (!playerScores.containsKey(player.getUniqueId())) playerScores.put(player.getUniqueId(), 0);
+        return playerScores.get(player.getUniqueId());
+    }
+
+    public int getScore(Team team) {
+        if (!teamScores.containsKey(team)) teamScores.put(team, 0);
+        return teamScores.get(team);
     }
 
     public GameState getGameState() {
@@ -396,6 +419,10 @@ public class Game {
 
         GamePlayer(UUID uid) {
             this.uid = uid;
+        }
+
+        public void setMaxLives(int lives) {
+            this.lives = lives;
         }
 
         public Team getTeam() {

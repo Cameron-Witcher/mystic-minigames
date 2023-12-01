@@ -3,6 +3,7 @@ package net.mysticcloud.spigot.minigames.utils;
 import net.mysticcloud.spigot.core.utils.MessageUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 
 import java.util.*;
 
@@ -27,11 +28,11 @@ public enum Team {
         return teams;
     }
 
-    public static void sort(Map<UUID, Team> players, int teams) {
-        Set<UUID> pls = players.keySet();
+    public static Map<UUID, Team> sort(Collection<UUID> uids, int teams, Game game) {
         Team[] teamArray = getTeamsFromMax(teams).toArray(new Team[teams]);
+        Map<UUID, Team> players = new HashMap<>();
         int i = 0;
-        for (UUID uid : pls) {
+        for (UUID uid : uids) {
             players.put(uid, teamArray[i]);
             Bukkit.getPlayer(uid).sendMessage(MessageUtils.colorize("&eYou're on the " + teamArray[i].chatColor + "&l" + teamArray[i].name() + "&r&e team!"));
             i = i + 1;
@@ -39,6 +40,10 @@ public enum Team {
                 i = 0;
 
         }
+        for(Map.Entry<UUID, Team> e : players.entrySet()){
+            game.getPlayer(e.getKey()).setTeam(e.getValue());
+        }
+        return players;
     }
 
     public ChatColor chatColor() {

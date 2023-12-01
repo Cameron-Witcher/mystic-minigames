@@ -6,6 +6,7 @@ import net.mysticcloud.spigot.minigames.utils.Game;
 import net.mysticcloud.spigot.minigames.utils.Team;
 import net.mysticcloud.spigot.minigames.utils.Utils;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -32,10 +33,10 @@ public class DeathListener implements Listener {
     @EventHandler
     public void onPlayerDeath(EntityDamageEvent e) {
         if (e.getEntity() instanceof Player && e.getEntity().hasMetadata("game")) {
-            Bukkit.broadcastMessage("Damage: " + e.getDamage());
-            Bukkit.broadcastMessage("Final Damage: " + e.getFinalDamage());
-            Bukkit.broadcastMessage("Health: " + ((Player) e.getEntity()).getHealth());
-//            if(((Player) e.getEntity()).getHealthScale() - e.getFinalDamage())
+            if (((Player) e.getEntity()).getHealth() - e.getFinalDamage() <= 0) {
+                ((Game) e.getEntity().getMetadata("game").get(0).value()).kill((Player) e.getEntity());
+
+            }
         }
     }
 }

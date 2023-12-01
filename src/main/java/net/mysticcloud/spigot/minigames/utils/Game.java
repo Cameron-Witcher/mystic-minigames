@@ -30,7 +30,7 @@ public class Game {
     private String gameName;
     private Arena arena;
     private final GameState gameState = new GameState();
-    Map<UUID, Team> players = new HashMap<>();
+    Map<UUID, GamePlayer> players = new HashMap<>();
     private int teams = 0;
     private int minPlayers = 2;
     private int maxPlayers = 10;
@@ -121,7 +121,7 @@ public class Game {
         Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new GenerateRunnable(task, () -> {
             player.teleport(lobby);
             player.setMetadata("game", new FixedMetadataValue(Utils.getPlugin(), this));
-            players.put(player.getUniqueId(), Team.NONE);
+            players.put(player.getUniqueId(), new GamePlayer(player.getUniqueId()));
             sendMessage("&3" + player.getName() + "&e has joined! (&3" + players.size() + "&e/&3" + maxPlayers + "&e)");
             if (players.size() >= minPlayers && !gameState.countdown()) {
                 gameState.startCountdown();
@@ -157,8 +157,9 @@ public class Game {
 
 
     public void sendMessage(Team team, String message) {
-        for (Map.Entry<UUID, Team> e : players.entrySet()) {
-            if (e.getValue().equals(team)) Bukkit.getPlayer(e.getKey()).sendMessage(MessageUtils.colorize(message));
+        for (Map.Entry<UUID, GamePlayer> e : players.entrySet()) {
+            if (e.getValue().getTeam().equals(team))
+                Bukkit.getPlayer(e.getKey()).sendMessage(MessageUtils.colorize(message));
         }
     }
 
@@ -167,7 +168,7 @@ public class Game {
         arena.clear();
     }
 
-    public Map<UUID, Team> getPlayers() {
+    public Map<UUID, GamePlayer> getPlayers() {
         return players;
     }
 
@@ -194,6 +195,18 @@ public class Game {
 
     public GameController getController() {
         return controller;
+    }
+
+    public void kill(Player player) {
+        GamePlayer gamePlayer = players.get(player.getUniqueId());
+        gamePlayer.setLives(gamePlayer.getLives() - 1);
+        player.setHealth(player.getHealthScale());
+        if (teams > 1 && gamePlayer.getLives() > 0)
+            player.teleport((Location) getData().get(getPlayers().get(player.getUniqueId()).getTeam().name().toLowerCase() + "_spawn"));
+    }
+
+    public GamePlayer getPlayer(UUID uid) {
+        return players.get(uid);
     }
 
 
@@ -281,5 +294,31 @@ public class Game {
         public void end();
 
         public void generate();
+    }
+
+    public class GamePlayer {
+        Team team;
+        int lives;
+        UUID uid;
+
+        GamePlayer(UUID uid) {
+            this.uid = uid;
+        }
+
+        public Team getTeam() {
+            return team;
+        }
+
+        public void setTeam(Team team) {
+            this.team = team;
+        }
+
+        public int getLives() {
+            return lives;
+        }
+
+        public void setLives(int lives) {
+            this.lives = lives;
+        }
     }
 }

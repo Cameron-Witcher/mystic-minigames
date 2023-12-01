@@ -24,9 +24,7 @@ public class CTW extends Game {
         setController(new GameController() {
             @Override
             public void start() {
-
-                Team.sort(getPlayers(), getTeams());
-                for (Map.Entry<UUID, Team> e : getPlayers().entrySet()) {
+                for (Map.Entry<UUID, Team> e : Team.sort(getPlayers().keySet(), getTeams(), CTW.this).entrySet()) {
                     Player player = Bukkit.getPlayer(e.getKey());
                     switch (e.getValue()) {
                         case RED:

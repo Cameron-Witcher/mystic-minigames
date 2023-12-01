@@ -65,12 +65,12 @@ public class Game {
         this.controller = controller;
     }
 
-    public void removePlayer(UUID uid){
+    public void removePlayer(UUID uid) {
         players.remove(uid);
         Bukkit.getPlayer(uid).teleport(Bukkit.getWorlds().get(0).getSpawnLocation());
         Bukkit.getPlayer(uid).removeMetadata("game", Utils.getPlugin());
 
-        if(/*win state*/true){
+        if (/*win state*/true) {
             end();
         }
     }
@@ -79,7 +79,7 @@ public class Game {
 
         controller.end();
 
-        for(UUID uid : players.keySet()){
+        for (UUID uid : players.keySet()) {
             Bukkit.getPlayer(uid).teleport(Bukkit.getWorlds().get(0).getSpawnLocation());
         }
         players.clear();
@@ -151,7 +151,7 @@ public class Game {
             loc.clone().add(data.getInt("x"), data.getInt("y"), data.getInt("z")).getBlock().setType(Material.AIR);
 
         }
-
+        gameState.hasStarted(true);
         controller.start();
     }
 
@@ -197,7 +197,7 @@ public class Game {
     }
 
 
-    class GameState {
+    public class GameState {
 
         boolean lobbyOpen = true;
         boolean gameRunning = false;
@@ -215,10 +215,17 @@ public class Game {
         public void startCountdown() {
             if (!countdown) {
                 countdown = true;
-                sendMessage("Starting countdown");
                 Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new CountdownTimer(new Date().getTime(), 10), 0);
             }
 
+        }
+
+        public boolean hasStarted() {
+            return gameRunning;
+        }
+
+        public void hasStarted(boolean gameRunning) {
+            this.gameRunning = gameRunning;
         }
     }
 

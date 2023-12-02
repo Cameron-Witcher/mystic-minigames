@@ -26,7 +26,7 @@ public class DeathListener implements Listener {
 
     @EventHandler
     public void onPlayerDamage(EntityDamageByEntityEvent e) {
-        if (e.getEntity() instanceof Player && e.getEntity().hasMetadata("game")) {
+        if (e.getEntity() instanceof Player && e.getEntity().getWorld().hasMetadata("game")) {
             UUID damager = e.getDamager().getUniqueId();
             if(e.getDamager() instanceof Projectile && ((Projectile)e.getDamager()).getShooter() instanceof LivingEntity){
                 damager = ((LivingEntity)((Projectile)e.getDamager()).getShooter()).getUniqueId();
@@ -40,12 +40,12 @@ public class DeathListener implements Listener {
 
     @EventHandler
     public void onPlayerDeath(EntityDamageEvent e) {
-        if (e.getEntity() instanceof Player && e.getEntity().hasMetadata("game")) {
-            Game game = (Game) e.getEntity().getMetadata("game").get(0).value();
+        if (e.getEntity() instanceof Player && e.getEntity().getWorld().hasMetadata("game")) {
+            Game game = (Game) e.getEntity().getWorld().getMetadata("game").get(0).value();
             if (!game.getGameState().hasStarted()) e.setCancelled(true);
             if (((Player) e.getEntity()).getHealth() - e.getFinalDamage() <= 0) {
                 e.setCancelled(true);
-                ((Game) e.getEntity().getMetadata("game").get(0).value()).kill((Player) e.getEntity(), e.getCause());
+                ((Game) e.getEntity().getWorld().getMetadata("game").get(0).value()).kill((Player) e.getEntity(), e.getCause());
 
             }
         }

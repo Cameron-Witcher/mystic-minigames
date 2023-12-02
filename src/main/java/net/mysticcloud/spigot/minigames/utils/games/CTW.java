@@ -199,7 +199,7 @@ public class CTW extends Game {
     public void kill(Player player, EntityDamageEvent.DamageCause cause) {
         GamePlayer gamePlayer = getPlayer(player.getUniqueId());
         Entity damager = player.hasMetadata("last_damager") ? Bukkit.getEntity((UUID) player.getMetadata("last_damager").get(0).value()) : null;
-        if(!(damager == null) &&  damager.hasMetadata("game")){
+        if(!(damager == null) && damager instanceof Player){
             score(Bukkit.getPlayer(damager.getUniqueId()));
         }
         switch (cause) {

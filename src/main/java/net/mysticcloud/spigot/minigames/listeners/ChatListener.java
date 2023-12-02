@@ -17,8 +17,8 @@ public class ChatListener implements Listener {
 
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent e) {
-        if (e.getPlayer().hasMetadata("game")) {
-            Game game = (Game) e.getPlayer().getMetadata("game").get(0).value();
+        if (e.getPlayer().getWorld().hasMetadata("game")) {
+            Game game = (Game) e.getPlayer().getWorld().getMetadata("game").get(0).value();
             assert game != null;
             Team team = game.getPlayers().get(e.getPlayer().getUniqueId()).getTeam();
             if (!team.equals(Team.SPECTATOR))
@@ -28,12 +28,12 @@ public class ChatListener implements Listener {
 
         } else {
             for (Player player : Bukkit.getOnlinePlayers())
-                if (!player.hasMetadata("game"))
+                if (!player.getWorld().hasMetadata("game"))
                     player.sendMessage(MessageUtils.colorize("&7" + e.getPlayer().getName() + "&f: &7") + e.getMessage());
 
         }
 
-        Game game = e.getPlayer().hasMetadata("game") ? (Game) e.getPlayer().getMetadata("game").get(0).value() : null;
+        Game game = e.getPlayer().getWorld().hasMetadata("game") ? (Game) e.getPlayer().getWorld().getMetadata("game").get(0).value() : null;
         Game.GamePlayer player = game == null ? null : game.getPlayer(e.getPlayer().getUniqueId());
 
         MessageUtils.log("[CHAT] " +

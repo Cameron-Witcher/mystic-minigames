@@ -54,11 +54,11 @@ public class Game {
         return data;
     }
 
-    public void addNoBuildZone(Location location){
+    public void addNoBuildZone(Location location) {
         noBuildZones.add(location);
     }
 
-    public List<Location> getNoBuildZones(){
+    public List<Location> getNoBuildZones() {
         return noBuildZones;
     }
 
@@ -86,7 +86,6 @@ public class Game {
         if (list) players.remove(uid);
         Player player = Bukkit.getPlayer(uid);
         player.teleport(Bukkit.getWorlds().get(0).getSpawnLocation());
-        player.removeMetadata("game", Utils.getPlugin());
         player.setGameMode(GameMode.SURVIVAL);
         player.getInventory().setContents(inventoryList.get(player.getUniqueId()));
         inventoryList.remove(player.getUniqueId());
@@ -117,7 +116,6 @@ public class Game {
         }
         Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new GenerateRunnable(task, () -> {
             player.teleport(lobby);
-            player.setMetadata("game", new FixedMetadataValue(Utils.getPlugin(), this));
             players.put(player.getUniqueId(), new GamePlayer(player.getUniqueId()));
             sendMessage("&3" + player.getName() + "&e has joined! (&3" + players.size() + "&e/&3" + maxPlayers + "&e)");
             if (players.size() >= minPlayers && !gameState.countdown()) {
@@ -319,6 +317,7 @@ public class Game {
         arena.startGeneration();
         Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new GenerateRunnable(Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new GenerateRunnable(Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
             arena.startGeneration();
+            arena.getWorld().setMetadata("game", new FixedMetadataValue(Utils.getPlugin(), this));
         }, 1), () -> {
             controller.generate();
         }), 1), () -> {

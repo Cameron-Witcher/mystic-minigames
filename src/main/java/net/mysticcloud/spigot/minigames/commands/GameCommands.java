@@ -51,7 +51,7 @@ public class GameCommands implements CommandExecutor {
             }
             if (args[0].equalsIgnoreCase("leave")) {
                 if (sender instanceof Player)
-                    for (MetadataValue metadataValue : ((Player) sender).getMetadata("game")) {
+                    for (MetadataValue metadataValue : ((Player) sender).getWorld().getMetadata("game")) {
                         Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
                             ((Game) metadataValue.value()).removePlayer(((Player) sender).getUniqueId());
                         }, 1);

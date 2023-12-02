@@ -26,8 +26,8 @@ public class ItemListener implements Listener {
 
     @EventHandler
     public void onItemPickup(EntityPickupItemEvent e) {
-        if (e.getEntity().hasMetadata("game")) {
-            for (MetadataValue value : e.getEntity().getMetadata("game")) {
+        if (e.getEntity().getWorld().hasMetadata("game")) {
+            for (MetadataValue value : e.getEntity().getWorld().getMetadata("game")) {
                 Game game = (Game) value.value();
                 Game.GamePlayer player = game.getPlayer(e.getEntity().getUniqueId());
                 if (game instanceof CTW) {

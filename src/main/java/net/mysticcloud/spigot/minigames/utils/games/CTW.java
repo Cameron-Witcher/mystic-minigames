@@ -195,22 +195,15 @@ public class CTW extends Game {
 
         switch (cause) {
             case PROJECTILE:
-                sendMessage((gamePlayer.getTeam().equals(Team.NONE) ? "&3" : gamePlayer.getTeam().chatColor()) + player.getName() + "&e was shot" + (damager == null ? " by a projectile!" : " by " + (getPlayer(damager.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : getPlayer(damager.getUniqueId()).getTeam().chatColor()) + damager.getName() + "&e!&7 (" + Integer.parseInt(CoreUtils.distance(player.getLocation(), damager.getLocation()) + "") + " blocks)"));
+                sendMessage((gamePlayer.getTeam().equals(Team.NONE) ? "&3" : gamePlayer.getTeam().chatColor()) + player.getName() + "&e was shot" + (damager == null ? " by a projectile!" : " by " + (getPlayer(damager.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : getPlayer(damager.getUniqueId()).getTeam().chatColor()) + damager.getName() + "&e!&7 (" + CoreUtils.distance(player.getLocation(), damager.getLocation()).intValue()) + " blocks)");
                 break;
             default:
                 sendMessage((gamePlayer.getTeam().equals(Team.NONE) ? "&3" : gamePlayer.getTeam().chatColor()) + player.getName() + "&e was killed" + (damager == null ? "!" : " by " + (getPlayer(damager.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : getPlayer(damager.getUniqueId()).getTeam().chatColor()) + damager.getName() + "&e!"));
                 break;
         }
         if (player.hasMetadata("flag")) {
-            ItemStack hat = new ItemStack(Material.LEATHER_HELMET);
 
-            LeatherArmorMeta hatMeta = (LeatherArmorMeta) hat.getItemMeta();
-            hatMeta.setColor(gamePlayer.getTeam().getDyeColor());
-            hat.setItemMeta(hatMeta);
-
-            player.getEquipment().setHelmet(hat);
-
-            Team flag = (Team) player.getMetadata("team").get(0).value();
+            Team flag = (Team) player.getMetadata("flag").get(0).value();
 
             dropFlag(flag, ((Location) getData().get(flag.name().toLowerCase() + "_flag")));
             sendMessage(MessageUtils.colorize(gamePlayer.getTeam().chatColor() + "&l" + player.getName() + "&r &ehas dropped the " + flag.chatColor() + "&l" + flag.name() + "&r&e flag!"));

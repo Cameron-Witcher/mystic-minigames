@@ -103,6 +103,7 @@ public class Game {
         BukkitTask task = null;
         if (!generated) {
             player.sendMessage(MessageUtils.prefixes("game") + "Generating world... Please wait.");
+            generate();
         }
         Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new GenerateRunnable(task, () -> {
             player.teleport(lobby);

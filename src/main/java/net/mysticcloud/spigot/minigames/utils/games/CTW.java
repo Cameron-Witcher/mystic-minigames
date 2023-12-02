@@ -160,6 +160,7 @@ public class CTW extends Game {
         item.setVelocity(new Vector(0, 0, 0));
         item.setUnlimitedLifetime(true);
         item.setMetadata("flag", new FixedMetadataValue(Utils.getPlugin(), team));
+        item.setInvulnerable(true);
         flags.put(team, item);
     }
 
@@ -199,7 +200,7 @@ public class CTW extends Game {
     public void kill(Player player, EntityDamageEvent.DamageCause cause) {
         GamePlayer gamePlayer = getPlayer(player.getUniqueId());
         Entity damager = player.hasMetadata("last_damager") ? Bukkit.getEntity((UUID) player.getMetadata("last_damager").get(0).value()) : null;
-        if(!(damager == null) && damager instanceof Player){
+        if (!(damager == null) && damager instanceof Player) {
             score(Bukkit.getPlayer(damager.getUniqueId()));
         }
         switch (cause) {

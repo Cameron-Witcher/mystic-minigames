@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
@@ -33,7 +34,21 @@ public class BlockListener implements Listener {
             for (MetadataValue value : e.getPlayer().getMetadata("game")) {
                 Game game = (Game) value.value();
                 for (Location location : game.getNoBuildZones())
-                    if (CoreUtils.distance(location, e.getBlock().getLocation()) <= 16) {
+                    if (CoreUtils.distance(location, e.getBlock().getLocation()) <= 5) {
+                        e.setCancelled(true);
+                        e.getPlayer().sendMessage(ChatColor.RED + "Sorry, you can't build here.");
+                    }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onBlockPlace(BlockPlaceEvent e) {
+        if (e.getPlayer().hasMetadata("game")) {
+            for (MetadataValue value : e.getPlayer().getMetadata("game")) {
+                Game game = (Game) value.value();
+                for (Location location : game.getNoBuildZones())
+                    if (CoreUtils.distance(location, e.getBlock().getLocation()) <= 5) {
                         e.setCancelled(true);
                         e.getPlayer().sendMessage(ChatColor.RED + "Sorry, you can't build here.");
                     }

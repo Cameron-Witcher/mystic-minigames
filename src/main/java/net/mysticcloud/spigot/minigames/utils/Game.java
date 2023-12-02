@@ -274,7 +274,8 @@ public class Game {
         player.setHealth(player.getHealthScale());
         if (gamePlayer.getLives() > 0) {
             player.setGameMode(GameMode.SPECTATOR);
-            player.teleport(player.getLocation().clone().add(0, Math.abs(player.getLocation().getY()) + 50, 0));
+            if (player.getLocation().getY() < 0)
+                player.teleport(player.getLocation().clone().add(0, Math.abs(player.getLocation().getY()) + 50, 0));
             Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new CountdownRunnable(3, (timer) -> {
                 player.sendTitle("", ChatColor.RED + "Respawning in " + timer + " second" + (timer == 1 ? "" : "s"), 0, 25, 50);
             }, () -> {

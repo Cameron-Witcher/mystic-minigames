@@ -4,6 +4,8 @@ import net.mysticcloud.spigot.core.utils.CoreUtils;
 import net.mysticcloud.spigot.core.utils.MessageUtils;
 import net.mysticcloud.spigot.minigames.MysticMinigames;
 import net.mysticcloud.spigot.minigames.utils.Game;
+import net.mysticcloud.spigot.minigames.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
@@ -70,7 +72,12 @@ public class BlockListener implements Listener {
                     List<Block> remove = new ArrayList<>();
                     for (Block block : e.blockList())
                         if (CoreUtils.distance(block.getLocation(), location) <= 5) remove.add(block);
-                    e.blockList().removeAll(remove);
+//                    e.blockList().removeAll(remove);
+                    Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+                        for (Block block : remove) {
+                            block.getLocation().getBlock().setBlockData(block.getBlockData());
+                        }
+                    }, 2);
                     remove.clear();
                 }
 

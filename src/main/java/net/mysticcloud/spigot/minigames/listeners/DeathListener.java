@@ -7,6 +7,7 @@ import net.mysticcloud.spigot.minigames.utils.Team;
 import net.mysticcloud.spigot.minigames.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -26,15 +27,19 @@ public class DeathListener implements Listener {
 
     @EventHandler
     public void onPlayerDamage(EntityDamageByEntityEvent e) {
-        if (e.getEntity() instanceof Player && e.getEntity().getWorld().hasMetadata("game")) {
-            UUID damager = e.getDamager().getUniqueId();
-            if(e.getDamager() instanceof Projectile && ((Projectile)e.getDamager()).getShooter() instanceof LivingEntity){
-                damager = ((LivingEntity)((Projectile)e.getDamager()).getShooter()).getUniqueId();
+        if (e.getEntity().getWorld().hasMetadata("game")) {
+            if (e.getEntity() instanceof Item && e.getEntity().hasMetadata("flag")) e.setCancelled(true);
+
+            if (e.getEntity() instanceof Player) {
+                UUID damager = e.getDamager().getUniqueId();
+                if (e.getDamager() instanceof Projectile && ((Projectile) e.getDamager()).getShooter() instanceof LivingEntity) {
+                    damager = ((LivingEntity) ((Projectile) e.getDamager()).getShooter()).getUniqueId();
+                }
+                e.getEntity().setMetadata("last_damager", new FixedMetadataValue(Utils.getPlugin(), damager));
+                Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+                    e.getEntity().removeMetadata("last_damager", Utils.getPlugin());
+                }, 5 * 20);
             }
-            e.getEntity().setMetadata("last_damager", new FixedMetadataValue(Utils.getPlugin(), damager));
-            Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
-                e.getEntity().removeMetadata("last_damager", Utils.getPlugin());
-            }, 5 * 20);
         }
     }
 

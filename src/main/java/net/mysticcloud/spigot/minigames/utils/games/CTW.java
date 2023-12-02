@@ -208,7 +208,7 @@ public class CTW extends Game {
                 sendMessage((gamePlayer.getTeam().equals(Team.NONE) ? "&3" : gamePlayer.getTeam().chatColor()) + player.getName() + "&e was shot" + (damager == null ? " by a projectile!" : " by " + (getPlayer(damager.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : getPlayer(damager.getUniqueId()).getTeam().chatColor()) + damager.getName() + "&e!&7 (" + CoreUtils.distance(player.getLocation(), damager.getLocation()).intValue()) + " blocks)");
                 break;
             default:
-                sendMessage((gamePlayer.getTeam().equals(Team.NONE) ? "&3" : gamePlayer.getTeam().chatColor()) + player.getName() + "&e was killed" + (damager == null ? "!" : " by " + (getPlayer(damager.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : getPlayer(damager.getUniqueId()).getTeam().chatColor()) + damager.getName() + "&e!"));
+                sendMessage((gamePlayer.getTeam().equals(Team.NONE) ? "&3" : gamePlayer.getTeam().chatColor()) + player.getName() + "&e was killed" + (damager == null ? "!" : " by " + (damager instanceof Player ? (getPlayer(damager.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : getPlayer(damager.getUniqueId()).getTeam().chatColor()) + damager.getName() : "&7" + damager.getName()) + "&e!"));
                 break;
         }
         if (player.hasMetadata("flag")) {

@@ -3,6 +3,7 @@ package net.mysticcloud.spigot.minigames.utils.games;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.mysticcloud.spigot.core.utils.CoreUtils;
 import net.mysticcloud.spigot.core.utils.MessageUtils;
 import net.mysticcloud.spigot.core.utils.regions.RegionUtils;
 import net.mysticcloud.spigot.minigames.utils.Team;
@@ -191,10 +192,29 @@ public class CTW extends Game {
     public void kill(Player player, EntityDamageEvent.DamageCause cause) {
         GamePlayer gamePlayer = getPlayer(player.getUniqueId());
         Entity damager = player.hasMetadata("last_damager") ? Bukkit.getEntity((UUID) player.getMetadata("last_damager").get(0).value()) : null;
+
         switch (cause) {
+            case PROJECTILE:
+                sendMessage((gamePlayer.getTeam().equals(Team.NONE) ? "&3" : gamePlayer.getTeam().chatColor()) + player.getName() + "&e was shot" + (damager == null ? " by a projectile!" : " by " + (getPlayer(damager.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : getPlayer(damager.getUniqueId()).getTeam().chatColor()) + damager.getName() + "&e!&7 (" + Integer.parseInt(CoreUtils.distance(player.getLocation(), damager.getLocation()) + "") + " blocks)"));
+                break;
             default:
                 sendMessage((gamePlayer.getTeam().equals(Team.NONE) ? "&3" : gamePlayer.getTeam().chatColor()) + player.getName() + "&e was killed" + (damager == null ? "!" : " by " + (getPlayer(damager.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : getPlayer(damager.getUniqueId()).getTeam().chatColor()) + damager.getName() + "&e!"));
                 break;
+        }
+        if (player.hasMetadata("flag")) {
+            ItemStack hat = new ItemStack(Material.LEATHER_HELMET);
+
+            LeatherArmorMeta hatMeta = (LeatherArmorMeta) hat.getItemMeta();
+            hatMeta.setColor(gamePlayer.getTeam().getDyeColor());
+            hat.setItemMeta(hatMeta);
+
+            player.getEquipment().setHelmet(hat);
+
+            Team flag = (Team) player.getMetadata("team").get(0).value();
+
+            dropFlag(flag, ((Location) getData().get(flag.name().toLowerCase() + "_flag")));
+            sendMessage(MessageUtils.colorize(gamePlayer.getTeam().chatColor() + "&l" + player.getName() + "&r &ehas dropped the " + flag.chatColor() + "&l" + flag.name() + "&r&e flag!"));
+            player.removeMetadata("flag", Utils.getPlugin());
         }
         super.kill(player, cause);
     }

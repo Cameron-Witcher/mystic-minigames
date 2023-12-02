@@ -126,8 +126,15 @@ public class Game {
 
     public int score(Player player, int amount) {
         playerScores.put(player.getUniqueId(), getScore(player) + amount);
-        teamScores.put(getPlayer(player.getUniqueId()).getTeam(), getScore(getPlayer(player.getUniqueId()).getTeam()) + amount);
         return playerScores.get(player.getUniqueId());
+    }
+
+    public int score(Team team) {
+        return score(team, 1);
+    }
+
+    public int score(Team team, int amount) {
+        return teamScores.put(team, getScore(team) + amount);
     }
 
     public int getScore(Player player) {

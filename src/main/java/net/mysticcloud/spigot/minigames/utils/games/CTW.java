@@ -192,7 +192,9 @@ public class CTW extends Game {
     public void kill(Player player, EntityDamageEvent.DamageCause cause) {
         GamePlayer gamePlayer = getPlayer(player.getUniqueId());
         Entity damager = player.hasMetadata("last_damager") ? Bukkit.getEntity((UUID) player.getMetadata("last_damager").get(0).value()) : null;
-
+        if(!(damager == null) &&  damager.hasMetadata("game")){
+            score(Bukkit.getPlayer(damager.getUniqueId()));
+        }
         switch (cause) {
             case PROJECTILE:
                 sendMessage((gamePlayer.getTeam().equals(Team.NONE) ? "&3" : gamePlayer.getTeam().chatColor()) + player.getName() + "&e was shot" + (damager == null ? " by a projectile!" : " by " + (getPlayer(damager.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : getPlayer(damager.getUniqueId()).getTeam().chatColor()) + damager.getName() + "&e!&7 (" + CoreUtils.distance(player.getLocation(), damager.getLocation()).intValue()) + " blocks)");
@@ -222,7 +224,7 @@ public class CTW extends Game {
     }
 
     public void captureFlag(Player player, Team flag) {
-        score(player);
+        score(getPlayer(player.getUniqueId()).getTeam());
         GamePlayer gamePlayer = getPlayer(player.getUniqueId());
 
         sendMessage(MessageUtils.colorize(gamePlayer.getTeam().chatColor() + "&l" + player.getName() + "&r &ehas captured the " + flag.chatColor() + "&l" + flag.name() + "&r&e flag! (&7" + getScore(gamePlayer.getTeam()) + "/" + MAX_SCORE + "&e)"));

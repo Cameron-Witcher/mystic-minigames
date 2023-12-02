@@ -113,27 +113,34 @@ public class CTW extends Game {
                         switch (sdata.getString("structure")) {
                             case "spawn:red":
                             case "ctw:red_spawn":
+                                addNoBuildZone(bloc);
                                 addSpawn(new Spawn(bloc, Team.RED));
                                 break;
                             case "spawn:blue":
                             case "ctw:blue_spawn":
+                                addNoBuildZone(bloc);
                                 addSpawn(new Spawn(bloc, Team.BLUE));
                                 break;
                             case "spawn:green":
+                                addNoBuildZone(bloc);
                                 addSpawn(new Spawn(bloc, Team.GREEN));
                                 break;
                             case "spawn:yellow":
+                                addNoBuildZone(bloc);
                                 addSpawn(new Spawn(bloc, Team.YELLOW));
                                 break;
                             case "spawn:none":
                             case "location:spawn":
+                                addNoBuildZone(bloc);
                                 addSpawn(new Spawn(bloc, Team.NONE));
                                 break;
                             case "ctw:red_flag":
+                                addNoBuildZone(bloc);
                                 getData().put("red_flag", bloc);
                                 bloc.getBlock().setType(Material.OAK_FENCE);
                                 break;
                             case "ctw:blue_flag":
+                                addNoBuildZone(bloc);
                                 getData().put("blue_flag", bloc);
                                 bloc.getBlock().setType(Material.OAK_FENCE);
                                 break;

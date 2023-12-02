@@ -20,6 +20,7 @@ import org.json2.JSONObject;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.Array;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -36,6 +37,7 @@ public class Game {
     private GameController controller = null;
     private boolean generated = false;
     private Location lobby = null;
+    private List<Location> noBuildZones = new ArrayList<>();
 
 
     private Map<UUID, ItemStack[]> inventoryList = new HashMap<>();
@@ -50,6 +52,14 @@ public class Game {
 
     public JSONObject getData() {
         return data;
+    }
+
+    public void addNoBuildZone(Location location){
+        noBuildZones.add(location);
+    }
+
+    public List<Location> getNoBuildZones(){
+        return noBuildZones;
     }
 
     protected void setTeams(int i) {

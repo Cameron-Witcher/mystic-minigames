@@ -203,14 +203,20 @@ public class CTW extends Game {
         if (!(damager == null) && damager instanceof Player) {
             score(Bukkit.getPlayer(damager.getUniqueId()));
         }
+        String victim = (gamePlayer.getTeam().equals(Team.NONE) ? "&3" : gamePlayer.getTeam().chatColor()) + player.getName();
+        String action = " was killed";
+        String ending = "!";
         switch (cause) {
             case PROJECTILE:
-                sendMessage((gamePlayer.getTeam().equals(Team.NONE) ? "&3" : gamePlayer.getTeam().chatColor()) + player.getName() + "&e was shot" + (damager == null ? " by a projectile!" : " by " + (getPlayer(damager.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : getPlayer(damager.getUniqueId()).getTeam().chatColor()) + damager.getName() + "&e!&7 (" + CoreUtils.distance(player.getLocation(), damager.getLocation()).intValue()) + " blocks)");
+                action = " was shot";
+                ending = (damager == null ? " by a projectile!" : " by " + (Bukkit.getEntity(damager.getUniqueId()) instanceof Player ? (getPlayer(damager.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : getPlayer(damager.getUniqueId()).getTeam().chatColor()) : "&7") + damager.getName() + "&e!&7 (" + CoreUtils.distance(player.getLocation(), damager.getLocation()).intValue() + " blocks)");
+
                 break;
             default:
                 sendMessage((gamePlayer.getTeam().equals(Team.NONE) ? "&3" : gamePlayer.getTeam().chatColor()) + player.getName() + "&e was killed" + (damager == null ? "!" : " by " + (damager instanceof Player ? (getPlayer(damager.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : getPlayer(damager.getUniqueId()).getTeam().chatColor()) + damager.getName() : "&7" + damager.getName()) + "&e!"));
                 break;
         }
+        sendMessage("&3" + victim + "&e" + action + ending);
         if (player.hasMetadata("flag")) {
 
             Team flag = (Team) player.getMetadata("flag").get(0).value();

@@ -17,6 +17,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.UUID;
 
@@ -35,10 +36,16 @@ public class DeathListener implements Listener {
                 if (e.getDamager() instanceof Projectile && ((Projectile) e.getDamager()).getShooter() instanceof LivingEntity) {
                     damager = ((LivingEntity) ((Projectile) e.getDamager()).getShooter()).getUniqueId();
                 }
-                e.getEntity().setMetadata("last_damager", new FixedMetadataValue(Utils.getPlugin(), damager));
-                Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+                if (e.getEntity().hasMetadata("last_damager")) {
                     e.getEntity().removeMetadata("last_damager", Utils.getPlugin());
-                }, 5 * 20);
+                    Bukkit.getScheduler().cancelTask(((BukkitTask) e.getEntity().getMetadata("last_damager_timer").get(0).value()).getTaskId());
+                    e.getEntity().removeMetadata("last_damager_timer", Utils.getPlugin());
+                }
+                e.getEntity().setMetadata("last_damager", new FixedMetadataValue(Utils.getPlugin(), damager));
+                e.getEntity().setMetadata("last_damager_timer", new FixedMetadataValue(Utils.getPlugin(), Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+                    e.getEntity().removeMetadata("last_damager", Utils.getPlugin());
+                    e.getEntity().removeMetadata("last_damager_timer", Utils.getPlugin());
+                }, 7 * 20)));
             }
         }
     }

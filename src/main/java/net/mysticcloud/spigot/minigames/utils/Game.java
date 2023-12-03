@@ -1,5 +1,6 @@
 package net.mysticcloud.spigot.minigames.utils;
 
+import jdk.internal.org.objectweb.asm.tree.InsnList;
 import net.mysticcloud.spigot.core.utils.CoreUtils;
 import net.mysticcloud.spigot.core.utils.MessageUtils;
 import net.mysticcloud.spigot.core.utils.regions.RegionUtils;
@@ -307,11 +308,15 @@ public class Game {
         player.getInventory().clear();
         GamePlayer gamePlayer = getPlayer(player.getUniqueId());
         player.setHealth(player.getHealthScale());
-        for (Spawn spawn : spawns)
-            if (spawn.getTeam().equals(gamePlayer.getTeam())) {
-                player.teleport(spawn.getLocation());
-                break;
-            }
+        List<Spawn> spawns = getSpawns(gamePlayer.getTeam());
+        player.teleport(spawns.get(new Random().nextInt(spawns.size())).getLocation());
+    }
+
+    private List<Spawn> getSpawns(Team team) {
+        List<Spawn> spawns = new ArrayList<>();
+        for (Spawn spawn : Game.this.spawns)
+            if (spawn.getTeam().equals(team)) spawns.add(spawn);
+        return spawns;
     }
 
     public void generate() {

@@ -36,23 +36,24 @@ public class DeathListener implements Listener {
                 if (e.getEntity() instanceof Item && e.getEntity().hasMetadata("flag")) e.setCancelled(true);
 
                 if (e.getEntity() instanceof Player) {
-                    UUID damager = e.getDamager().getUniqueId();
-                    if (e.getDamager() instanceof Projectile && ((Projectile) e.getDamager()).getShooter() instanceof LivingEntity) {
-                        damager = ((LivingEntity) ((Projectile) e.getDamager()).getShooter()).getUniqueId();
-                        if(game instanceof OITQ){
-                            e.setDamage(50);
-                        }
-                    }
                     if (e.getEntity().hasMetadata("last_damager")) {
                         e.getEntity().removeMetadata("last_damager", Utils.getPlugin());
                         Bukkit.getScheduler().cancelTask(((BukkitTask) e.getEntity().getMetadata("last_damager_timer").get(0).value()).getTaskId());
                         e.getEntity().removeMetadata("last_damager_timer", Utils.getPlugin());
                     }
-                    e.getEntity().setMetadata("last_damager", new FixedMetadataValue(Utils.getPlugin(), damager));
+                    e.getEntity().setMetadata("last_damager", new FixedMetadataValue(Utils.getPlugin(), (e.getDamager() instanceof Projectile && ((Projectile) e.getDamager()).getShooter() instanceof LivingEntity ? ((LivingEntity) ((Projectile) e.getDamager()).getShooter()).getUniqueId() : e.getDamager().getUniqueId())));
                     e.getEntity().setMetadata("last_damager_timer", new FixedMetadataValue(Utils.getPlugin(), Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
                         e.getEntity().removeMetadata("last_damager", Utils.getPlugin());
                         e.getEntity().removeMetadata("last_damager_timer", Utils.getPlugin());
                     }, 7 * 20)));
+
+                    if (e.getDamager() instanceof Projectile) {
+                        if(game instanceof OITQ){
+                            e.setDamage(50);
+                            e.getDamager().remove();
+
+                        }
+                    }
                 }
             }
         }

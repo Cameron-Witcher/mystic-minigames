@@ -199,9 +199,9 @@ public class CTW extends Game {
     @Override
     public void kill(Player player, EntityDamageEvent.DamageCause cause) {
         GamePlayer gamePlayer = getPlayer(player.getUniqueId());
-        Entity damager = player.hasMetadata("last_damager") ? Bukkit.getEntity((UUID) player.getMetadata("last_damager").get(0).value()) : null;
-        if (!(damager == null) && damager instanceof Player) {
-            score(Bukkit.getPlayer(damager.getUniqueId()));
+        Entity entity = player.hasMetadata("last_damager") ? Bukkit.getEntity((UUID) player.getMetadata("last_damager").get(0).value()) : null;
+        if (!(entity == null) && entity instanceof Player) {
+            score(Bukkit.getPlayer(entity.getUniqueId()));
         }
         String victim = (gamePlayer.getTeam().equals(Team.NONE) ? "&3" : gamePlayer.getTeam().chatColor()) + player.getName();
         String action = " was killed";
@@ -209,11 +209,28 @@ public class CTW extends Game {
         switch (cause) {
             case PROJECTILE:
                 action = " was shot";
-                ending = (damager == null ? " by a projectile!" : " by " + (Bukkit.getEntity(damager.getUniqueId()) instanceof Player ? (getPlayer(damager.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : getPlayer(damager.getUniqueId()).getTeam().chatColor()) : "&7") + damager.getName() + "&e!&7 (" + CoreUtils.distance(player.getLocation(), damager.getLocation()).intValue() + " blocks)");
-
+                ending = (entity == null ? " by a projectile!" : " by " + (Bukkit.getEntity(entity.getUniqueId()) instanceof Player ? (getPlayer(entity.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : getPlayer(entity.getUniqueId()).getTeam().chatColor()) : "&7") + entity.getName() + "&e!&7 (" + CoreUtils.distance(player.getLocation(), entity.getLocation()).intValue() + " blocks)");
+                break;
+            case VOID:
+                action = " fell out of the world";
+                ending = ".";
+                if (entity != null) {
+                    Player killer = (Player) entity;
+                    action = " was pushed over the edge";
+                    ending = " by " + (getPlayer(killer.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : getPlayer(killer.getUniqueId()).getTeam().chatColor()) + entity.getName() + "&e.";
+                }
                 break;
             default:
-                sendMessage((gamePlayer.getTeam().equals(Team.NONE) ? "&3" : gamePlayer.getTeam().chatColor()) + player.getName() + "&e was killed" + (damager == null ? "!" : " by " + (damager instanceof Player ? (getPlayer(damager.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : getPlayer(damager.getUniqueId()).getTeam().chatColor()) + damager.getName() : "&7" + damager.getName()) + "&e!"));
+                if (entity != null) {
+                    ending = " by &7" + entity.getName() + "&e.";
+                    if (entity instanceof Player) {
+                        Player killer = (Player) entity;
+                        if (killer.getEquipment() != null && killer.getEquipment().getItemInMainHand().getType().name().endsWith("_AXE")) {
+                            action = " was decapitated";
+                        }
+                        ending = " by " + (getPlayer(killer.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : getPlayer(killer.getUniqueId()).getTeam().chatColor()) + entity.getName() + "&e.";
+                    }
+                }
                 break;
         }
         sendMessage("&3" + victim + "&e" + action + ending);

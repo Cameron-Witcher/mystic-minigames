@@ -16,6 +16,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
@@ -26,6 +27,19 @@ import java.util.UUID;
 public class DeathListener implements Listener {
     public DeathListener(MysticMinigames plugin) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
+    }
+
+
+    @EventHandler
+    public void onProjectileHit(ProjectileHitEvent e) {
+        if (e.getEntity().getWorld().hasMetadata("game")) {
+            for (MetadataValue data : e.getEntity().getWorld().getMetadata("game")) {
+                Game game = (Game) data.value();
+                if (game instanceof OITQ) {
+                    e.getEntity().remove();
+                }
+            }
+        }
     }
 
     @EventHandler
@@ -48,7 +62,7 @@ public class DeathListener implements Listener {
                     }, 7 * 20)));
 
                     if (e.getDamager() instanceof Projectile) {
-                        if(game instanceof OITQ){
+                        if (game instanceof OITQ) {
                             e.setDamage(50);
                             e.getDamager().remove();
 

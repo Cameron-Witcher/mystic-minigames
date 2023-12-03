@@ -5,6 +5,7 @@ import net.mysticcloud.spigot.minigames.MysticMinigames;
 import net.mysticcloud.spigot.minigames.utils.Game;
 import net.mysticcloud.spigot.minigames.utils.Team;
 import net.mysticcloud.spigot.minigames.utils.Utils;
+import net.mysticcloud.spigot.minigames.utils.games.OITQ;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Item;
@@ -17,6 +18,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.UUID;
@@ -29,23 +31,29 @@ public class DeathListener implements Listener {
     @EventHandler
     public void onPlayerDamage(EntityDamageByEntityEvent e) {
         if (e.getEntity().getWorld().hasMetadata("game")) {
-            if (e.getEntity() instanceof Item && e.getEntity().hasMetadata("flag")) e.setCancelled(true);
+            for (MetadataValue data : e.getEntity().getWorld().getMetadata("game")) {
+                Game game = (Game) data.value();
+                if (e.getEntity() instanceof Item && e.getEntity().hasMetadata("flag")) e.setCancelled(true);
 
-            if (e.getEntity() instanceof Player) {
-                UUID damager = e.getDamager().getUniqueId();
-                if (e.getDamager() instanceof Projectile && ((Projectile) e.getDamager()).getShooter() instanceof LivingEntity) {
-                    damager = ((LivingEntity) ((Projectile) e.getDamager()).getShooter()).getUniqueId();
+                if (e.getEntity() instanceof Player) {
+                    UUID damager = e.getDamager().getUniqueId();
+                    if (e.getDamager() instanceof Projectile && ((Projectile) e.getDamager()).getShooter() instanceof LivingEntity) {
+                        damager = ((LivingEntity) ((Projectile) e.getDamager()).getShooter()).getUniqueId();
+                        if(game instanceof OITQ){
+                            e.setDamage(50);
+                        }
+                    }
+                    if (e.getEntity().hasMetadata("last_damager")) {
+                        e.getEntity().removeMetadata("last_damager", Utils.getPlugin());
+                        Bukkit.getScheduler().cancelTask(((BukkitTask) e.getEntity().getMetadata("last_damager_timer").get(0).value()).getTaskId());
+                        e.getEntity().removeMetadata("last_damager_timer", Utils.getPlugin());
+                    }
+                    e.getEntity().setMetadata("last_damager", new FixedMetadataValue(Utils.getPlugin(), damager));
+                    e.getEntity().setMetadata("last_damager_timer", new FixedMetadataValue(Utils.getPlugin(), Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+                        e.getEntity().removeMetadata("last_damager", Utils.getPlugin());
+                        e.getEntity().removeMetadata("last_damager_timer", Utils.getPlugin());
+                    }, 7 * 20)));
                 }
-                if (e.getEntity().hasMetadata("last_damager")) {
-                    e.getEntity().removeMetadata("last_damager", Utils.getPlugin());
-                    Bukkit.getScheduler().cancelTask(((BukkitTask) e.getEntity().getMetadata("last_damager_timer").get(0).value()).getTaskId());
-                    e.getEntity().removeMetadata("last_damager_timer", Utils.getPlugin());
-                }
-                e.getEntity().setMetadata("last_damager", new FixedMetadataValue(Utils.getPlugin(), damager));
-                e.getEntity().setMetadata("last_damager_timer", new FixedMetadataValue(Utils.getPlugin(), Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
-                    e.getEntity().removeMetadata("last_damager", Utils.getPlugin());
-                    e.getEntity().removeMetadata("last_damager_timer", Utils.getPlugin());
-                }, 7 * 20)));
             }
         }
     }

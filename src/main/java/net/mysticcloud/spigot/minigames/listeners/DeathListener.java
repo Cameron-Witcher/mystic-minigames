@@ -8,10 +8,7 @@ import net.mysticcloud.spigot.minigames.utils.Utils;
 import net.mysticcloud.spigot.minigames.utils.games.OITQ;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -47,6 +44,7 @@ public class DeathListener implements Listener {
         if (e.getEntity().getWorld().hasMetadata("game")) {
             for (MetadataValue data : e.getEntity().getWorld().getMetadata("game")) {
                 Game game = (Game) data.value();
+                if (e.getDamager() instanceof Firework && e.getDamager().hasMetadata("game")) e.setCancelled(true);
                 if (e.getEntity() instanceof Item && e.getEntity().hasMetadata("flag")) e.setCancelled(true);
 
                 if (e.getEntity() instanceof Player) {

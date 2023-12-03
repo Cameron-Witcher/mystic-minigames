@@ -10,12 +10,10 @@ import net.mysticcloud.spigot.minigames.utils.Team;
 import net.mysticcloud.spigot.minigames.utils.Utils;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
 import net.mysticcloud.spigot.minigames.utils.Game;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Structure;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -201,7 +199,11 @@ public class CTW extends Game {
         GamePlayer gamePlayer = getPlayer(player.getUniqueId());
         Entity entity = player.hasMetadata("last_damager") ? Bukkit.getEntity((UUID) player.getMetadata("last_damager").get(0).value()) : null;
         if (!(entity == null) && entity instanceof Player) {
-            score(Bukkit.getPlayer(entity.getUniqueId()));
+            Player killer = Bukkit.getPlayer(entity.getUniqueId());
+            score(killer);
+            killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1f, 1.5f);
+            killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1f, 1.11f);
+            killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1f, 0.95f);
         }
         String victim = (gamePlayer.getTeam().equals(Team.NONE) ? "&3" : gamePlayer.getTeam().chatColor()) + player.getName();
         String action = " was killed";
@@ -242,6 +244,8 @@ public class CTW extends Game {
             sendMessage(MessageUtils.colorize(gamePlayer.getTeam().chatColor() + "&l" + player.getName() + "&r &ehas dropped the " + flag.chatColor() + "&l" + flag.name() + "&r&e flag!"));
             player.removeMetadata("flag", Utils.getPlugin());
         }
+        Firework rocket = spawnFirework(player.getLocation(), FireworkEffect.builder().flicker(true).with(FireworkEffect.Type.BALL).withColor(gamePlayer.getTeam().getDyeColor()).build());
+        rocket.detonate();
         super.kill(player, cause);
     }
 

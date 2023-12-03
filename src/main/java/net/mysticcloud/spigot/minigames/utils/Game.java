@@ -4,9 +4,11 @@ import net.mysticcloud.spigot.core.utils.MessageUtils;
 import net.mysticcloud.spigot.core.utils.regions.RegionUtils;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
 import org.bukkit.*;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitTask;
 import org.json2.JSONArray;
@@ -281,6 +283,7 @@ public class Game {
 
     private void setSpectator(Player player) {
         player.setGameMode(GameMode.SPECTATOR);
+        player.getWorld().strikeLightningEffect(player.getLocation());
         getPlayer(player.getUniqueId()).setTeam(Team.SPECTATOR);
         if (player.getLocation().getY() < 0)
             player.teleport(player.getLocation().clone().add(0, Math.abs(player.getLocation().getY()) + 50, 0));
@@ -342,6 +345,16 @@ public class Game {
                 }
             }
         }
+    }
+
+    protected Firework spawnFirework(Location loc, FireworkEffect effect) {
+        Firework rocket = loc.getWorld().spawn(loc, Firework.class);
+        FireworkMeta meta = rocket.getFireworkMeta();
+        meta.clearEffects();
+        meta.addEffect(effect);
+        rocket.setFireworkMeta(meta);
+        rocket.setMetadata("game", new FixedMetadataValue(Utils.getPlugin(), this));
+        return rocket;
     }
 
     public class Spawn {

@@ -10,16 +10,15 @@ import net.mysticcloud.spigot.minigames.utils.Team;
 import net.mysticcloud.spigot.minigames.utils.Utils;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
 import net.mysticcloud.spigot.minigames.utils.Game;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Structure;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -119,11 +118,15 @@ public class OITQ extends Game {
 
     @Override
     public void kill(Player player, EntityDamageEvent.DamageCause cause) {
+
         GamePlayer gamePlayer = getPlayer(player.getUniqueId());
         Entity entity = player.hasMetadata("last_damager") ? Bukkit.getEntity((UUID) player.getMetadata("last_damager").get(0).value()) : null;
         if (entity instanceof Player) {
             Player killer = Bukkit.getPlayer(entity.getUniqueId());
             score(killer);
+            killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1f, 1.5f);
+            killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1f, 1.11f);
+            killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1f, 0.95f);
             assert killer != null;
             if(!killer.getInventory().contains(Material.ARROW))
                 killer.getInventory().addItem(new ItemStack(Material.ARROW));
@@ -159,6 +162,8 @@ public class OITQ extends Game {
                 break;
         }
         sendMessage("&3" + victim + "&e" + action + ending);
+        Firework rocket = spawnFirework(player.getLocation(), FireworkEffect.builder().flicker(true).with(FireworkEffect.Type.BALL).withColor(Color.RED).build());
+        rocket.detonate();
         super.kill(player, cause);
     }
 }

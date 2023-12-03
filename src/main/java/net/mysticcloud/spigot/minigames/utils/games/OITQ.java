@@ -57,7 +57,7 @@ public class OITQ extends Game {
                 if (!getGameState().hasStarted()) return false;
                 players.clear();
                 for (GamePlayer player : getPlayers().values()) {
-                    if (player.getTeam().equals(Team.NONE) || player.getTeam().equals(Team.SPECTATOR)) continue;
+                    if (player.getTeam().equals(Team.SPECTATOR)) continue;
                     if (getScore(player.getTeam()) >= MAX_SCORE) return true;
                     Bukkit.getPlayer(player.getUUID()).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + "Lives: " + player.getLives() + " | Team Score: " + getScore(player.getTeam()) + "/" + MAX_SCORE));
                     players.add(player.getUUID());

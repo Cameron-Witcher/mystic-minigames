@@ -125,7 +125,7 @@ public class OITQ extends Game {
             Player killer = Bukkit.getPlayer(entity.getUniqueId());
             score(killer);
             assert killer != null;
-            if(killer.getInventory().contains(Material.ARROW))
+            if(!killer.getInventory().contains(Material.ARROW))
                 killer.getInventory().addItem(new ItemStack(Material.ARROW));
         }
         String victim = (gamePlayer.getTeam().equals(Team.NONE) ? "&3" : gamePlayer.getTeam().chatColor()) + player.getName();

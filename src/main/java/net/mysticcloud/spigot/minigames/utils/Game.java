@@ -1,27 +1,17 @@
 package net.mysticcloud.spigot.minigames.utils;
 
-import jdk.internal.org.objectweb.asm.tree.InsnList;
-import net.mysticcloud.spigot.core.utils.CoreUtils;
 import net.mysticcloud.spigot.core.utils.MessageUtils;
 import net.mysticcloud.spigot.core.utils.regions.RegionUtils;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
 import org.bukkit.*;
-import org.bukkit.block.Block;
-import org.bukkit.block.Structure;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.util.Vector;
 import org.json2.JSONArray;
 import org.json2.JSONObject;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.sql.Array;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 

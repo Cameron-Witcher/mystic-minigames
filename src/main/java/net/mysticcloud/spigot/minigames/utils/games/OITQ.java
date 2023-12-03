@@ -114,15 +114,19 @@ public class OITQ extends Game {
     @Override
     protected void spawnPlayer(Player player) {
         super.spawnPlayer(player);
-        player.getInventory().addItem(new ItemStack(Material.BOW), new ItemStack(Material.ARROW));
+        player.getInventory().addItem(new ItemStack(Material.BOW), new ItemStack(Material.WOODEN_SWORD), new ItemStack(Material.ARROW));
     }
 
     @Override
     public void kill(Player player, EntityDamageEvent.DamageCause cause) {
         GamePlayer gamePlayer = getPlayer(player.getUniqueId());
         Entity entity = player.hasMetadata("last_damager") ? Bukkit.getEntity((UUID) player.getMetadata("last_damager").get(0).value()) : null;
-        if (!(entity == null) && entity instanceof Player) {
-            score(Bukkit.getPlayer(entity.getUniqueId()));
+        if (entity instanceof Player) {
+            Player killer = Bukkit.getPlayer(entity.getUniqueId());
+            score(killer);
+            assert killer != null;
+            if(killer.getInventory().contains(Material.ARROW))
+                killer.getInventory().addItem(new ItemStack(Material.ARROW));
         }
         String victim = (gamePlayer.getTeam().equals(Team.NONE) ? "&3" : gamePlayer.getTeam().chatColor()) + player.getName();
         String action = " was killed";

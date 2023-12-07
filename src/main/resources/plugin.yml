@@ -8,3 +8,5 @@ main: net.mysticcloud.spigot.minigames.MysticMinigames
 commands:
   game:
     description: Game command
+  arena:
+    description: Arena command.

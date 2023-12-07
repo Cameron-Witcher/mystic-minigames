@@ -118,6 +118,11 @@ public class Arena {
         this.data = data;
     }
 
+    public void delete() {
+        CoreUtils.deleteWorld(world.getWorldFolder());
+        world = null;
+    }
+
     public static class Spawn {
         Location location;
         Team team;

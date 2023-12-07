@@ -8,6 +8,8 @@ import net.mysticcloud.spigot.minigames.utils.GameManager;
 import net.mysticcloud.spigot.minigames.utils.Utils;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.UUID;
+
 
 public class MysticMinigames extends JavaPlugin {
 
@@ -30,7 +32,11 @@ public class MysticMinigames extends JavaPlugin {
     public void onDisable() {
 
         for (Game game : GameManager.getGames().values()) {
-            game.end();
+
+            for (UUID uid : game.getPlayers().keySet()) {
+                game.removePlayer(uid, false);
+            }
+            game.getArena().delete();
             GameManager.saveGame(game);
         }
 

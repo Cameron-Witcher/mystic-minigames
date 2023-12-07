@@ -298,15 +298,13 @@ public class Game {
 
 
     public void generate() {
-        Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new GenerateRunnable(Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
-            arena.startGeneration();
-            Bukkit.broadcastMessage("Arena generated.");
-            arena.getWorld().setMetadata("game", new FixedMetadataValue(Utils.getPlugin(), this));
-        }, 1), () -> {
-            controller.generate();
-            Bukkit.broadcastMessage("Controller generated.");
-        }), 1);
+        arena.startGeneration();
+        Bukkit.broadcastMessage("Arena generated.");
+        arena.getWorld().setMetadata("game", new FixedMetadataValue(Utils.getPlugin(), this));
+        controller.generate();
+        Bukkit.broadcastMessage("Controller generated.");
         generated = true;
+
     }
 
     protected Firework spawnFirework(Location loc, FireworkEffect effect) {

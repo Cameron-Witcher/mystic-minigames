@@ -11,7 +11,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitTask;
-import org.json2.JSONArray;
 import org.json2.JSONObject;
 
 import java.util.*;
@@ -25,10 +24,11 @@ public class Game {
     private final Map<UUID, Integer> playerScores = new HashMap<>();
     private final Map<Team, Integer> teamScores = new HashMap<>();
     private final Map<UUID, GamePlayer> players = new HashMap<>();
+    private final List<Location> noBuildZones = new ArrayList<>();
     private int teams = 0, minPlayers = 2, maxPlayers = 10;
     private GameController controller = null;
     private boolean generated = false;
-    private List<Location> noBuildZones = new ArrayList<>();
+
 
 
     private Map<UUID, ItemStack[]> inventoryList = new HashMap<>();
@@ -95,6 +95,7 @@ public class Game {
         teamScores.clear();
         playerScores.clear();
         arena.delete();
+
         generated = false;
         gameState.reset();
         noBuildZones.clear();

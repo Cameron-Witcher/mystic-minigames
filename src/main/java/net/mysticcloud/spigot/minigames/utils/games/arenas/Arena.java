@@ -64,7 +64,7 @@ public class Arena {
         CoreUtils.copyWorld(masterWorld, newWorld);
 
         WorldCreator wc = new WorldCreator(newWorld.getName());
-        wc.generator(new EmptyChunkGenerator());
+//        wc.generator(new EmptyChunkGenerator());
 
         world = Bukkit.getServer().createWorld(wc);
     }

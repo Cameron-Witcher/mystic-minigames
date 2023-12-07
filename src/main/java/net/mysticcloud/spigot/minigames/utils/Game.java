@@ -83,15 +83,24 @@ public class Game {
 
     public void end() {
 
+        Bukkit.broadcastMessage("Ending game 1");
+
         controller.end();
+
+        Bukkit.broadcastMessage("Ending game 2");
 
         for (UUID uid : players.keySet()) {
             removePlayer(uid, false);
         }
+        Bukkit.broadcastMessage("Ending game 3");
         players.clear();
+        Bukkit.broadcastMessage("Ending game 4");
         close();
+        Bukkit.broadcastMessage("Ending game 5");
         GameManager.removeGame(gameName + "-" + arena.getName());
+        Bukkit.broadcastMessage("Ending game 6");
         GameManager.createGame(gameName, arena, teams, data);
+        Bukkit.broadcastMessage("Ending game 7");
     }
 
     public boolean addPlayer(UUID uid) {
@@ -214,8 +223,13 @@ public class Game {
     }
 
     public void startGame() {
+        for(GamePlayer player : players.values()){
+            teamScores.put(player.getTeam(),0);
+            playerScores.put(player.getUUID(),0);
+        }
         gameState.hasStarted(true);
         controller.start();
+
     }
 
 

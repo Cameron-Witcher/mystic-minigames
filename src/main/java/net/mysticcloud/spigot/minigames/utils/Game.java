@@ -100,11 +100,13 @@ public class Game {
         Player player = Bukkit.getPlayer(uid);
         inventoryList.put(uid, player.getInventory().getContents());
         BukkitTask task = null;
-        if (!generated) {
-            player.sendMessage(MessageUtils.prefixes("game") + "Generating world... Please wait.");
-            generate();
-        }
-        Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new GenerateRunnable(task, () -> {
+
+        Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new GenerateRunnable(Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+            if (!generated) {
+                player.sendMessage(MessageUtils.prefixes("game") + "Generating world... Please wait.");
+                generate();
+            }
+        }, 0), () -> {
             List<Arena.Spawn> spawns = arena.getSpawns(Team.SPECTATOR);
             player.teleport(spawns.get(new Random().nextInt(spawns.size())).getLocation());
             players.put(player.getUniqueId(), new GamePlayer(player.getUniqueId()));
@@ -315,8 +317,6 @@ public class Game {
         rocket.setMetadata("game", new FixedMetadataValue(Utils.getPlugin(), this));
         return rocket;
     }
-
-
 
 
     public class GameState {

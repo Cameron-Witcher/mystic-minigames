@@ -38,7 +38,6 @@ public class Game {
         this.gameName = gameName;
         this.arena = arena;
         arena.setGame(this);
-        generate();
     }
 
     public JSONObject getData() {

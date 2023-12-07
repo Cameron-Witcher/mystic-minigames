@@ -57,7 +57,7 @@ public class GameManager {
         if (file.exists()) {
             file.delete();
             try {
-                MessageUtils.log("Region file creation: " + (file.createNewFile() ? "success" : "FAILED."));
+                file.createNewFile();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

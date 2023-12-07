@@ -83,6 +83,7 @@ public class Game {
 
     public void end() {
 
+        Bukkit.broadcastMessage("Ending game");
 
 
         controller.end();

@@ -75,7 +75,7 @@ public class Arena {
     }
 
     public void addSpawn(Location loc, Team team) {
-        getSpawns();
+        checkSpawns();
         JSONObject obj = new JSONObject("{}");
         obj.put("team", team.name());
         obj.put("location", Utils.encryptLocation(loc));
@@ -84,12 +84,16 @@ public class Arena {
 
     public List<Spawn> getSpawns() {
         List<Spawn> spawns = new ArrayList<>();
-        if (!data.has("spawns")) data.put("spawns", new JSONArray());
+        checkSpawns();
         for (int i = 0; i < data.getJSONArray("spawns").length(); i++) {
             JSONObject spawnData = data.getJSONArray("spawns").getJSONObject(i);
             spawns.add(new Spawn(Utils.decryptLocation(world, spawnData.getJSONObject("location")), spawnData.has("team") ? Team.valueOf(spawnData.getString("team").toUpperCase()) : Team.NONE));
         }
         return spawns;
+    }
+
+    private void checkSpawns() {
+        if (!data.has("spawns")) data.put("spawns", new JSONArray());
     }
 
     public List<Spawn> getSpawns(Team team) {

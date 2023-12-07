@@ -1,6 +1,7 @@
 package net.mysticcloud.spigot.minigames.utils.games.arenas;
 
 import net.mysticcloud.spigot.minigames.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -15,7 +16,7 @@ public class ArenaManager {
 
     public static void registerArenas() {
         //loop thru all arena files, save them to arena object, save arena object to map under file name
-        for (File file : Utils.getPlugin().getDataFolder().getParentFile().getParentFile().listFiles()) {
+        for (File file : Bukkit.getServer().getWorlds().get(0).getWorldFolder().getParentFile().listFiles()) {
             if (file.isDirectory()) {
                 for (File file1 : file.listFiles()) {
                     if (file1.getName().endsWith(".arena")) {

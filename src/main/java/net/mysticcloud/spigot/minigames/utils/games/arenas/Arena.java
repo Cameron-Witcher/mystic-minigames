@@ -64,7 +64,7 @@ public class Arena {
     }
 
     public void startGeneration() {
-        File newWorld = new File(new Date().getTime() + "");
+        File newWorld = new File(name);
         newWorld.mkdirs();
         CoreUtils.copyWorld(masterWorld, newWorld);
 

@@ -2,6 +2,7 @@ package net.mysticcloud.spigot.minigames.utils;
 
 import net.mysticcloud.spigot.core.utils.CoreUtils;
 import net.mysticcloud.spigot.minigames.MysticMinigames;
+import net.mysticcloud.spigot.minigames.utils.games.arenas.ArenaManager;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.json2.JSONObject;
@@ -12,6 +13,7 @@ public class Utils {
 
     public static void init(MysticMinigames mainClass) {
         plugin = mainClass;
+        ArenaManager.registerArenas();
         GameManager.init();
 
         CoreUtils.addPalpitation(() -> {

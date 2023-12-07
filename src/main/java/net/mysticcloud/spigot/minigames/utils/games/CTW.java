@@ -12,6 +12,8 @@ import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
 import net.mysticcloud.spigot.minigames.utils.Game;
 import org.bukkit.*;
 import org.bukkit.block.Structure;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Item;
@@ -24,6 +26,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 import org.json2.JSONArray;
 import org.json2.JSONObject;
+import org.yaml.snakeyaml.Yaml;
 
 import java.util.*;
 
@@ -94,60 +97,26 @@ public class CTW extends Game {
 
             @Override
             public void generate() {
-                JSONArray save = RegionUtils.getSave(arena.getName());
-                Location loc = new Location(arena.getWorld(), 0, 0, 0);
-                int length = 0, width = 0, height = 0;
-                for (int i = 0; i < save.length(); i++) {
-                    JSONObject data = save.getJSONObject(i);
-                    if (data.getInt("x") > length) length = data.getInt("x");
-                    if (data.getInt("y") > height) height = data.getInt("y");
-                    if (data.getInt("z") > width) width = data.getInt("z");
-
-                    if (!Bukkit.createBlockData(data.getString("data")).getMaterial().equals(Material.STRUCTURE_BLOCK)) {
-                        loc.clone().add(data.getInt("x"), data.getInt("y"), data.getInt("z")).getBlock().setBlockData(Bukkit.createBlockData(data.getString("data")));
-                    } else {
-                        Location bloc = loc.clone().add(data.getInt("x"), data.getInt("y"), data.getInt("z"));
-                        JSONObject sdata = data.getJSONObject("structure_data");
-                        switch (sdata.getString("structure")) {
-                            case "spawn:red":
-                            case "ctw:red_spawn":
-                                addNoBuildZone(bloc);
-                                addSpawn(new Spawn(bloc, Team.RED));
-                                break;
-                            case "spawn:blue":
-                            case "ctw:blue_spawn":
-                                addNoBuildZone(bloc);
-                                addSpawn(new Spawn(bloc, Team.BLUE));
-                                break;
-                            case "spawn:green":
-                                addNoBuildZone(bloc);
-                                addSpawn(new Spawn(bloc, Team.GREEN));
-                                break;
-                            case "spawn:yellow":
-                                addNoBuildZone(bloc);
-                                addSpawn(new Spawn(bloc, Team.YELLOW));
-                                break;
-                            case "spawn:none":
-                            case "location:spawn":
-                                addNoBuildZone(bloc);
-                                addSpawn(new Spawn(bloc, Team.NONE));
-                                break;
-                            case "ctw:red_flag":
-                                addNoBuildZone(bloc);
-                                getData().put("red_flag", bloc);
-                                bloc.getBlock().setType(Material.OAK_FENCE);
-                                break;
-                            case "ctw:blue_flag":
-                                addNoBuildZone(bloc);
-                                getData().put("blue_flag", bloc);
-                                bloc.getBlock().setType(Material.OAK_FENCE);
-                                break;
-                        }
-                    }
+                JSONObject data = arena.getData();
+                JSONArray spawns = arena.getData().getJSONArray("spawns");
+                for (int i = 0; i < spawns.length(); i++) {
+                    JSONObject spawnData = spawns.getJSONObject(i);
+                    Location loc = Utils.decryptLocation(arena.getWorld(), spawnData.getJSONObject("location"));
+                    addNoBuildZone(loc);
+                    arena.addSpawn(loc, spawnData.has("team") ? Team.valueOf(spawnData.getString("team").toUpperCase()) : Team.NONE);
                 }
-                arena.setDimentions(length, width, height);
-                //Do shit
+
+                JSONArray flags = arena.getData().getJSONArray("flags");
+                for (int i = 0; i < flags.length(); i++) {
+                    JSONObject flagData = flags.getJSONObject(i);
+                    Location loc = Utils.decryptLocation(arena.getWorld(), flagData.getJSONObject("location"));
+                    addNoBuildZone(loc);
+                    Team team = Team.valueOf(flagData.getString("team").toUpperCase());
+                    getData().put(team.name().toLowerCase() + "_flag", loc);
+                }
             }
+
+
         });
     }
 

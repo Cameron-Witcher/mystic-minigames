@@ -21,7 +21,6 @@ public class Game {
     private final String gameName;
     private final Arena arena;
     private final GameState gameState = new GameState();
-    private final List<Spawn> spawns = new ArrayList<>();
     private final JSONObject data = new JSONObject("{}");
     private final Map<UUID, Integer> playerScores = new HashMap<>();
     private final Map<Team, Integer> teamScores = new HashMap<>();
@@ -29,7 +28,6 @@ public class Game {
     private int teams = 0, minPlayers = 2, maxPlayers = 10;
     private GameController controller = null;
     private boolean generated = false;
-    private Location lobby = null;
     private List<Location> noBuildZones = new ArrayList<>();
 
 
@@ -39,7 +37,7 @@ public class Game {
     public Game(String gameName, Arena arena) {
         this.gameName = gameName;
         this.arena = arena;
-        data.put("spawns", new JSONArray());
+        arena.setGame(this);
         generate();
     }
 
@@ -108,8 +106,10 @@ public class Game {
             generate();
         }
         Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new GenerateRunnable(task, () -> {
-            player.teleport(lobby);
+            List<Arena.Spawn> spawns = arena.getSpawns(Team.SPECTATOR);
+            player.teleport(spawns.get(new Random().nextInt(spawns.size())).getLocation());
             players.put(player.getUniqueId(), new GamePlayer(player.getUniqueId()));
+            player.setGameMode(GameMode.SPECTATOR);
             sendMessage("&3" + player.getName() + "&e has joined! (&3" + players.size() + "&e/&3" + maxPlayers + "&e)");
             if (players.size() >= minPlayers && !gameState.countdown()) {
                 gameState.startCountdown();
@@ -207,14 +207,6 @@ public class Game {
     }
 
     public void startGame() {
-        lobby = null;
-        JSONArray save = RegionUtils.getSave("lobby");
-        Location loc = new Location(arena.getWorld(), arena.getLength() / 2, arena.getHeight() + 1, arena.getWidth() / 2);
-        for (int i = 0; i < save.length(); i++) {
-            JSONObject data = save.getJSONObject(i);
-            loc.clone().add(data.getInt("x"), data.getInt("y"), data.getInt("z")).getBlock().setType(Material.AIR);
-
-        }
         gameState.hasStarted(true);
         controller.start();
     }
@@ -229,7 +221,8 @@ public class Game {
 
     public void close() {
         generated = false;
-        arena.clear();
+        arena.regenerate();
+        generated = true;
     }
 
     public Map<UUID, GamePlayer> getPlayers() {
@@ -293,58 +286,25 @@ public class Game {
         return players.get(uid);
     }
 
-    public void addSpawn(Spawn spawn) {
-        spawns.add(spawn);
-    }
 
     protected void spawnPlayer(Player player) {
         player.getInventory().clear();
+        player.setGameMode(GameMode.SURVIVAL);
         GamePlayer gamePlayer = getPlayer(player.getUniqueId());
         player.setHealth(player.getHealthScale());
-        List<Spawn> spawns = getSpawns(gamePlayer.getTeam());
+        List<Arena.Spawn> spawns = arena.getSpawns(gamePlayer.getTeam());
         player.teleport(spawns.get(new Random().nextInt(spawns.size())).getLocation());
     }
 
-    private List<Spawn> getSpawns(Team team) {
-        List<Spawn> spawns = new ArrayList<>();
-        for (Spawn spawn : Game.this.spawns)
-            if (spawn.getTeam().equals(team)) spawns.add(spawn);
-        return spawns;
-    }
 
     public void generate() {
-        arena.startGeneration();
-        Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new GenerateRunnable(Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new GenerateRunnable(Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+        Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new GenerateRunnable(Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
             arena.startGeneration();
             arena.getWorld().setMetadata("game", new FixedMetadataValue(Utils.getPlugin(), this));
         }, 1), () -> {
             controller.generate();
-        }), 1), () -> {
-            generateLobby();
         }), 1);
         generated = true;
-    }
-
-    private void generateLobby() {
-        JSONArray save = RegionUtils.getSave("lobby");
-        Location loc = new Location(arena.getWorld(), arena.getLength() / 2, arena.getHeight() + 1, arena.getWidth() / 2);
-        for (int i = 0; i < save.length(); i++) {
-            JSONObject data = save.getJSONObject(i);
-
-            if (!Bukkit.createBlockData(data.getString("data")).getMaterial().equals(Material.STRUCTURE_BLOCK)) {
-                loc.clone().add(data.getInt("x"), data.getInt("y"), data.getInt("z")).getBlock().setBlockData(Bukkit.createBlockData(data.getString("data")));
-            } else {
-                Location bloc = loc.clone().add(data.getInt("x"), data.getInt("y"), data.getInt("z"));
-                bloc.getBlock().setType(Material.AIR);
-                JSONObject sdata = data.getJSONObject("structure_data");
-                switch (sdata.getString("structure")) {
-                    case "lobby:spawn":
-                        lobby = bloc;
-                        break;
-
-                }
-            }
-        }
     }
 
     protected Firework spawnFirework(Location loc, FireworkEffect effect) {
@@ -357,28 +317,7 @@ public class Game {
         return rocket;
     }
 
-    public class Spawn {
-        Location location;
-        Team team;
 
-        public Spawn(Location location) {
-            this.location = location;
-            this.team = Team.NONE;
-        }
-
-        public Spawn(Location location, Team team) {
-            this.team = team;
-            this.location = location;
-        }
-
-        public Team getTeam() {
-            return team;
-        }
-
-        public Location getLocation() {
-            return location.clone();
-        }
-    }
 
 
     public class GameState {
@@ -417,11 +356,11 @@ public class Game {
         }
     }
 
-    private class GenerateRunnable implements Runnable {
+    public static class GenerateRunnable implements Runnable {
         BukkitTask task;
         Runnable run;
 
-        GenerateRunnable(BukkitTask task, Runnable run) {
+        public GenerateRunnable(BukkitTask task, Runnable run) {
             this.run = run;
             this.task = task;
         }
@@ -473,11 +412,13 @@ public class Game {
 
     }
 
+
     private interface TimerRunnable {
         public abstract void go(int timer);
     }
 
-    protected interface GameController {
+
+    public interface GameController {
 
         public void start();
 

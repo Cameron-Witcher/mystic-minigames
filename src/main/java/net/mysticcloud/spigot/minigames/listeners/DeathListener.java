@@ -63,7 +63,6 @@ public class DeathListener implements Listener {
                         if (game instanceof OITQ) {
                             e.setDamage(50);
                             e.getDamager().remove();
-
                         }
                     }
                 }

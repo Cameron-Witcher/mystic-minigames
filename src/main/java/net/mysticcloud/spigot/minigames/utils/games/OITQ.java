@@ -12,6 +12,8 @@ import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
 import net.mysticcloud.spigot.minigames.utils.Game;
 import org.bukkit.*;
 import org.bukkit.block.Structure;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Item;
@@ -81,30 +83,13 @@ public class OITQ extends Game {
 
             @Override
             public void generate() {
-                JSONArray save = RegionUtils.getSave(arena.getName());
-                Location loc = new Location(arena.getWorld(), 0, 0, 0);
-                int length = 0, width = 0, height = 0;
-                for (int i = 0; i < save.length(); i++) {
-                    JSONObject data = save.getJSONObject(i);
-                    if (data.getInt("x") > length) length = data.getInt("x");
-                    if (data.getInt("y") > height) height = data.getInt("y");
-                    if (data.getInt("z") > width) width = data.getInt("z");
-
-                    if (!Bukkit.createBlockData(data.getString("data")).getMaterial().equals(Material.STRUCTURE_BLOCK)) {
-                        loc.clone().add(data.getInt("x"), data.getInt("y"), data.getInt("z")).getBlock().setBlockData(Bukkit.createBlockData(data.getString("data")));
-                    } else {
-                        Location bloc = loc.clone().add(data.getInt("x"), data.getInt("y"), data.getInt("z"));
-                        JSONObject sdata = data.getJSONObject("structure_data");
-                        switch (sdata.getString("structure")) {
-                            case "location:spawn":
-                                addNoBuildZone(bloc);
-                                addSpawn(new Spawn(bloc, Team.NONE));
-                                break;
-                        }
-                    }
+                JSONArray spawns = arena.getData().getJSONArray("spawns");
+                for (int i = 0; i < spawns.length(); i++) {
+                    JSONObject spawnData = spawns.getJSONObject(i);
+                    Location loc = Utils.decryptLocation(arena.getWorld(), spawnData.getJSONObject("location"));
+                    addNoBuildZone(loc);
+                    arena.addSpawn(loc, Team.NONE);
                 }
-                arena.setDimentions(length, width, height);
-                //Do shit
             }
         });
     }
@@ -128,7 +113,7 @@ public class OITQ extends Game {
             killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1f, 1.11f);
             killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1f, 0.95f);
             assert killer != null;
-            if(!killer.getInventory().contains(Material.ARROW))
+            if (!killer.getInventory().contains(Material.ARROW))
                 killer.getInventory().addItem(new ItemStack(Material.ARROW));
         }
         String victim = (gamePlayer.getTeam().equals(Team.NONE) ? "&3" : gamePlayer.getTeam().chatColor()) + player.getName();

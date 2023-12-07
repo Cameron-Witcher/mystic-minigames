@@ -6,6 +6,7 @@ import net.mysticcloud.spigot.minigames.utils.Game;
 import net.mysticcloud.spigot.minigames.utils.games.CTW;
 import net.mysticcloud.spigot.minigames.utils.games.OITQ;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
+import net.mysticcloud.spigot.minigames.utils.games.arenas.ArenaManager;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Structure;
@@ -44,7 +45,7 @@ public class GameManager {
                 System.out.println("An error occurred.");
                 throw new RuntimeException(e);
             }
-            Game game = createGame(data.getString("game"), new Arena(data.getString("arena")), data.has("teams") ? data.getInt("teams") : -1, data);
+            Game game = createGame(data.getString("game"), ArenaManager.getArena(data.getString("arena")), data.has("teams") ? data.getInt("teams") : -1, data);
 
         }
     }

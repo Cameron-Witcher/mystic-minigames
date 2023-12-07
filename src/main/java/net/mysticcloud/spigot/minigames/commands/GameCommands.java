@@ -21,6 +21,8 @@ import org.bukkit.metadata.MetadataValue;
 import org.json2.JSONArray;
 import org.json2.JSONObject;
 
+import java.io.IOException;
+
 public class GameCommands implements CommandExecutor {
     public GameCommands(MysticMinigames plugin, String... cmd) {
         for (String s : cmd) {
@@ -39,6 +41,14 @@ public class GameCommands implements CommandExecutor {
                 if (args.length == 0) {
                     //send help
                     return true;
+                }
+                if (args[0].equalsIgnoreCase("save")) {
+                    Arena arena = ArenaManager.getArena(args[1]);
+                    try {
+                        arena.saveToFile();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
                 if (args[0].equalsIgnoreCase("edit")) {
                     //Syntax: /arena edit <arena> [extra]

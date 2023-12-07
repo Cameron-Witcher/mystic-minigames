@@ -107,8 +107,14 @@ public class Game {
                 generate();
             }
         }, 0), () -> {
-            List<Arena.Spawn> spawns = arena.getSpawns(Team.SPECTATOR);
-            player.teleport(spawns.get(new Random().nextInt(spawns.size())).getLocation());
+            try {
+                List<Arena.Spawn> spawns = arena.getSpawns(Team.SPECTATOR);
+                player.teleport(spawns.get(new Random().nextInt(spawns.size())).getLocation());
+            } catch (IllegalArgumentException ex) {
+                List<Arena.Spawn> spawns = arena.getSpawns(Team.NONE);
+                player.teleport(spawns.get(new Random().nextInt(spawns.size())).getLocation());
+            }
+
             players.put(player.getUniqueId(), new GamePlayer(player.getUniqueId()));
             player.setGameMode(GameMode.SPECTATOR);
             sendMessage("&3" + player.getName() + "&e has joined! (&3" + players.size() + "&e/&3" + maxPlayers + "&e)");

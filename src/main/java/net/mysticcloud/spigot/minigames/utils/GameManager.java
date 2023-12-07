@@ -75,6 +75,12 @@ public class GameManager {
 
         }
 
+        try {
+            game.getArena().saveToFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
 
     }
 

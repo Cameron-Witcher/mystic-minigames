@@ -119,7 +119,8 @@ public class Arena {
     }
 
     public void delete() {
-        CoreUtils.deleteWorld(world.getWorldFolder());
+        if (world != null)
+            CoreUtils.deleteWorld(world.getWorldFolder());
         world = null;
     }
 

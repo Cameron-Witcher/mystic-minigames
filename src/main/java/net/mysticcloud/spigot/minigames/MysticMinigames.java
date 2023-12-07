@@ -37,7 +37,6 @@ public class MysticMinigames extends JavaPlugin {
                 game.removePlayer(uid, false);
             }
             game.getArena().delete();
-            GameManager.saveGame(game);
         }
 
     }

@@ -89,9 +89,7 @@ public class GameManager {
     }
 
     public static Game createGame(String gameName, Arena arena, int teams) {
-        Game game = createGame(gameName, arena, teams, null);
-        saveGame(game);
-        return game;
+        return createGame(gameName, arena, teams, null);
     }
 
     public static Game createGame(String gameName, Arena arena, int teams, JSONObject data) {
@@ -109,6 +107,7 @@ public class GameManager {
                 break;
         }
         games.put(game.getName() + "-" + game.getArena().getName(), game);
+        saveGame(game);
         return game;
     }
 

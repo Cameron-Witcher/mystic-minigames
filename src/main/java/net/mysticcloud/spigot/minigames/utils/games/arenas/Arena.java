@@ -105,11 +105,9 @@ public class Arena {
 
 
     public void regenerate() {
-        Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new Game.GenerateRunnable(Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new Game.GenerateRunnable(Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
-            CoreUtils.deleteWorld(world.getWorldFolder());
-        }, 1), this::startGeneration), 1), () -> {
-            game.getController().generate();
-        }), 1);
+        CoreUtils.deleteWorld(world.getWorldFolder());
+        startGeneration();
+        game.getController().generate();
 
 
     }

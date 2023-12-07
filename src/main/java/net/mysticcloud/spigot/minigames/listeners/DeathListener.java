@@ -77,7 +77,7 @@ public class DeathListener implements Listener {
             if (!game.getGameState().hasStarted()) e.setCancelled(true);
             if (((Player) e.getEntity()).getHealth() - e.getFinalDamage() <= 0) {
                 e.setCancelled(true);
-                ((Game) e.getEntity().getWorld().getMetadata("game").get(0).value()).kill((Player) e.getEntity(), e.getCause());
+                game.kill((Player) e.getEntity(), e.getCause());
 
             }
         }

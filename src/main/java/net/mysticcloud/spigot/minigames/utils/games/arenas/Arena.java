@@ -24,7 +24,6 @@ public class Arena {
     String name;
     File masterWorld;
     JSONObject data = new JSONObject("{}");
-    private final List<Spawn> spawns = new ArrayList<>();
     private Game game = null;
     private World world = null;
 
@@ -35,10 +34,6 @@ public class Arena {
 
     public void setGame(Game game) {
         this.game = game;
-    }
-
-    public void setData(JSONObject data) {
-        this.data = data;
     }
 
     public JSONObject getData() {
@@ -80,17 +75,26 @@ public class Arena {
     }
 
     public void addSpawn(Location loc, Team team) {
-        spawns.add(new Spawn(loc, team));
-        if (!data.has("spawns")) data.put("spawns", new JSONArray());
+        getSpawns();
         JSONObject obj = new JSONObject("{}");
         obj.put("team", team.name());
         obj.put("location", Utils.encryptLocation(loc));
         data.getJSONArray("spawns").put(obj);
     }
 
+    public List<Spawn> getSpawns() {
+        List<Spawn> spawns = new ArrayList<>();
+        if (!data.has("spawns")) data.put("spawns", new JSONArray());
+        for (int i = 0; i < data.getJSONArray("spawns").length(); i++) {
+            JSONObject spawnData = data.getJSONArray("spawns").getJSONObject(i);
+            spawns.add(new Spawn(Utils.decryptLocation(world, spawnData.getJSONObject("location")), spawnData.has("team") ? Team.valueOf(spawnData.getString("team").toUpperCase()) : Team.NONE));
+        }
+        return spawns;
+    }
+
     public List<Spawn> getSpawns(Team team) {
         List<Spawn> spawns = new ArrayList<>();
-        for (Spawn spawn : Arena.this.spawns)
+        for (Spawn spawn : getSpawns())
             if (spawn.getTeam().equals(team)) spawns.add(spawn);
         return spawns;
     }
@@ -106,7 +110,11 @@ public class Arena {
 
     }
 
-    public class Spawn {
+    void setData(JSONObject data) {
+        this.data = data;
+    }
+
+    public static class Spawn {
         Location location;
         Team team;
 

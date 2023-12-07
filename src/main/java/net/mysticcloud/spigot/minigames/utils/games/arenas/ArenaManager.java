@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.json2.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,6 +31,7 @@ public class ArenaManager {
     private static void loadArena(File arenaFile) {
         FileConfiguration yml = YamlConfiguration.loadConfiguration(arenaFile);
         Arena arena = new Arena(yml.getString("name"), arenaFile.getParentFile());
+        arena.setData(new JSONObject(yml.getString("data")));
         arenas.put(arena.getName(), arena);
     }
 

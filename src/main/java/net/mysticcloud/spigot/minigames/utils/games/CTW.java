@@ -98,6 +98,7 @@ public class CTW extends Game {
             @Override
             public void generate() {
                 JSONObject data = arena.getData();
+                arena.getSpawns();
                 JSONArray spawns = arena.getData().getJSONArray("spawns");
                 for (int i = 0; i < spawns.length(); i++) {
                     JSONObject spawnData = spawns.getJSONObject(i);

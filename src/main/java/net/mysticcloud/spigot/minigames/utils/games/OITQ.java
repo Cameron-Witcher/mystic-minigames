@@ -88,7 +88,6 @@ public class OITQ extends Game {
                     JSONObject spawnData = spawns.getJSONObject(i);
                     Location loc = Utils.decryptLocation(arena.getWorld(), spawnData.getJSONObject("location"));
                     addNoBuildZone(loc);
-                    arena.addSpawn(loc, Team.NONE);
                 }
             }
         });

@@ -109,6 +109,7 @@ public class CTW extends Game {
                 for (int i = 0; i < flags.length(); i++) {
                     JSONObject flagData = flags.getJSONObject(i);
                     Location loc = Utils.decryptLocation(arena.getWorld(), flagData.getJSONObject("location"));
+                    loc.getBlock().setType(Material.OAK_FENCE);
                     addNoBuildZone(loc);
                     Team team = Team.valueOf(flagData.getString("team").toUpperCase());
                     getData().put(team.name().toLowerCase() + "_flag", loc);
@@ -122,7 +123,7 @@ public class CTW extends Game {
     private void dropFlag(Team team, Location loc) {
         World world = loc.getWorld();
         assert world != null;
-        Item item = world.dropItem(loc.clone().add(0.5, 1.51, 0.5), new ItemStack(Material.valueOf(team.name() + "_WOOL")));
+        Item item = world.dropItem(loc.getBlock().getLocation().clone().add(0.5, 1.51, 0.5), new ItemStack(Material.valueOf(team.name() + "_WOOL")));
         item.setVelocity(new Vector(0, 0, 0));
         item.setUnlimitedLifetime(true);
         item.setMetadata("flag", new FixedMetadataValue(Utils.getPlugin(), team));

@@ -28,7 +28,7 @@ public class Utils {
     }
 
     public static Location decryptLocation(World world, JSONObject location) {
-        return new Location(world, location.getDouble("x"), location.getDouble("y"), location.getDouble("z"), location.getFloat("pitch"), location.getFloat("yaw"));
+        return new Location(world, location.getDouble("x"), location.getDouble("y"), location.getDouble("z"), location.getFloat("yaw"), location.getFloat("pitch"));
     }
 
     public static JSONObject encryptLocation(Location location) {

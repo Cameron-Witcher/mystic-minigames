@@ -2,6 +2,8 @@ name: MysticMinigames
 author: QuickScythe
 version: 3.5.1
 description: Runs the MysticCloud minigame server
+depend:
+  - MysticCore
 api-version: 1.20
 api: Spigot
 main: net.mysticcloud.spigot.minigames.MysticMinigames

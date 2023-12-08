@@ -24,9 +24,8 @@ public class InventoryListener implements Listener {
         if (e.getWhoClicked().getWorld().hasMetadata("game")) {
             for (MetadataValue data : e.getWhoClicked().getWorld().getMetadata("game")) {
                 Game game = (Game) data.value();
-                if (game instanceof CTW) {
                     if (e.getSlotType().equals(InventoryType.SlotType.ARMOR)) e.setCancelled(true);
-                }
+
             }
         }
     }

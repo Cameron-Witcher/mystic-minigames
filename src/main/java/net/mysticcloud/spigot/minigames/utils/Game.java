@@ -102,7 +102,9 @@ public class Game {
 
         generated = false;
         gameState.reset();
+        gameScoreboard.reset();
         noBuildZones.clear();
+
     }
 
     public boolean addPlayer(UUID uid) {
@@ -518,15 +520,22 @@ public class Game {
         Scoreboard scoreboard;
 
         public GameScoreboard() {
-            scoreboardManager = Bukkit.getScoreboardManager();
-            scoreboard = scoreboardManager.getNewScoreboard();
-            for (Team team : Team.values())
-                scoreboard.registerNewTeam(team.name()).setColor(team.chatColor());
-
+            setup();
         }
 
         public Scoreboard getScoreboard() {
             return scoreboard;
+        }
+
+        public void reset() {
+            setup();
+        }
+
+        private void setup(){
+            scoreboardManager = Bukkit.getScoreboardManager();
+            scoreboard = scoreboardManager.getNewScoreboard();
+            for (Team team : Team.values())
+                scoreboard.registerNewTeam(team.name()).setColor(team.chatColor());
         }
     }
 }

@@ -5,6 +5,7 @@ import net.mysticcloud.spigot.minigames.MysticMinigames;
 import net.mysticcloud.spigot.minigames.utils.Game;
 import net.mysticcloud.spigot.minigames.utils.Team;
 import net.mysticcloud.spigot.minigames.utils.Utils;
+import net.mysticcloud.spigot.minigames.utils.games.HotPotato;
 import net.mysticcloud.spigot.minigames.utils.games.OITQ;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -46,13 +47,13 @@ public class DeathListener implements Listener {
         if (e.getEntity().getWorld().hasMetadata("game")) {
             for (MetadataValue data : e.getEntity().getWorld().getMetadata("game")) {
                 Game game = (Game) data.value();
-                if (e.getDamager() instanceof Firework && e.getDamager().hasMetadata("game")){
+                if (e.getDamager() instanceof Firework && e.getDamager().hasMetadata("game")) {
                     e.setCancelled(true);
                     return;
                 }
-                if (e.getEntity() instanceof Item && e.getEntity().hasMetadata("flag")){
+                if (e.getEntity() instanceof Item && e.getEntity().hasMetadata("flag")) {
                     e.setCancelled(true);
-                    e.getEntity().setVelocity(new Vector(0,0,0));
+                    e.getEntity().setVelocity(new Vector(0, 0, 0));
                     return;
                 }
 
@@ -84,6 +85,15 @@ public class DeathListener implements Listener {
         if (e.getEntity() instanceof Player && e.getEntity().getWorld().hasMetadata("game")) {
             Game game = (Game) e.getEntity().getWorld().getMetadata("game").get(0).value();
             if (!game.getGameState().hasStarted()) e.setCancelled(true);
+            if (game instanceof HotPotato) {
+                e.setDamage(0);
+                if (e.getEntity().hasMetadata("last_damager")) {
+                    if (Bukkit.getEntity((UUID) e.getEntity().getMetadata("last_damager").get(0).value()) instanceof Player) {
+                        ((HotPotato) game).swapHolder(Bukkit.getPlayer((UUID) e.getEntity().getMetadata("last_damager").get(0).value()), (Player) e.getEntity());
+                    }
+                }
+                return;
+            }
             if (((Player) e.getEntity()).getHealth() - e.getFinalDamage() <= 0) {
                 e.setCancelled(true);
                 game.kill((Player) e.getEntity(), e.getCause());

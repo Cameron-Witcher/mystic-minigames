@@ -82,7 +82,7 @@ public class CTW extends Game {
                 for (GamePlayer player : getPlayers().values()) {
                     if (player.getTeam().equals(Team.NONE) || player.getTeam().equals(Team.SPECTATOR)) continue;
                     if (getScore(player.getTeam()) >= MAX_SCORE) return true;
-                    Bukkit.getPlayer(player.getUUID()).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + "Lives: " + player.getLives() + " | " + MessageUtils.formatTimeRaw(LASTED) + " | Team Score: " + getScore(player.getTeam()) + "/" + MAX_SCORE));
+                    Bukkit.getPlayer(player.getUUID()).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + "Lives: " + player.getLives() + " | " + MessageUtils.formatTimeRaw(DURATION - LASTED) + " | Team Score: " + getScore(player.getTeam()) + "/" + MAX_SCORE));
                     if (!teamListMap.containsKey(player.getTeam()))
                         teamListMap.put(player.getTeam(), new ArrayList<>());
                     teamListMap.get(player.getTeam()).add(player.getUUID());

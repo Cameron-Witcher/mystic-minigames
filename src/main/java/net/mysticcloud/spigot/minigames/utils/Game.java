@@ -380,33 +380,25 @@ public class Game {
     }
 
     public void processDamage(Player victim, double damage, EntityDamageEvent.DamageCause cause) {
-        Bukkit.broadcastMessage("6");
-        if (victim.hasMetadata("last_damager")) {
-            Bukkit.broadcastMessage("7");
-            Entity perp = Bukkit.getEntity((UUID) victim.getMetadata("last_damager").get(0).value());
-            Bukkit.broadcastMessage("8");
-            if (perp instanceof Player) {
-                Bukkit.broadcastMessage("9");
-                Player perp1 = (Player) perp;
-                Bukkit.broadcastMessage("10");
-                if (perp1.equals(victim) || (!isFriendlyFire() && getPlayer(victim.getUniqueId()).getTeam().equals(getPlayer(perp1.getUniqueId()).getTeam())))
+        Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+            if (victim.hasMetadata("last_damager")) {
+                Entity perp = Bukkit.getEntity((UUID) victim.getMetadata("last_damager").get(0).value());
+                if(perp instanceof Firework && perp.hasMetadata("game"))
                     return;
-                Bukkit.broadcastMessage("11");
+                if (perp instanceof Player) {
+                    Player perp1 = (Player) perp;
+                    if (perp1.equals(victim) || (!isFriendlyFire() && getPlayer(victim.getUniqueId()).getTeam().equals(getPlayer(perp1.getUniqueId()).getTeam())))
+                        return;
 
+                }
             }
-        }
-        Bukkit.broadcastMessage("12");
-        if (victim.getHealth() - damage <= 0) {
-            Bukkit.broadcastMessage("13");
-            kill(victim, cause);
-            Bukkit.broadcastMessage("14");
-            return;
-        }
-        Bukkit.broadcastMessage("15");
-//        ((CraftPlayer)p).getHandle().damageEntity(DamageSource.OUT_OF_WORLD, 100);
-        victim.damage(damage);
-        Bukkit.getPluginManager().callEvent(new EntityDamageEvent(victim, EntityDamageEvent.DamageCause.CUSTOM, damage));
-        Bukkit.broadcastMessage("16");
+            if (victim.getHealth() - damage <= 0) {
+                kill(victim, cause);
+                return;
+            }
+            victim.damage(damage);
+            Bukkit.getPluginManager().callEvent(new EntityDamageEvent(victim, EntityDamageEvent.DamageCause.CUSTOM, damage));
+        }, 1);
     }
 
 

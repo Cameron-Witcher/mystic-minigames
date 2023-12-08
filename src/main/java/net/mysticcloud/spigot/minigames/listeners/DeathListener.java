@@ -50,7 +50,6 @@ public class DeathListener implements Listener {
                 Game game = (Game) data.value();
                 if (e.getDamager() instanceof Firework && e.getDamager().hasMetadata("game")) {
                     e.setCancelled(true);
-                    return;
                 }
                 if (e.getEntity() instanceof Item && e.getEntity().hasMetadata("flag")) {
                     e.setCancelled(true);
@@ -76,22 +75,15 @@ public class DeathListener implements Listener {
 
     @EventHandler
     public void onPlayerDeath(EntityDamageEvent e) {
-        Bukkit.broadcastMessage("1");
         if (e.getCause().equals(EntityDamageEvent.DamageCause.CUSTOM)) {
             e.setCancelled(false);
             return;
         }
-        Bukkit.broadcastMessage("2");
         if (e.getEntity() instanceof Player && e.getEntity().getWorld().hasMetadata("game")) {
-            Bukkit.broadcastMessage("3");
             Game game = (Game) e.getEntity().getWorld().getMetadata("game").get(0).value();
-            Bukkit.broadcastMessage("4");
             if (!game.getGameState().hasStarted()) e.setCancelled(true);
-            Bukkit.broadcastMessage("5");
             game.processDamage((Player)e.getEntity(), e.getDamage(), e.getCause());
-            Bukkit.broadcastMessage("17");
             e.setCancelled(true);
-            Bukkit.broadcastMessage("18");
 
 
         }

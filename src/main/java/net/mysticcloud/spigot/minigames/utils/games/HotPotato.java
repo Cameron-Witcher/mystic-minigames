@@ -40,6 +40,8 @@ public class HotPotato extends Game {
         setMinPlayers(2);
         setMaxPlayers(20);
 
+        setFriendlyFire(true);
+
         scoresObjective.setDisplaySlot(DisplaySlot.BELOW_NAME);
         scoresObjective.setDisplayName(ChatColor.GREEN + Symbols.STAR_1.toString());
 

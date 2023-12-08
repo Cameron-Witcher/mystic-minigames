@@ -76,7 +76,9 @@ public class DeathListener implements Listener {
 
     @EventHandler
     public void onPlayerDeath(EntityDamageEvent e) {
+        e.setCancelled(true);
         Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+            e.setCancelled(false);
             if (e.getEntity() instanceof Player && e.getEntity().getWorld().hasMetadata("game")) {
                 Game game = (Game) e.getEntity().getWorld().getMetadata("game").get(0).value();
                 if (!game.getGameState().hasStarted()) e.setCancelled(true);
@@ -85,7 +87,7 @@ public class DeathListener implements Listener {
                     Entity perp = Bukkit.getEntity((UUID) victim.getMetadata("last_damager").get(0).value());
                     if (perp instanceof Player) {
                         Player perp1 = (Player) perp;
-                        if (perp1.equals(victim)) {
+                        if (perp1.equals(victim) || (!game.isFriendlyFire() && game.getPlayer(victim.getUniqueId()).getTeam().equals(game.getPlayer(perp1.getUniqueId()).getTeam()))) {
                             e.setCancelled(true);
                             return;
                         }

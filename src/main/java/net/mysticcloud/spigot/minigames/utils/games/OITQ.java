@@ -47,6 +47,8 @@ public class OITQ extends Game {
         setMinPlayers(2);
         setMaxPlayers(20);
 
+        setFriendlyFire(true);
+
         livesObjective.setDisplaySlot(DisplaySlot.BELOW_NAME);
         livesObjective.setDisplayName(ChatColor.RED + Symbols.HEART_1.toString());
 

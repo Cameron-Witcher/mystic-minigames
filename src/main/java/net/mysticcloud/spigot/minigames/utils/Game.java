@@ -33,6 +33,7 @@ public class Game {
     private int teams = 0, minPlayers = 2, maxPlayers = 10;
     private GameController controller = null;
     private boolean generated = false;
+    private boolean friendlyFire = true;
 
 
     private Map<UUID, ItemStack[]> inventoryList = new HashMap<>();
@@ -42,6 +43,13 @@ public class Game {
         this.gameName = gameName;
         this.arena = arena;
         arena.setGame(this);
+    }
+
+    public void setFriendlyFire(boolean friendlyFire){
+        this.friendlyFire = friendlyFire;
+    }
+    public boolean isFriendlyFire(){
+        return friendlyFire;
     }
 
     public JSONObject getData() {

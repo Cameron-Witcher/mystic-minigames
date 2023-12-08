@@ -85,31 +85,33 @@ public class Game {
     }
 
     public void end() {
+        if(!gameState.isEnding()) {
+            gameState.startEnding();
 
-        for (UUID uid : players.keySet()) {
-            Player player = Bukkit.getPlayer(uid);
-            player.setGameMode(GameMode.SPECTATOR);
-            getPlayer(player.getUniqueId()).setTeam(Team.SPECTATOR);
-        }
-
-
-        controller.end();
-
-        Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
             for (UUID uid : players.keySet()) {
-                removePlayer(uid, false);
+                Player player = Bukkit.getPlayer(uid);
+                player.setGameMode(GameMode.SPECTATOR);
+                getPlayer(player.getUniqueId()).setTeam(Team.SPECTATOR);
             }
-            players.clear();
-            teamScores.clear();
-            playerScores.clear();
-            arena.delete();
 
-            generated = false;
-            gameState.reset();
-            gameScoreboard.reset();
-            noBuildZones.clear();
-        }, 15 * 20);
 
+            controller.end();
+
+            Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+                for (UUID uid : players.keySet()) {
+                    removePlayer(uid, false);
+                }
+                players.clear();
+                teamScores.clear();
+                playerScores.clear();
+                arena.delete();
+
+                generated = false;
+                gameState.reset();
+                gameScoreboard.reset();
+                noBuildZones.clear();
+            }, 15 * 20);
+        }
 
     }
 
@@ -368,6 +370,7 @@ public class Game {
         boolean lobbyOpen = true;
         boolean gameRunning = false;
         boolean countdown = false;
+        boolean ending = false;
         long started = 0;
 
         public boolean acceptingPlayers() {
@@ -416,11 +419,20 @@ public class Game {
             this.gameRunning = gameRunning;
         }
 
+        public void startEnding(){
+            ending = true;
+        }
+
+        public boolean isEnding(){
+            return ending;
+        }
+
         public void reset() {
             lobbyOpen = true;
             gameRunning = false;
             countdown = false;
             started = 0;
+            ending = false;
         }
     }
 

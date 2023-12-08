@@ -238,6 +238,8 @@ public class CTW extends Game {
         Team team = (Team) item.getMetadata("flag").get(0).value();
         sendMessage(MessageUtils.colorize(gamePlayer.getTeam().chatColor() + "&l" + player.getName() + "&r &ehas stolen the " + team.chatColor() + "&l" + team.name() + "&r&e flag!"));
         player.getEquipment().setHelmet(item.getItemStack());
+        player.playSound(player, Sound.ENTITY_ITEM_PICKUP, 1f, 0.5f);
+        player.playSound(player, Sound.UI_BUTTON_CLICK, 1f, 1f);
         item.remove();
         player.setMetadata("flag", new FixedMetadataValue(Utils.getPlugin(), team));
     }
@@ -272,7 +274,7 @@ public class CTW extends Game {
 
     @Override
     public int score(Team team, int amount) {
-        for(UUID uid : getPlayers(team)) {
+        for (UUID uid : getPlayers(team)) {
             Player player = Bukkit.getPlayer(uid);
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.5f);
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.11f);

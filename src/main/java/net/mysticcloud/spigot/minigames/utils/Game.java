@@ -378,12 +378,13 @@ public class Game {
                         }
                     }
                 }, () -> {
+                    startGame();
                     for (UUID uid : getPlayers().keySet()) {
                         Player player = Bukkit.getPlayer(uid);
                         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 1f, 0.5f);
                         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, SoundCategory.MASTER, 1f, 0.5f);
                     }
-                    startGame();
+
                 }), 0);
             }
 

@@ -77,7 +77,10 @@ public class DeathListener implements Listener {
     @EventHandler
     public void onPlayerDeath(EntityDamageEvent e) {
         Bukkit.broadcastMessage("1");
-        if (e.getCause().equals(EntityDamageEvent.DamageCause.CUSTOM)) return;
+        if (e.getCause().equals(EntityDamageEvent.DamageCause.CUSTOM)) {
+            e.setCancelled(false);
+            return;
+        }
         Bukkit.broadcastMessage("2");
         if (e.getEntity() instanceof Player && e.getEntity().getWorld().hasMetadata("game")) {
             Bukkit.broadcastMessage("3");

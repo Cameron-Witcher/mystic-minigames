@@ -75,9 +75,11 @@ public class Game {
     public void removePlayer(UUID uid, boolean list) {
         if (list) players.remove(uid);
         Player player = Bukkit.getPlayer(uid);
+        player.setFallDistance(0);
         player.teleport(Bukkit.getWorlds().get(0).getSpawnLocation());
         player.setGameMode(GameMode.SURVIVAL);
         player.getInventory().setContents(inventoryList.get(player.getUniqueId()));
+
         inventoryList.remove(player.getUniqueId());
     }
 

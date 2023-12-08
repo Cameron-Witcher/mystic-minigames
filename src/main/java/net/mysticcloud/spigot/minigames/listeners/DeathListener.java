@@ -41,7 +41,7 @@ public class DeathListener implements Listener {
 
     @EventHandler
     public void onPlayerDamage(EntityDamageByEntityEvent e) {
-        Bukkit.broadcastMessage("Damage (entity): " + e.getDamager().getName() + "  damaged " + e.getEntity().getName());
+        Bukkit.broadcastMessage("Damage (entity): " + e.getDamager().getClass() + "  damaged " + e.getEntity().getName());
         if (e.getEntity().getWorld().hasMetadata("game")) {
             for (MetadataValue data : e.getEntity().getWorld().getMetadata("game")) {
                 Game game = (Game) data.value();

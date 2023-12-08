@@ -2,8 +2,11 @@ package net.mysticcloud.spigot.minigames.utils;
 
 import net.mysticcloud.spigot.core.utils.MessageUtils;
 import net.mysticcloud.spigot.core.utils.placeholder.Symbols;
+import net.mysticcloud.spigot.minigames.utils.games.HotPotato;
+import net.mysticcloud.spigot.minigames.utils.games.OITQ;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
 import org.bukkit.*;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -45,10 +48,11 @@ public class Game {
         arena.setGame(this);
     }
 
-    public void setFriendlyFire(boolean friendlyFire){
+    public void setFriendlyFire(boolean friendlyFire) {
         this.friendlyFire = friendlyFire;
     }
-    public boolean isFriendlyFire(){
+
+    public boolean isFriendlyFire() {
         return friendlyFire;
     }
 
@@ -96,7 +100,7 @@ public class Game {
     }
 
     public void end() {
-        if(!gameState.isEnding()) {
+        if (!gameState.isEnding()) {
             gameState.startEnding();
 
             for (UUID uid : players.keySet()) {
@@ -375,6 +379,26 @@ public class Game {
         return gameScoreboard;
     }
 
+    public void processDamage(Player victim, double damage, EntityDamageEvent.DamageCause cause) {
+        if (victim.hasMetadata("last_damager")) {
+            Entity perp = Bukkit.getEntity((UUID) victim.getMetadata("last_damager").get(0).value());
+            if (perp instanceof Player) {
+                Player perp1 = (Player) perp;
+                if (perp1.equals(victim) || (!isFriendlyFire() && getPlayer(victim.getUniqueId()).getTeam().equals(getPlayer(perp1.getUniqueId()).getTeam())))
+                    return;
+
+
+            }
+        }
+
+        if (victim.getHealth() - damage <= 0) {
+
+            kill(victim, cause);
+            return;
+        }
+        Bukkit.getPluginManager().callEvent(new EntityDamageEvent(victim, EntityDamageEvent.DamageCause.WORLD_BORDER, damage));
+    }
+
 
     public class GameState {
 
@@ -430,11 +454,11 @@ public class Game {
             this.gameRunning = gameRunning;
         }
 
-        public void startEnding(){
+        public void startEnding() {
             ending = true;
         }
 
-        public boolean isEnding(){
+        public boolean isEnding() {
             return ending;
         }
 

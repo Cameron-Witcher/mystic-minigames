@@ -76,39 +76,15 @@ public class DeathListener implements Listener {
 
     @EventHandler
     public void onPlayerDeath(EntityDamageEvent e) {
-        Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
-            if (e.getEntity() instanceof Player && e.getEntity().getWorld().hasMetadata("game")) {
-                Game game = (Game) e.getEntity().getWorld().getMetadata("game").get(0).value();
-                if (!game.getGameState().hasStarted()) e.setCancelled(true);
-                Player victim = (Player) e.getEntity();
-                if (victim.hasMetadata("last_damager")) {
-                    Entity perp = Bukkit.getEntity((UUID) victim.getMetadata("last_damager").get(0).value());
-                    if (perp instanceof Player) {
-                        Player perp1 = (Player) perp;
-                        if (perp1.equals(victim) || (!game.isFriendlyFire() && game.getPlayer(victim.getUniqueId()).getTeam().equals(game.getPlayer(perp1.getUniqueId()).getTeam()))) {
-                            e.setCancelled(true);
-                            return;
-                        }
-                        if (game instanceof HotPotato) {
-                            HotPotato hp = (HotPotato) game;
-                            e.setDamage(0);
-                            if (hp.getHolder().equals(perp1.getUniqueId())) hp.swapHolder(perp1, victim);
-                        }
-                        if (game instanceof OITQ) {
-                            if (e.getCause().equals(EntityDamageEvent.DamageCause.PROJECTILE)) {
-                                e.setDamage(50);
-                            }
-                        }
-                    }
-                }
+        if (e.getCause().equals(EntityDamageEvent.DamageCause.WORLD_BORDER)) return;
+        if (e.getEntity() instanceof Player && e.getEntity().getWorld().hasMetadata("game")) {
+            Game game = (Game) e.getEntity().getWorld().getMetadata("game").get(0).value();
+            if (!game.getGameState().hasStarted()) e.setCancelled(true);
+            game.processDamage((Player)e.getEntity(), e.getDamage(), e.getCause());
+            e.setCancelled(true);
 
-                if (victim.getHealth() - e.getDamage() <= 0) {
-                    e.setCancelled(true);
-                    game.kill((Player) e.getEntity(), e.getCause());
 
-                }
+        }
 
-            }
-        }, 0);
     }
 }

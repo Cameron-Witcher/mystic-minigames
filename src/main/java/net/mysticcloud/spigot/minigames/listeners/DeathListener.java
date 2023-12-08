@@ -13,6 +13,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.FireworkExplodeEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -45,8 +46,14 @@ public class DeathListener implements Listener {
         if (e.getEntity().getWorld().hasMetadata("game")) {
             for (MetadataValue data : e.getEntity().getWorld().getMetadata("game")) {
                 Game game = (Game) data.value();
-                if (e.getDamager() instanceof Firework && e.getDamager().hasMetadata("game")) e.setCancelled(true);
-                if (e.getEntity() instanceof Item && e.getEntity().hasMetadata("flag")) e.setCancelled(true);
+                if (e.getDamager() instanceof Firework && e.getDamager().hasMetadata("game")){
+                    e.setCancelled(true);
+                    return;
+                }
+                if (e.getEntity() instanceof Item && e.getEntity().hasMetadata("flag")){
+                    e.setCancelled(true);
+                    return;
+                }
 
                 if (e.getEntity() instanceof Player) {
                     if (e.getEntity().hasMetadata("last_damager")) {

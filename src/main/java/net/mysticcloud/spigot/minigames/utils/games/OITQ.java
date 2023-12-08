@@ -145,7 +145,7 @@ public class OITQ extends Game {
                 break;
         }
         sendMessage("&3" + victim + "&e" + action + ending);
-        Firework rocket = spawnFirework(player.getLocation(), FireworkEffect.builder().flicker(true).with(FireworkEffect.Type.BALL).withColor(Color.RED).build());
+        Firework rocket = spawnFirework(player.getLocation().clone().add(0, 1, 0), FireworkEffect.builder().flicker(true).with(FireworkEffect.Type.BALL).withColor(Color.RED).build());
         rocket.detonate();
         super.kill(player, cause);
     }

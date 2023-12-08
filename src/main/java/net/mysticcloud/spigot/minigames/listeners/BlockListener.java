@@ -8,13 +8,16 @@ import net.mysticcloud.spigot.minigames.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.metadata.MetadataValue;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BlockListener implements Listener {
     public BlockListener(MysticMinigames plugin) {
@@ -69,13 +72,12 @@ public class BlockListener implements Listener {
             for (MetadataValue value : e.getBlock().getWorld().getMetadata("game")) {
                 Game game = (Game) value.value();
                 for (Location location : game.getNoBuildZones()) {
-                    List<Block> remove = new ArrayList<>();
+                    Map<Location, BlockData> remove = new HashMap<>();
                     for (Block block : e.blockList())
-                        if (CoreUtils.distance(block.getLocation(), location) <= 5) remove.add(block);
-//                    e.blockList().removeAll(remove);
+                        if (CoreUtils.distance(block.getLocation(), location) <= 5) remove.put(block.getLocation(), block.getBlockData());
                     Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
-                        for (Block block : remove) {
-                            block.getLocation().getBlock().setBlockData(block.getBlockData());
+                        for (Map.Entry<Location, BlockData> entry : remove.entrySet()) {
+                            entry.getKey().getBlock().setBlockData(entry.getValue());
                         }
                     }, 2);
                     remove.clear();

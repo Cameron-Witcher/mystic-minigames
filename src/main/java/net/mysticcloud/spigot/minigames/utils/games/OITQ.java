@@ -105,47 +105,79 @@ public class OITQ extends Game {
 
         GamePlayer gamePlayer = getPlayer(player.getUniqueId());
         Entity entity = player.hasMetadata("last_damager") ? Bukkit.getEntity((UUID) player.getMetadata("last_damager").get(0).value()) : null;
-//        if (entity instanceof Player) {
-//            Player killer = Bukkit.getPlayer(entity.getUniqueId());
-//            score(killer);
-//            killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1f, 1.5f);
-//            killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1f, 1.11f);
-//            killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1f, 0.95f);
-//            assert killer != null;
-//            if (!killer.getInventory().contains(Material.ARROW))
-//                killer.getInventory().addItem(new ItemStack(Material.ARROW));
-//        }
-//        String victim = (gamePlayer.getTeam().equals(Team.NONE) ? "&3" : gamePlayer.getTeam().chatColor()) + player.getName();
-//        String action = " was killed";
-//        String ending = "!";
-//        switch (cause) {
-//            case PROJECTILE:
-//                action = " was shot";
-//                ending = (entity == null ? " by a projectile!" : " by " + (Bukkit.getEntity(entity.getUniqueId()) instanceof Player ? (getPlayer(entity.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : getPlayer(entity.getUniqueId()).getTeam().chatColor()) : "&7") + entity.getName() + "&e!&7 (" + CoreUtils.distance(player.getLocation(), entity.getLocation()).intValue() + " blocks)");
-//                break;
-//            case VOID:
-//                action = " fell out of the world";
-//                ending = ".";
-//                if (entity != null) {
-//                    Player killer = (Player) entity;
-//                    action = " was pushed over the edge";
-//                    ending = " by " + (getPlayer(killer.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : getPlayer(killer.getUniqueId()).getTeam().chatColor()) + entity.getName() + "&e.";
-//                }
-//                break;
-//            default:
-//                if (entity != null) {
-//                    ending = " by &7" + entity.getName() + "&e.";
-//                    if (entity instanceof Player) {
-//                        Player killer = (Player) entity;
-//                        if (killer.getEquipment() != null && killer.getEquipment().getItemInMainHand().getType().name().endsWith("_AXE")) {
-//                            action = " was decapitated";
-//                        }
-//                        ending = " by " + (getPlayer(killer.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : getPlayer(killer.getUniqueId()).getTeam().chatColor()) + entity.getName() + "&e.";
-//                    }
-//                }
-//                break;
-//        }
-//        sendMessage("&3" + victim + "&e" + action + ending);
+        Bukkit.broadcastMessage("1");
+        if (entity instanceof Player) {
+            Bukkit.broadcastMessage("2");
+            Player killer = Bukkit.getPlayer(entity.getUniqueId());
+            Bukkit.broadcastMessage("3");
+            score(killer);
+            Bukkit.broadcastMessage("4");
+            killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1f, 1.5f);
+            killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1f, 1.11f);
+            killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1f, 0.95f);
+            Bukkit.broadcastMessage("5");
+            if (!killer.getInventory().contains(Material.ARROW))
+                killer.getInventory().addItem(new ItemStack(Material.ARROW));
+            Bukkit.broadcastMessage("6");
+        }
+        Bukkit.broadcastMessage("7");
+        String victim = (gamePlayer.getTeam().equals(Team.NONE) ? "&3" : gamePlayer.getTeam().chatColor()) + player.getName();
+        Bukkit.broadcastMessage("8");
+        String action = " was killed";
+        Bukkit.broadcastMessage("9");
+        String ending = "!";
+        switch (cause) {
+            case PROJECTILE:
+                Bukkit.broadcastMessage("10");
+                action = " was shot";
+                Bukkit.broadcastMessage("11");
+                ending = (entity == null ? " by a projectile!" : " by " + (entity instanceof Player ? (getPlayer(entity.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : getPlayer(entity.getUniqueId()).getTeam().chatColor()) : "&7") + entity.getName() + "&e!&7 (" + CoreUtils.distance(player.getLocation(), entity.getLocation()).intValue() + " blocks)");
+                Bukkit.broadcastMessage("12");
+                break;
+            case VOID:
+                Bukkit.broadcastMessage("13");
+                action = " fell out of the world";
+                Bukkit.broadcastMessage("14");
+                ending = ".";
+                Bukkit.broadcastMessage("15");
+                if (entity != null) {
+                    Bukkit.broadcastMessage("16");
+                    Player killer = (Player) entity;
+                    Bukkit.broadcastMessage("17");
+                    action = " was pushed over the edge";
+                    Bukkit.broadcastMessage("18");
+                    ending = " by " + (getPlayer(killer.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : getPlayer(killer.getUniqueId()).getTeam().chatColor()) + entity.getName() + "&e.";
+                    Bukkit.broadcastMessage("19");
+                }
+                Bukkit.broadcastMessage("20");
+                break;
+            default:
+                Bukkit.broadcastMessage("21");
+                if (entity != null) {
+                    Bukkit.broadcastMessage("22");
+                    ending = " by &7" + entity.getName() + "&e.";
+                    Bukkit.broadcastMessage("23");
+                    if (entity instanceof Player) {
+                        Bukkit.broadcastMessage("24");
+                        Player killer = (Player) entity;
+                        Bukkit.broadcastMessage("25");
+                        if (killer.getEquipment() != null && killer.getEquipment().getItemInMainHand().getType().name().endsWith("_AXE")) {
+                            Bukkit.broadcastMessage("26");
+                            action = " was decapitated";
+                            Bukkit.broadcastMessage("27");
+                        }
+                        Bukkit.broadcastMessage("28");
+                        ending = " by " + (getPlayer(killer.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : getPlayer(killer.getUniqueId()).getTeam().chatColor()) + entity.getName() + "&e.";
+                        Bukkit.broadcastMessage("29");
+                    }
+                    Bukkit.broadcastMessage("30");
+                }
+                Bukkit.broadcastMessage("31");
+                break;
+        }
+        Bukkit.broadcastMessage("32");
+        sendMessage("&3" + victim + "&e" + action + ending);
+        Bukkit.broadcastMessage("33");
         Firework rocket = spawnFirework(player.getLocation(), FireworkEffect.builder().flicker(true).with(FireworkEffect.Type.BALL).withColor(Color.RED).build());
         rocket.detonate();
         super.kill(player, cause);

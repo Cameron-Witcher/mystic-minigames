@@ -131,6 +131,8 @@ public class HotPotato extends Game {
 
     public void swapHolder(Player from, Player to) {
         from.sendMessage(MessageUtils.colorize("&aYou have passed the Potato to " + to.getName()));
+        from.playSound(from,Sound.BLOCK_NOTE_BLOCK_PLING,1,1);
+        to.playSound(to,Sound.BLOCK_NOTE_BLOCK_PLING,1,1);
         setHolder(to);
     }
 

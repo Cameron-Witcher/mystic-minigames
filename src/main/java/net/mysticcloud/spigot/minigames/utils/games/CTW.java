@@ -51,7 +51,7 @@ public class CTW extends Game {
         setTeams(teams);
         setMinPlayers(teams);
         setMaxPlayers(teams * 4);
-        setFriendlyFire(true);
+        setFriendlyFire(false);
         livesObjective.setDisplaySlot(DisplaySlot.BELOW_NAME);
         livesObjective.setDisplayName(ChatColor.RED + Symbols.HEART_1.toString());
         setController(new GameController() {

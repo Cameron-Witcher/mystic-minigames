@@ -548,7 +548,6 @@ public class Game {
     public class GameScoreboard {
         ScoreboardManager scoreboardManager;
         Scoreboard scoreboard;
-        private Objective livesObjective = getScoreboardManager().getScoreboard().registerNewObjective("lives", "dummy", "Lives");
 
 
         public GameScoreboard() {

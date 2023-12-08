@@ -4,6 +4,7 @@ import net.mysticcloud.spigot.core.utils.CoreUtils;
 import net.mysticcloud.spigot.core.utils.MessageUtils;
 import net.mysticcloud.spigot.minigames.utils.Game;
 import net.mysticcloud.spigot.minigames.utils.games.CTW;
+import net.mysticcloud.spigot.minigames.utils.games.HotPotato;
 import net.mysticcloud.spigot.minigames.utils.games.OITQ;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.ArenaManager;
@@ -101,6 +102,9 @@ public class GameManager {
                 break;
             case "oitq":
                 game = new OITQ(arena);
+                break;
+            case "hotpotato":
+                game = new HotPotato(arena);
                 break;
             default:
                 game = null;

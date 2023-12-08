@@ -1,7 +1,6 @@
 package net.mysticcloud.spigot.minigames.utils;
 
 import net.mysticcloud.spigot.core.utils.MessageUtils;
-import net.mysticcloud.spigot.core.utils.regions.RegionUtils;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
 import org.bukkit.*;
 import org.bukkit.entity.Firework;
@@ -87,28 +86,39 @@ public class Game {
 
     public void end() {
 
-        Bukkit.broadcastMessage("Ending game");
+        for (UUID uid : players.keySet()) {
+            Player player = Bukkit.getPlayer(uid);
+            player.setGameMode(GameMode.SPECTATOR);
+            getPlayer(player.getUniqueId()).setTeam(Team.SPECTATOR);
+        }
 
 
         controller.end();
 
-        for (UUID uid : players.keySet()) {
-            removePlayer(uid, false);
-        }
-        players.clear();
-        teamScores.clear();
-        playerScores.clear();
-        arena.delete();
+        Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+            for (UUID uid : players.keySet()) {
+                removePlayer(uid, false);
+            }
+            players.clear();
+            teamScores.clear();
+            playerScores.clear();
+            arena.delete();
 
-        generated = false;
-        gameState.reset();
-        gameScoreboard.reset();
-        noBuildZones.clear();
+            generated = false;
+            gameState.reset();
+            gameScoreboard.reset();
+            noBuildZones.clear();
+        }, 15 * 20);
+
 
     }
 
     public boolean addPlayer(UUID uid) {
-        if (players.size() >= maxPlayers || !gameState.acceptingPlayers()) return false;
+        if (players.size() >= maxPlayers || !gameState.acceptingPlayers()) {
+            Bukkit.getPlayer(uid).sendMessage(MessageUtils.prefixes("game") + "Sorry, that game is either full or has already started.");
+            Bukkit.getPlayer(uid).sendMessage(MessageUtils.colorize("&7Spectate games coming soon."));
+            return false;
+        }
 
         Player player = Bukkit.getPlayer(uid);
         inventoryList.put(uid, player.getInventory().getContents());
@@ -296,6 +306,7 @@ public class Game {
                 player.teleport(player.getLocation().clone().add(0, Math.abs(player.getLocation().getY()) + 50, 0));
             Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new CountdownRunnable(3, (timer) -> {
                 player.sendTitle("", ChatColor.RED + "Respawning in " + timer + " second" + (timer == 1 ? "" : "s"), 0, 25, 50);
+                return false;
             }, () -> {
                 player.setGameMode(GameMode.SURVIVAL);
                 spawnPlayer(player);
@@ -371,6 +382,10 @@ public class Game {
             if (!countdown) {
                 countdown = true;
                 Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new CountdownRunnable(10, (int t) -> {
+                    if (getPlayers().size() < minPlayers) {
+                        sendMessage(MessageUtils.colorize("&cNot enough players. Cancelling countdown."));
+                        return true;
+                    }
                     sendMessage(MessageUtils.colorize("&3Starting in " + t + " second" + (t == 1 ? "" : "s") + "!"));
                     for (UUID uid : getPlayers().keySet()) {
                         Player player = Bukkit.getPlayer(uid);
@@ -379,6 +394,7 @@ public class Game {
 
                         }
                     }
+                    return false;
                 }, () -> {
                     startGame();
                     for (UUID uid : getPlayers().keySet()) {
@@ -432,14 +448,20 @@ public class Game {
         long date;
         int timer;
         Runnable finish;
-        TimerRunnable tick;
+        TimerTick tick;
+        boolean cancel = false;
 
-        CountdownRunnable(int timer, TimerRunnable tick, Runnable finish) {
+        CountdownRunnable(int timer, TimerTick tick, Runnable finish) {
             this.timer = timer;
             this.date = new Date().getTime();
             this.finish = finish;
             this.tick = tick;
             tick();
+        }
+
+        private void tick() {
+            cancel = tick.go(timer);
+            timer = timer - 1;
         }
 
         @Override
@@ -453,20 +475,13 @@ public class Game {
                 tick();
 
             }
-            Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), this, 1);
-
+            if (!cancel) Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), this, 1);
         }
-
-        private void tick() {
-            tick.go(timer);
-            timer = timer - 1;
-        }
-
     }
 
 
-    private interface TimerRunnable {
-        public abstract void go(int timer);
+    private interface TimerTick {
+        public abstract boolean go(int timer);
     }
 
 
@@ -531,7 +546,7 @@ public class Game {
             setup();
         }
 
-        private void setup(){
+        private void setup() {
             scoreboardManager = Bukkit.getScoreboardManager();
             scoreboard = scoreboardManager.getNewScoreboard();
             for (Team team : Team.values())

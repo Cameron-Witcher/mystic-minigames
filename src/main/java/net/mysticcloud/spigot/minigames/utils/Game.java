@@ -380,23 +380,31 @@ public class Game {
     }
 
     public void processDamage(Player victim, double damage, EntityDamageEvent.DamageCause cause) {
+        Bukkit.broadcastMessage("6");
         if (victim.hasMetadata("last_damager")) {
+            Bukkit.broadcastMessage("7");
             Entity perp = Bukkit.getEntity((UUID) victim.getMetadata("last_damager").get(0).value());
+            Bukkit.broadcastMessage("8");
             if (perp instanceof Player) {
+                Bukkit.broadcastMessage("9");
                 Player perp1 = (Player) perp;
+                Bukkit.broadcastMessage("10");
                 if (perp1.equals(victim) || (!isFriendlyFire() && getPlayer(victim.getUniqueId()).getTeam().equals(getPlayer(perp1.getUniqueId()).getTeam())))
                     return;
-
+                Bukkit.broadcastMessage("11");
 
             }
         }
-
+        Bukkit.broadcastMessage("12");
         if (victim.getHealth() - damage <= 0) {
-
+            Bukkit.broadcastMessage("13");
             kill(victim, cause);
+            Bukkit.broadcastMessage("14");
             return;
         }
+        Bukkit.broadcastMessage("15");
         Bukkit.getPluginManager().callEvent(new EntityDamageEvent(victim, EntityDamageEvent.DamageCause.WORLD_BORDER, damage));
+        Bukkit.broadcastMessage("16");
     }
 
 

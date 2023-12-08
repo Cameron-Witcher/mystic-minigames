@@ -403,6 +403,8 @@ public class Game {
             return;
         }
         Bukkit.broadcastMessage("15");
+//        ((CraftPlayer)p).getHandle().damageEntity(DamageSource.OUT_OF_WORLD, 100);
+        victim.damage(damage);
         Bukkit.getPluginManager().callEvent(new EntityDamageEvent(victim, EntityDamageEvent.DamageCause.CUSTOM, damage));
         Bukkit.broadcastMessage("16");
     }

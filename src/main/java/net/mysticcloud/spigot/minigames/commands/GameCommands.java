@@ -97,6 +97,9 @@ public class GameCommands implements CommandExecutor {
                 //send help
                 return true;
             }
+            if (args[0].equalsIgnoreCase("end")) {
+
+            }
             if (args[0].equalsIgnoreCase("create")) {
                 //Syntax: /game create <game> <arena> [teams]
                 if (args.length <= 2) {

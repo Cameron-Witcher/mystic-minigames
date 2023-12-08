@@ -403,7 +403,7 @@ public class Game {
             return;
         }
         Bukkit.broadcastMessage("15");
-        Bukkit.getPluginManager().callEvent(new EntityDamageEvent(victim, EntityDamageEvent.DamageCause.WORLD_BORDER, damage));
+        Bukkit.getPluginManager().callEvent(new EntityDamageEvent(victim, EntityDamageEvent.DamageCause.CUSTOM, damage));
         Bukkit.broadcastMessage("16");
     }
 

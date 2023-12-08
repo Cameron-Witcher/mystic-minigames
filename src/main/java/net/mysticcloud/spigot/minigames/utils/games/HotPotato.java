@@ -113,11 +113,20 @@ public class HotPotato extends Game {
         Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
             if (victim.hasMetadata("last_damager")) {
                 Entity perp = Bukkit.getEntity((UUID) victim.getMetadata("last_damager").get(0).value());
-                if(getHolder().equals(perp.getUniqueId())) swapHolder(((Player)perp), victim);
+                if (getHolder().equals(perp.getUniqueId())) swapHolder(((Player) perp), victim);
             }
             super.processDamage(victim, 0, cause);
         }, 0);
 
+    }
+
+    @Override
+    public void removePlayer(UUID uid, boolean list) {
+        if (getHolder().equals(uid)) {
+            UUID[] uids = getPlayers().keySet().toArray(new UUID[getPlayers().keySet().size()]);
+            setHolder(Bukkit.getPlayer(uids[(new Random().nextInt(uids.length))]));
+        }
+        super.removePlayer(uid, list);
     }
 
     private void setHolder(Player player) {
@@ -131,8 +140,8 @@ public class HotPotato extends Game {
 
     public void swapHolder(Player from, Player to) {
         from.sendMessage(MessageUtils.colorize("&aYou have passed the Potato to " + to.getName()));
-        from.playSound(from,Sound.BLOCK_NOTE_BLOCK_PLING,1,1);
-        to.playSound(to,Sound.BLOCK_NOTE_BLOCK_PLING,1,1);
+        from.playSound(from, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+        to.playSound(to, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
         setHolder(to);
     }
 

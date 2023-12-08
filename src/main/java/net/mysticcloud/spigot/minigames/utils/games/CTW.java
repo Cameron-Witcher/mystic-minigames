@@ -136,6 +136,21 @@ public class CTW extends Game {
         });
     }
 
+    @Override
+    public void removePlayer(UUID uid, boolean list) {
+        Player player = Bukkit.getPlayer(uid);
+        if (player.hasMetadata("flag")) {
+
+            Team flag = (Team) player.getMetadata("flag").get(0).value();
+
+            dropFlag(flag, ((Location) getData().get(flag.name().toLowerCase() + "_flag")));
+            sendMessage(MessageUtils.colorize(getPlayer(uid).getTeam().chatColor() + "&l" + player.getName() + "&r &ehas dropped the " + flag.chatColor() + "&l" + flag.name() + "&r&e flag!"));
+            player.removeMetadata("flag", Utils.getPlugin());
+        }
+        super.removePlayer(uid,list);
+
+    }
+
     private void dropFlag(Team team, Location loc) {
         World world = loc.getWorld();
         assert world != null;

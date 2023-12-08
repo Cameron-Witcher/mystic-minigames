@@ -53,8 +53,9 @@ public class HotPotato extends Game {
             public boolean check() {
                 if (!getGameState().hasStarted()) return false;
                 LASTED = new Date().getTime() - STARTED;
-                for(GamePlayer player : getPlayers().values()){
-                    if(!potatoHolder.equals(player.getUUID())) score(Bukkit.getPlayer(player.getUUID()));
+                for (GamePlayer player : getPlayers().values()) {
+                    if (!potatoHolder.equals(player.getUUID())) score(Bukkit.getPlayer(player.getUUID()));
+                    Bukkit.getPlayer(player.getUUID()).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.DARK_AQUA + MessageUtils.formatTimeRaw(DURATION - LASTED) + " | " + (getHolder().equals(player.getUUID()) ? ChatColor.RED + "You have the potato!" : ChatColor.GREEN + "You don't have the potato!")));
                 }
 
                 return LASTED >= DURATION;
@@ -90,11 +91,11 @@ public class HotPotato extends Game {
         player.sendMessage(MessageUtils.colorize("&cYou have the Potato!"));
     }
 
-    public UUID getHolder(){
+    public UUID getHolder() {
         return potatoHolder;
     }
 
-    public void swapHolder(Player from, Player to){
+    public void swapHolder(Player from, Player to) {
         from.sendMessage(MessageUtils.colorize("&aYou have passed the Potato to " + to.getName()));
         setHolder(to);
     }

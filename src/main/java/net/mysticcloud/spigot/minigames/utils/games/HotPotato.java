@@ -5,6 +5,7 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.mysticcloud.spigot.core.utils.CoreUtils;
 import net.mysticcloud.spigot.core.utils.MessageUtils;
+import net.mysticcloud.spigot.core.utils.placeholder.Symbols;
 import net.mysticcloud.spigot.minigames.utils.Team;
 import net.mysticcloud.spigot.minigames.utils.Utils;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
@@ -15,6 +16,8 @@ import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
 import org.json2.JSONArray;
 import org.json2.JSONObject;
 
@@ -26,7 +29,9 @@ public class HotPotato extends Game {
     private long STARTED;
     private final long DURATION = TimeUnit.MILLISECONDS.convert(2, TimeUnit.MINUTES);
 
-    UUID potatoHolder = null;
+    private UUID potatoHolder = null;
+
+    private Objective scoresObjective = getScoreboardManager().getScoreboard().registerNewObjective("lives", "dummy", "Lives");
 
 
     public HotPotato(Arena arena) {
@@ -34,9 +39,16 @@ public class HotPotato extends Game {
         setTeams(1);
         setMinPlayers(2);
         setMaxPlayers(20);
+
+        scoresObjective.setDisplaySlot(DisplaySlot.BELOW_NAME);
+        scoresObjective.setDisplayName(ChatColor.GREEN + Symbols.STAR_1.toString());
+
         setController(new GameController() {
 
             long LASTED = 0;
+            long SCORE_CHECK = 0;
+            long NOW = 0;
+            boolean CHECK_SCORE = false;
 
             @Override
             public void start() {
@@ -52,12 +64,17 @@ public class HotPotato extends Game {
             @Override
             public boolean check() {
                 if (!getGameState().hasStarted()) return false;
-                LASTED = new Date().getTime() - STARTED;
-                for (GamePlayer player : getPlayers().values()) {
-                    if (!potatoHolder.equals(player.getUUID())) score(Bukkit.getPlayer(player.getUUID()));
-                    Bukkit.getPlayer(player.getUUID()).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.DARK_AQUA + MessageUtils.formatTimeRaw(DURATION - LASTED) + " | " + (getHolder().equals(player.getUUID()) ? ChatColor.RED + "You have the potato!" : ChatColor.GREEN + "You don't have the potato!")));
+                NOW = new Date().getTime();
+                LASTED = NOW - STARTED;
+                if (NOW - SCORE_CHECK >= TimeUnit.MILLISECONDS.convert(1, TimeUnit.SECONDS)) CHECK_SCORE = true;
+                for (GamePlayer gamePlayer : getPlayers().values()) {
+                    Player player = Bukkit.getPlayer(gamePlayer.getUUID());
+                    scoresObjective.getScore(player.getName()).setScore(getScore(player));
+                    if (CHECK_SCORE && !potatoHolder.equals(gamePlayer.getUUID())) score(player);
+                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.DARK_AQUA + MessageUtils.formatTimeRaw(DURATION - LASTED) + " | " + (getHolder().equals(gamePlayer.getUUID()) ? ChatColor.RED + "You have the potato!" : ChatColor.GREEN + "You don't have the potato!")));
                 }
 
+                CHECK_SCORE = false;
                 return LASTED >= DURATION;
             }
 

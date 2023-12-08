@@ -1,6 +1,7 @@
 package net.mysticcloud.spigot.minigames.utils;
 
 import net.mysticcloud.spigot.core.utils.MessageUtils;
+import net.mysticcloud.spigot.core.utils.placeholder.Symbols;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
 import org.bukkit.*;
 import org.bukkit.entity.Firework;
@@ -10,6 +11,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.json2.JSONObject;
@@ -545,6 +548,8 @@ public class Game {
     public class GameScoreboard {
         ScoreboardManager scoreboardManager;
         Scoreboard scoreboard;
+        private Objective livesObjective = getScoreboardManager().getScoreboard().registerNewObjective("lives", "dummy", "Lives");
+
 
         public GameScoreboard() {
             setup();

@@ -5,6 +5,7 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.mysticcloud.spigot.core.utils.CoreUtils;
 import net.mysticcloud.spigot.core.utils.MessageUtils;
+import net.mysticcloud.spigot.core.utils.placeholder.Symbols;
 import net.mysticcloud.spigot.core.utils.regions.RegionUtils;
 import net.mysticcloud.spigot.minigames.utils.Team;
 import net.mysticcloud.spigot.minigames.utils.Utils;
@@ -24,6 +25,8 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
 import org.bukkit.util.Vector;
 import org.json2.JSONArray;
 import org.json2.JSONObject;
@@ -35,12 +38,19 @@ public class OITQ extends Game {
     int MAX_SCORE = 50;
     int MAX_LIVES = 5;
 
+    private Objective livesObjective = getScoreboardManager().getScoreboard().registerNewObjective("lives", "dummy", "Lives");
+
 
     public OITQ(Arena arena) {
         super("OITQ", arena);
         setTeams(1);
         setMinPlayers(2);
         setMaxPlayers(20);
+
+        livesObjective.setDisplaySlot(DisplaySlot.BELOW_NAME);
+        livesObjective.setDisplayName(ChatColor.RED + Symbols.HEART_1.toString());
+
+
         setController(new GameController() {
 
             List<UUID> players = new ArrayList<>();
@@ -48,6 +58,7 @@ public class OITQ extends Game {
             @Override
             public void start() {
                 for (UUID uid : getPlayers().keySet()) {
+                    livesObjective.getScore(Bukkit.getPlayer(uid).getName()).setScore(MAX_LIVES);
                     getPlayer(uid).setMaxLives(MAX_LIVES);
                     spawnPlayer(Bukkit.getPlayer(uid));
                 }
@@ -60,7 +71,7 @@ public class OITQ extends Game {
                 for (GamePlayer player : getPlayers().values()) {
                     if (player.getTeam().equals(Team.SPECTATOR)) continue;
                     if (getScore(player.getTeam()) >= MAX_SCORE) return true;
-                    Bukkit.getPlayer(player.getUUID()).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + "Lives: " + player.getLives() + " | Score: " + getScore(Bukkit.getPlayer(player.getUUID())) + "/" + MAX_SCORE));
+                    Bukkit.getPlayer(player.getUUID()).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.DARK_AQUA + "Lives: " + player.getLives() + " | Score: " + getScore(Bukkit.getPlayer(player.getUUID())) + "/" + MAX_SCORE));
                     players.add(player.getUUID());
                 }
                 return players.size() <= 1;
@@ -148,6 +159,7 @@ public class OITQ extends Game {
         Firework rocket = spawnFirework(player.getLocation().clone().add(0, 1, 0), FireworkEffect.builder().flicker(true).with(FireworkEffect.Type.BALL).withColor(Color.RED).build());
         rocket.detonate();
         super.kill(player, cause);
+        livesObjective.getScore(player.getName()).setScore(gamePlayer.getLives());
     }
 
     @Override

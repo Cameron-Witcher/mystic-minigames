@@ -185,9 +185,6 @@ public class CTW extends Game {
         if (entity instanceof Player) {
             Player killer = Bukkit.getPlayer(entity.getUniqueId());
             score(killer);
-            killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.5f);
-            killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.11f);
-            killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 0.95f);
             if (!killer.getInventory().contains(Material.ARROW))
                 killer.getInventory().addItem(new ItemStack(Material.ARROW));
         }
@@ -263,5 +260,24 @@ public class CTW extends Game {
         dropFlag(flag, ((Location) getData().get(flag.name().toLowerCase() + "_flag")));
 
 
+    }
+
+    @Override
+    public int score(Player player, int amount) {
+        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.5f);
+        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.11f);
+        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 0.95f);
+        return super.score(player, amount);
+    }
+
+    @Override
+    public int score(Team team, int amount) {
+        for(UUID uid : getPlayers(team)) {
+            Player player = Bukkit.getPlayer(uid);
+            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.5f);
+            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.11f);
+            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 0.95f);
+        }
+        return super.score(team, amount);
     }
 }

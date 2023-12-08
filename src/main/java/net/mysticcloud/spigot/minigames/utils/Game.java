@@ -33,7 +33,6 @@ public class Game {
     private boolean generated = false;
 
 
-
     private Map<UUID, ItemStack[]> inventoryList = new HashMap<>();
 
 
@@ -220,27 +219,26 @@ public class Game {
         return gameState;
     }
 
-    public void sendMessage(String message) {
-        for (Team team : Team.values())
-            sendMessage(team, message);
-    }
 
     public void startGame() {
-        for(GamePlayer player : players.values()){
-            teamScores.put(player.getTeam(),0);
-            playerScores.put(player.getUUID(),0);
+        for (GamePlayer player : players.values()) {
+            teamScores.put(player.getTeam(), 0);
+            playerScores.put(player.getUUID(), 0);
         }
         gameState.hasStarted(true);
         controller.start();
 
     }
 
+    public void sendMessage(String message) {
+        for (Team team : Team.values())
+            sendMessage(team, message);
+    }
+
 
     public void sendMessage(Team team, String message) {
-        for (Map.Entry<UUID, GamePlayer> e : players.entrySet()) {
-            if (e.getValue().getTeam().equals(team))
-                Bukkit.getPlayer(e.getKey()).sendMessage(MessageUtils.colorize(message));
-        }
+        for (UUID uid : getPlayers(team))
+            Bukkit.getPlayer(uid).sendMessage(MessageUtils.colorize(message));
     }
 
     public void close() {
@@ -250,6 +248,14 @@ public class Game {
     }
 
     public Map<UUID, GamePlayer> getPlayers() {
+        return players;
+    }
+
+    public List<UUID> getPlayers(Team team) {
+        List<UUID> players = new ArrayList<>();
+        for (Map.Entry<UUID, GamePlayer> entry : this.players.entrySet()) {
+            if (entry.getValue().getTeam().equals(team)) players.add(entry.getKey());
+        }
         return players;
     }
 
@@ -364,6 +370,17 @@ public class Game {
                 countdown = true;
                 Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new CountdownRunnable(10, (int t) -> {
                     sendMessage(MessageUtils.colorize("&3Starting in " + t + " second" + (t == 1 ? "" : "s") + "!"));
+                    for (UUID uid : getPlayers().keySet()) {
+                        Player player = Bukkit.getPlayer(uid);
+                        if (t < 5) {
+                            if (!(t == 1))
+                                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BIT, SoundCategory.MASTER, 1f, 0.5f);
+                            else {
+                                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 1f, 0.5f);
+                                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, SoundCategory.MASTER, 1f, 0.5f);
+                            }
+                        }
+                    }
                 }, () -> {
                     startGame();
                 }), 0);
@@ -498,10 +515,10 @@ public class Game {
         ScoreboardManager scoreboardManager;
         Scoreboard scoreboard;
 
-        public GameScoreboard(){
+        public GameScoreboard() {
             scoreboardManager = Bukkit.getScoreboardManager();
             scoreboard = scoreboardManager.getNewScoreboard();
-            for(Team team : Team.values())
+            for (Team team : Team.values())
                 scoreboard.registerNewTeam(team.name()).setColor(team.chatColor());
 
         }

@@ -94,8 +94,11 @@ public class DeathListener implements Listener {
                 }
                 return;
             }
+            Bukkit.broadcastMessage("1");
             if (((Player) e.getEntity()).getHealth() - e.getFinalDamage() <= 0) {
+                Bukkit.broadcastMessage("2");
                 e.setCancelled(true);
+                Bukkit.broadcastMessage("3");
                 game.kill((Player) e.getEntity(), e.getCause());
 
             }

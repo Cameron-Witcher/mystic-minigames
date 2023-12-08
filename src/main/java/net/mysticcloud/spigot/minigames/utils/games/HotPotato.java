@@ -66,7 +66,10 @@ public class HotPotato extends Game {
                 if (!getGameState().hasStarted()) return false;
                 NOW = new Date().getTime();
                 LASTED = NOW - STARTED;
-                if (NOW - SCORE_CHECK >= TimeUnit.MILLISECONDS.convert(1, TimeUnit.SECONDS)) CHECK_SCORE = true;
+                if (NOW - SCORE_CHECK >= TimeUnit.MILLISECONDS.convert(1, TimeUnit.SECONDS)) {
+                    CHECK_SCORE = true;
+                    SCORE_CHECK = NOW;
+                }
                 for (GamePlayer gamePlayer : getPlayers().values()) {
                     Player player = Bukkit.getPlayer(gamePlayer.getUUID());
                     scoresObjective.getScore(player.getName()).setScore(getScore(player));

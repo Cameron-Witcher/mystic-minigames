@@ -1,6 +1,7 @@
 package net.mysticcloud.spigot.minigames.utils;
 
 import net.mysticcloud.spigot.core.utils.CoreUtils;
+import net.mysticcloud.spigot.core.utils.placeholder.PlaceholderUtils;
 import net.mysticcloud.spigot.minigames.MysticMinigames;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.ArenaManager;
 import org.bukkit.Location;
@@ -13,6 +14,10 @@ public class Utils {
 
     public static void init(MysticMinigames mainClass) {
         plugin = mainClass;
+        PlaceholderUtils.registerPlaceholder("team", (player) -> {
+            if (!player.getWorld().hasMetadata("game")) return "NO-GAME";
+            return ((Game) player.getWorld().getMetadata("game").get(0).value()).getPlayer(player.getUniqueId()).getTeam().name();
+        });
         ArenaManager.registerArenas();
         GameManager.init();
 

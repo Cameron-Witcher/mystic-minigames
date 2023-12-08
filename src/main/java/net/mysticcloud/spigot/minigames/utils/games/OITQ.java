@@ -108,6 +108,7 @@ public class OITQ extends Game {
         if (entity instanceof Player) {
             Player killer = Bukkit.getPlayer(entity.getUniqueId());
             score(killer);
+
             killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.5f);
             killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.11f);
             killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 0.95f);

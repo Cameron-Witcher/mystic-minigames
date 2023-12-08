@@ -11,6 +11,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.ScoreboardManager;
 import org.json2.JSONObject;
 
 import java.util.*;
@@ -25,6 +27,7 @@ public class Game {
     private final Map<Team, Integer> teamScores = new HashMap<>();
     private final Map<UUID, GamePlayer> players = new HashMap<>();
     private final List<Location> noBuildZones = new ArrayList<>();
+    private final GameScoreboard gameScoreboard = new GameScoreboard();
     private int teams = 0, minPlayers = 2, maxPlayers = 10;
     private GameController controller = null;
     private boolean generated = false;
@@ -79,7 +82,7 @@ public class Game {
         player.teleport(Bukkit.getWorlds().get(0).getSpawnLocation());
         player.setGameMode(GameMode.SURVIVAL);
         player.getInventory().setContents(inventoryList.get(player.getUniqueId()));
-
+        player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
         inventoryList.remove(player.getUniqueId());
     }
 
@@ -123,7 +126,7 @@ public class Game {
                 List<Arena.Spawn> spawns = arena.getSpawns(Team.NONE);
                 player.teleport(spawns.get(new Random().nextInt(spawns.size())).getLocation());
             }
-
+            player.setScoreboard(gameScoreboard.getScoreboard());
             players.put(player.getUniqueId(), new GamePlayer(player.getUniqueId()));
             player.setGameMode(GameMode.SPECTATOR);
             sendMessage("&3" + player.getName() + "&e has joined! (&3" + players.size() + "&e/&3" + maxPlayers + "&e)");
@@ -320,10 +323,8 @@ public class Game {
 
     public void generate() {
         arena.startGeneration();
-        Bukkit.broadcastMessage("Arena generated.");
         arena.getWorld().setMetadata("game", new FixedMetadataValue(Utils.getPlugin(), this));
         controller.generate();
-        Bukkit.broadcastMessage("Controller generated.");
         generated = true;
 
     }
@@ -336,6 +337,10 @@ public class Game {
         rocket.setFireworkMeta(meta);
         rocket.setMetadata("game", new FixedMetadataValue(Utils.getPlugin(), this));
         return rocket;
+    }
+
+    public GameScoreboard getScoreboardManager() {
+        return gameScoreboard;
     }
 
 
@@ -486,6 +491,23 @@ public class Game {
 
         public UUID getUUID() {
             return uid;
+        }
+    }
+
+    public class GameScoreboard {
+        ScoreboardManager scoreboardManager;
+        Scoreboard scoreboard;
+
+        public GameScoreboard(){
+            scoreboardManager = Bukkit.getScoreboardManager();
+            scoreboard = scoreboardManager.getNewScoreboard();
+            for(Team team : Team.values())
+                scoreboard.registerNewTeam(team.name()).setColor(team.chatColor());
+
+        }
+
+        public Scoreboard getScoreboard() {
+            return scoreboard;
         }
     }
 }

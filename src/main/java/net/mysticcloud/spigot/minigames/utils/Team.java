@@ -4,14 +4,15 @@ import net.mysticcloud.spigot.core.utils.MessageUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
+import org.bukkit.entity.Player;
 
 import java.util.*;
 
 public enum Team {
     RED(ChatColor.RED, Color.RED), BLUE(ChatColor.BLUE, Color.BLUE), GREEN(ChatColor.GREEN, Color.GREEN), YELLOW(ChatColor.YELLOW, Color.YELLOW), NONE(ChatColor.RESET, Color.WHITE), SPECTATOR(ChatColor.RESET, Color.WHITE);
 
-    final ChatColor chatColor;
-    final Color dyeColor;
+    private final ChatColor chatColor;
+    private final Color dyeColor;
 
     Team(ChatColor chatColor, Color dyeColor) {
         this.chatColor = chatColor;
@@ -36,6 +37,7 @@ public enum Team {
         for (UUID uid : uids) {
             players.put(uid, teamArray[i]);
             Bukkit.getPlayer(uid).sendMessage(MessageUtils.colorize("&eYou're on the " + teamArray[i].chatColor + "&l" + teamArray[i].name() + "&r&e team!"));
+            game.getScoreboardManager().getScoreboard().getTeam(teamArray[i].name()).addEntry(Bukkit.getPlayer(uid).getName());
             i = i + 1;
             if (i >= teams) i = 0;
 

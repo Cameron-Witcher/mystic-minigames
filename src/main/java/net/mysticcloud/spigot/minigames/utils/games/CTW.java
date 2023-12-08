@@ -5,6 +5,7 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.mysticcloud.spigot.core.utils.CoreUtils;
 import net.mysticcloud.spigot.core.utils.MessageUtils;
+import net.mysticcloud.spigot.core.utils.placeholder.Symbols;
 import net.mysticcloud.spigot.core.utils.regions.RegionUtils;
 import net.mysticcloud.spigot.minigames.utils.Team;
 import net.mysticcloud.spigot.minigames.utils.Utils;
@@ -23,12 +24,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
 import org.bukkit.util.Vector;
 import org.json2.JSONArray;
 import org.json2.JSONObject;
 import org.yaml.snakeyaml.Yaml;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class CTW extends Game {
 
@@ -36,6 +40,10 @@ public class CTW extends Game {
 
     int MAX_SCORE = 5;
     int MAX_LIVES = 10;
+    private long STARTED;
+    private final long DURATION = TimeUnit.MILLISECONDS.convert(10, TimeUnit.MINUTES);
+
+    private Objective livesObjective = getScoreboardManager().getScoreboard().registerNewObjective("lives", "dummy", "Lives");
 
 
     public CTW(Arena arena, int teams) {
@@ -43,14 +51,19 @@ public class CTW extends Game {
         setTeams(teams);
         setMinPlayers(teams);
         setMaxPlayers(teams * 4);
+        livesObjective.setDisplaySlot(DisplaySlot.BELOW_NAME);
+        livesObjective.setDisplayName(ChatColor.RED + Symbols.HEART_1.toString());
         setController(new GameController() {
 
             Map<Team, ArrayList<UUID>> teamListMap = new HashMap<>();
+            long LASTED = 0;
 
             @Override
             public void start() {
+                STARTED = new Date().getTime();
                 Map<UUID, Team> teamAssignments = Team.sort(getPlayers().keySet(), getTeams(), CTW.this);
                 for (UUID uid : getPlayers().keySet()) {
+                    livesObjective.getScore(Bukkit.getPlayer(uid).getName()).setScore(MAX_LIVES);
                     getPlayer(uid).setMaxLives(MAX_LIVES);
                     spawnPlayer(Bukkit.getPlayer(uid));
                 }
@@ -63,16 +76,18 @@ public class CTW extends Game {
             @Override
             public boolean check() {
                 if (!getGameState().hasStarted()) return false;
+                LASTED = new Date().getTime() - STARTED;
+
                 teamListMap.clear();
                 for (GamePlayer player : getPlayers().values()) {
                     if (player.getTeam().equals(Team.NONE) || player.getTeam().equals(Team.SPECTATOR)) continue;
                     if (getScore(player.getTeam()) >= MAX_SCORE) return true;
-                    Bukkit.getPlayer(player.getUUID()).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + "Lives: " + player.getLives() + " | Team Score: " + getScore(player.getTeam()) + "/" + MAX_SCORE));
+                    Bukkit.getPlayer(player.getUUID()).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + "Lives: " + player.getLives() + " | " + MessageUtils.formatTimeRaw(LASTED) + " | Team Score: " + getScore(player.getTeam()) + "/" + MAX_SCORE));
                     if (!teamListMap.containsKey(player.getTeam()))
                         teamListMap.put(player.getTeam(), new ArrayList<>());
                     teamListMap.get(player.getTeam()).add(player.getUUID());
                 }
-                return teamListMap.size() == 1;
+                return teamListMap.size() == 1 || LASTED >= DURATION;
 
                 //check scores and timer
             }
@@ -218,6 +233,7 @@ public class CTW extends Game {
         Firework rocket = spawnFirework(player.getLocation().clone().add(0, 1, 0), FireworkEffect.builder().flicker(true).with(FireworkEffect.Type.BALL).withColor(gamePlayer.getTeam().getDyeColor()).build());
         rocket.detonate();
         super.kill(player, cause);
+        livesObjective.getScore(player.getName()).setScore(gamePlayer.getLives());
     }
 
     public void pickupFlag(Player player, Item item) {

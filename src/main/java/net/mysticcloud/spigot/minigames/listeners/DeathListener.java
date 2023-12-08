@@ -71,8 +71,8 @@ public class DeathListener implements Listener {
                     if (e.getDamager() instanceof Projectile) {
                         if (game instanceof OITQ) {
                             e.setDamage(50);
-                            e.getDamager().remove();
                         }
+                        e.getDamager().remove();
                     }
                 }
             }

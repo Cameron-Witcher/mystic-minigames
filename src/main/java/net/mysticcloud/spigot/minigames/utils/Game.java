@@ -131,13 +131,19 @@ public class Game {
     }
 
     public boolean addPlayer(UUID uid) {
-        if (players.size() >= maxPlayers || !gameState.acceptingPlayers()) {
-            Bukkit.getPlayer(uid).sendMessage(MessageUtils.prefixes("game") + "Sorry, that game is either full or has already started.");
-            Bukkit.getPlayer(uid).sendMessage(MessageUtils.colorize("&7Spectate games coming soon."));
+        Player player = Bukkit.getPlayer(uid);
+        if(player.getWorld().hasMetadata("game")){
+            player.sendMessage(MessageUtils.prefixes("game") + "You can't join a game while you're already in one!");
             return false;
         }
-
-        Player player = Bukkit.getPlayer(uid);
+        if (players.size() >= maxPlayers || !gameState.acceptingPlayers()) {
+            player.setGameMode(GameMode.SPECTATOR);
+            UUID[] uids = getPlayers().keySet().toArray(new UUID[getPlayers().keySet().size()]);
+            player.setScoreboard(gameScoreboard.getScoreboard());
+            players.put(player.getUniqueId(), new GamePlayer(player.getUniqueId()));
+            player.teleport(Bukkit.getPlayer(uids[(new Random().nextInt(uids.length))]));
+            return true;
+        }
         inventoryList.put(uid, player.getInventory().getContents());
         BukkitTask task = null;
 

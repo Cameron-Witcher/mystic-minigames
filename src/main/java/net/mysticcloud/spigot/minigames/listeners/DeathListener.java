@@ -43,7 +43,7 @@ public class DeathListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler
     public void onPlayerDamage(EntityDamageByEntityEvent e) {
         if (e.getEntity().getWorld().hasMetadata("game")) {
             for (MetadataValue data : e.getEntity().getWorld().getMetadata("game")) {
@@ -69,13 +69,6 @@ public class DeathListener implements Listener {
                         e.getEntity().removeMetadata("last_damager", Utils.getPlugin());
                         e.getEntity().removeMetadata("last_damager_timer", Utils.getPlugin());
                     }, 7 * 20)));
-
-                    if (e.getDamager() instanceof Projectile) {
-                        if (game instanceof OITQ) {
-                            e.setDamage(50);
-                        }
-                        e.getDamager().remove();
-                    }
                 }
             }
         }
@@ -86,23 +79,35 @@ public class DeathListener implements Listener {
         if (e.getEntity() instanceof Player && e.getEntity().getWorld().hasMetadata("game")) {
             Game game = (Game) e.getEntity().getWorld().getMetadata("game").get(0).value();
             if (!game.getGameState().hasStarted()) e.setCancelled(true);
-            if (game instanceof HotPotato) {
-                e.setDamage(0);
-                if (e.getEntity().hasMetadata("last_damager")) {
-                    if (Bukkit.getEntity((UUID) e.getEntity().getMetadata("last_damager").get(0).value()) instanceof Player) {
-                        ((HotPotato) game).swapHolder(Bukkit.getPlayer((UUID) e.getEntity().getMetadata("last_damager").get(0).value()), (Player) e.getEntity());
+            Player victim = (Player) e.getEntity();
+            if (victim.hasMetadata("last_damager")) {
+                Entity perp = Bukkit.getEntity((UUID) victim.getMetadata("last_damager").get(0).value());
+
+                if (perp instanceof Player) {
+                    Player perp1 = (Player) perp;
+
+                    if (game instanceof HotPotato) {
+                        HotPotato hp = (HotPotato) game;
+                        e.setDamage(0);
+                        if (hp.getHolder().equals(perp1.getUniqueId())) hp.swapHolder(perp1, victim);
+                    }
+                    if(game instanceof OITQ){
+                        if(e.getCause().equals(EntityDamageEvent.DamageCause.PROJECTILE)){
+                            e.setDamage(50);
+                        }
                     }
                 }
-                return;
             }
+
             Bukkit.broadcastMessage("Damage: " + e.getDamage() + " Final Damage: " + e.getFinalDamage());
-            if (((Player) e.getEntity()).getHealth() - e.getDamage() <= 0) {
+            if (victim.getHealth() - e.getDamage() <= 0) {
                 Bukkit.broadcastMessage("2");
                 e.setCancelled(true);
                 Bukkit.broadcastMessage("3");
                 game.kill((Player) e.getEntity(), e.getCause());
 
             }
+
         }
     }
 }

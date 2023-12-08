@@ -76,9 +76,7 @@ public class DeathListener implements Listener {
 
     @EventHandler
     public void onPlayerDeath(EntityDamageEvent e) {
-        e.setCancelled(true);
         Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
-            e.setCancelled(false);
             if (e.getEntity() instanceof Player && e.getEntity().getWorld().hasMetadata("game")) {
                 Game game = (Game) e.getEntity().getWorld().getMetadata("game").get(0).value();
                 if (!game.getGameState().hasStarted()) e.setCancelled(true);
@@ -111,6 +109,6 @@ public class DeathListener implements Listener {
                 }
 
             }
-        }, 1);
+        }, 0);
     }
 }

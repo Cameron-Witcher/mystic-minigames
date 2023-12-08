@@ -19,6 +19,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
 
 import java.util.UUID;
 
@@ -51,6 +52,7 @@ public class DeathListener implements Listener {
                 }
                 if (e.getEntity() instanceof Item && e.getEntity().hasMetadata("flag")){
                     e.setCancelled(true);
+                    e.getEntity().setVelocity(new Vector(0,0,0));
                     return;
                 }
 

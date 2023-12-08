@@ -12,6 +12,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.metadata.MetadataValue;
 
 import java.util.ArrayList;
@@ -67,9 +68,9 @@ public class BlockListener implements Listener {
     }
 
     @EventHandler
-    public void onBlockChange(BlockExplodeEvent e) {
-        if (e.getBlock().getWorld().hasMetadata("game")) {
-            for (MetadataValue value : e.getBlock().getWorld().getMetadata("game")) {
+    public void onBlockChange(EntityExplodeEvent e) {
+        if (e.getEntity().getWorld().hasMetadata("game")) {
+            for (MetadataValue value : e.getEntity().getWorld().getMetadata("game")) {
                 Game game = (Game) value.value();
                 for (Location location : game.getNoBuildZones()) {
                     Map<Location, BlockData> remove = new HashMap<>();

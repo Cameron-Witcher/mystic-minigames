@@ -167,12 +167,14 @@ public class CTW extends Game {
     public void kill(Player player, EntityDamageEvent.DamageCause cause) {
         GamePlayer gamePlayer = getPlayer(player.getUniqueId());
         Entity entity = player.hasMetadata("last_damager") ? Bukkit.getEntity((UUID) player.getMetadata("last_damager").get(0).value()) : null;
-        if (!(entity == null) && entity instanceof Player) {
+        if (entity instanceof Player) {
             Player killer = Bukkit.getPlayer(entity.getUniqueId());
             score(killer);
-            killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1f, 1.5f);
-            killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1f, 1.11f);
-            killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1f, 0.95f);
+            killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.5f);
+            killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.11f);
+            killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 0.95f);
+            if (!killer.getInventory().contains(Material.ARROW))
+                killer.getInventory().addItem(new ItemStack(Material.ARROW));
         }
         String victim = (gamePlayer.getTeam().equals(Team.NONE) ? "&3" : gamePlayer.getTeam().chatColor()) + player.getName();
         String action = " was killed";
@@ -180,7 +182,7 @@ public class CTW extends Game {
         switch (cause) {
             case PROJECTILE:
                 action = " was shot";
-                ending = (entity == null ? " by a projectile!" : " by " + (Bukkit.getEntity(entity.getUniqueId()) instanceof Player ? (getPlayer(entity.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : getPlayer(entity.getUniqueId()).getTeam().chatColor()) : "&7") + entity.getName() + "&e!&7 (" + CoreUtils.distance(player.getLocation(), entity.getLocation()).intValue() + " blocks)");
+                ending = (entity == null ? " by a projectile!" : " by " + (entity instanceof Player ? (getPlayer(entity.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : getPlayer(entity.getUniqueId()).getTeam().chatColor()) : "&7") + entity.getName() + "&e!&7 (" + CoreUtils.distance(player.getLocation(), entity.getLocation()).intValue() + " blocks)");
                 break;
             case VOID:
                 action = " fell out of the world";
@@ -213,7 +215,7 @@ public class CTW extends Game {
             sendMessage(MessageUtils.colorize(gamePlayer.getTeam().chatColor() + "&l" + player.getName() + "&r &ehas dropped the " + flag.chatColor() + "&l" + flag.name() + "&r&e flag!"));
             player.removeMetadata("flag", Utils.getPlugin());
         }
-        Firework rocket = spawnFirework(player.getLocation(), FireworkEffect.builder().flicker(true).with(FireworkEffect.Type.BALL).withColor(gamePlayer.getTeam().getDyeColor()).build());
+        Firework rocket = spawnFirework(player.getLocation().clone().add(0, 1, 0), FireworkEffect.builder().flicker(true).with(FireworkEffect.Type.BALL).withColor(gamePlayer.getTeam().getDyeColor()).build());
         rocket.detonate();
         super.kill(player, cause);
     }

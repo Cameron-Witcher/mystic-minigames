@@ -59,7 +59,7 @@ public class Arena {
     }
 
     public void startGeneration() {
-        File newWorld = new File(name);
+        File newWorld = new File(name + "_" + new Date().getTime());
         newWorld.mkdirs();
         CoreUtils.copyWorld(masterWorld, newWorld);
 
@@ -117,8 +117,7 @@ public class Arena {
     }
 
     public void delete() {
-        if (world != null)
-            CoreUtils.deleteWorld(world.getWorldFolder());
+        if (world != null) CoreUtils.deleteWorld(world.getWorldFolder());
         world = null;
     }
 

@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 public class HotPotato extends Game {
 
     private long STARTED;
-    private final long DURATION = TimeUnit.MILLISECONDS.convert(10, TimeUnit.MINUTES);
+    private final long DURATION = TimeUnit.MILLISECONDS.convert(2, TimeUnit.MINUTES);
 
     UUID potatoHolder = null;
 
@@ -45,6 +45,7 @@ public class HotPotato extends Game {
                 }
                 UUID[] uids = getPlayers().keySet().toArray(new UUID[getPlayers().keySet().size()]);
                 setHolder(Bukkit.getPlayer(uids[(new Random().nextInt(uids.length))]));
+                STARTED = new Date().getTime();
 
             }
 

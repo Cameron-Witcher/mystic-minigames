@@ -372,16 +372,17 @@ public class Game {
                     sendMessage(MessageUtils.colorize("&3Starting in " + t + " second" + (t == 1 ? "" : "s") + "!"));
                     for (UUID uid : getPlayers().keySet()) {
                         Player player = Bukkit.getPlayer(uid);
-                        if (t < 5) {
-                            if (!(t == 1))
-                                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BIT, SoundCategory.MASTER, 1f, 0.5f);
-                            else {
-                                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 1f, 0.5f);
-                                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, SoundCategory.MASTER, 1f, 0.5f);
-                            }
+                        if (t <= 5) {
+                            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BIT, SoundCategory.MASTER, 1f, 0.5f);
+
                         }
                     }
                 }, () -> {
+                    for (UUID uid : getPlayers().keySet()) {
+                        Player player = Bukkit.getPlayer(uid);
+                        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 1f, 0.5f);
+                        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, SoundCategory.MASTER, 1f, 0.5f);
+                    }
                     startGame();
                 }), 0);
             }

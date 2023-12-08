@@ -106,6 +106,11 @@ public class OITQ extends Game {
         });
     }
 
+    @Override
+    public void processDamage(Player victim, double damage, EntityDamageEvent.DamageCause cause) {
+        if(cause.equals(EntityDamageEvent.DamageCause.PROJECTILE)) damage = 100;
+        super.processDamage(victim, damage, cause);
+    }
 
     @Override
     protected void spawnPlayer(Player player) {

@@ -383,7 +383,7 @@ public class Game {
         Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
             if (victim.hasMetadata("last_damager")) {
                 Entity perp = Bukkit.getEntity((UUID) victim.getMetadata("last_damager").get(0).value());
-                if(perp instanceof Firework && perp.hasMetadata("game"))
+                if(perp.hasMetadata("game"))
                     return;
                 if (perp instanceof Player) {
                     Player perp1 = (Player) perp;

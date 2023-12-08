@@ -108,6 +108,18 @@ public class HotPotato extends Game {
         });
     }
 
+    @Override
+    public void processDamage(Player victim, double damage, EntityDamageEvent.DamageCause cause) {
+        Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+            if (victim.hasMetadata("last_damager")) {
+                Entity perp = Bukkit.getEntity((UUID) victim.getMetadata("last_damager").get(0).value());
+                if(getHolder().equals(perp.getUniqueId())) swapHolder(((Player)perp), victim);
+            }
+            super.processDamage(victim, 0, cause);
+        }, 0);
+
+    }
+
     private void setHolder(Player player) {
         potatoHolder = player.getUniqueId();
         player.sendMessage(MessageUtils.colorize("&cYou have the Potato!"));

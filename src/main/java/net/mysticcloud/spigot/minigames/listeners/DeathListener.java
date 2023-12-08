@@ -79,20 +79,32 @@ public class DeathListener implements Listener {
         if (e.getEntity() instanceof Player && e.getEntity().getWorld().hasMetadata("game")) {
             Game game = (Game) e.getEntity().getWorld().getMetadata("game").get(0).value();
             if (!game.getGameState().hasStarted()) e.setCancelled(true);
+            Bukkit.broadcastMessage("1-1");
             Player victim = (Player) e.getEntity();
             if (victim.hasMetadata("last_damager")) {
+                Bukkit.broadcastMessage("1-2");
                 Entity perp = Bukkit.getEntity((UUID) victim.getMetadata("last_damager").get(0).value());
-
+                Bukkit.broadcastMessage("1-3");
                 if (perp instanceof Player) {
+                    Bukkit.broadcastMessage("1-4");
                     Player perp1 = (Player) perp;
-
+                    if(perp1.equals(victim)){
+                        Bukkit.broadcastMessage("1-5");
+                        e.setCancelled(true);
+                        return;
+                    }
+                    Bukkit.broadcastMessage("1-6");
                     if (game instanceof HotPotato) {
+                        Bukkit.broadcastMessage("1-7");
                         HotPotato hp = (HotPotato) game;
                         e.setDamage(0);
                         if (hp.getHolder().equals(perp1.getUniqueId())) hp.swapHolder(perp1, victim);
                     }
+                    Bukkit.broadcastMessage("1-8");
                     if(game instanceof OITQ){
+                        Bukkit.broadcastMessage("1-9");
                         if(e.getCause().equals(EntityDamageEvent.DamageCause.PROJECTILE)){
+                            Bukkit.broadcastMessage("1-10");
                             e.setDamage(50);
                         }
                     }

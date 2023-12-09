@@ -77,11 +77,7 @@ public class HotPotato extends Game {
                     Player player = Bukkit.getPlayer(gamePlayer.getUUID());
                     scoresObjective.getScore(player.getName()).setScore(getScore(player));
                     if (CHECK_SCORE && !potatoHolder.equals(gamePlayer.getUUID())) score(player);
-                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.DARK_AQUA +
-                            MessageUtils.formatTimeRaw(DURATION - LASTED) + " | " +
-                            (getHolder().equals(gamePlayer.getUUID()) ? ChatColor.RED + "You have the potato!"
-                                    : ChatColor.GREEN + "You don't have the potato!") + ChatColor.DARK_AQUA + " | " +
-                            getScore(player) + " " + ChatColor.GREEN + Symbols.STAR_1));
+                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.DARK_AQUA + MessageUtils.formatTimeRaw(DURATION - LASTED) + " | " + (getHolder().equals(gamePlayer.getUUID()) ? ChatColor.RED + "You have the potato!" : ChatColor.GREEN + "You don't have the potato!") + ChatColor.DARK_AQUA + " | " + getScore(player) + " " + ChatColor.GREEN + Symbols.STAR_1));
                 }
 
                 CHECK_SCORE = false;
@@ -92,13 +88,28 @@ public class HotPotato extends Game {
             @Override
             public void end() {
                 int z = getPlayerScores().size();
+
+                sendMessage(MessageUtils.colorize("&7--------------------------"));
+                sendMessage("");
+                sendMessage("");
+
                 for (Map.Entry<UUID, Integer> entry : sortPlayerScores().entrySet()) {
                     if (z == 1) {
-                        sendMessage("&3" + Bukkit.getPlayer(entry.getKey()).getName() + "&7 came in 1st place!");
+                        sendMessage("       " + "&a" + Bukkit.getPlayer(entry.getKey()).getName() + "&8 came in 1st place!");
                     }
+                    if (z == 2) {
+                        sendMessage("       " + "&6" + Bukkit.getPlayer(entry.getKey()).getName() + "&8 came in 2nd place!");
+                    }
+                    if (z == 3) {
+                        sendMessage("       " + "&7" + Bukkit.getPlayer(entry.getKey()).getName() + "&8 came in 3rd place!");
+                    }
+
                     z = z - 1;
                     //Divvy rewards and send messages
                 }
+                sendMessage("");
+                sendMessage("");
+                sendMessage(MessageUtils.colorize("&7--------------------------"));
             }
 
             @Override

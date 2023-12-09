@@ -97,18 +97,36 @@ public class CTW extends Game {
             @Override
             public void end() {
                 int z = getTeamScores().size();
-                for (Map.Entry<Team, Integer> entry : sortTeamScores().entrySet()) {
+                Map<Team, Integer> scores = sortTeamScores();
+                Team winner = Team.NONE;
+                sendMessage(MessageUtils.colorize("&7--------------------------"));
+                sendMessage("");
+                sendMessage("");
+
+
+
+                for (Map.Entry<Team, Integer> entry : scores.entrySet()) {
                     if (z == 1) {
-                        sendMessage(entry.getKey().chatColor() + entry.getKey().name() + "&7 has won!");
-                        sendMessage(entry.getKey(), MessageUtils.prefixes("game") + "Your team came in first! You'll get 10 points for every kill plus 30 for winning!");
-                        for (GamePlayer player : getPlayers().values()) {
-                            if (player.getTeam().equals(entry.getKey()))
-                                Bukkit.getPlayer(player.getUUID()).sendMessage(MessageUtils.prefixes("game") + "You scored " + (30 + (10 * getScore(Bukkit.getPlayer(player.getUUID())))));
-                        }
+                        winner = entry.getKey();
+                        sendMessage("       " + entry.getKey().chatColor() + entry.getKey().name() + " " + MessageUtils.colorize("&8 team came in 1st!"));
+//                        for (GamePlayer player : getPlayers().values()) {
+//                            if (player.getTeam().equals(entry.getKey()))
+//                                Bukkit.getPlayer(player.getUUID()).sendMessage(MessageUtils.prefixes("game") + "You scored " + (30 + (10 * getScore(Bukkit.getPlayer(player.getUUID())))));
+//                        }
+                    }
+                    if (z == 2) {
+                        sendMessage("       " + entry.getKey().chatColor() + entry.getKey().name() + " " + MessageUtils.colorize("&8 team came in 1st!"));
+                    }
+                    if (z == 3) {
+                        sendMessage("       " + entry.getKey().chatColor() + entry.getKey().name() + " " + MessageUtils.colorize("&8 team came in 1st!"));
                     }
                     z = z - 1;
                     //Divvy rewards and send messages
                 }
+
+                sendMessage("");
+                sendMessage("");
+                sendMessage(MessageUtils.colorize("&7--------------------------"));
             }
 
             @Override

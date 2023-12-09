@@ -85,13 +85,27 @@ public class OITQ extends Game {
             @Override
             public void end() {
                 int z = getPlayerScores().size();
+                sendMessage(MessageUtils.colorize("&7--------------------------"));
+                sendMessage("");
+                sendMessage("");
+
                 for (Map.Entry<UUID, Integer> entry : sortPlayerScores().entrySet()) {
                     if (z == 1) {
-                        sendMessage("&3" + Bukkit.getPlayer(entry.getKey()).getName() + "&7 came in 1st place!");
+                        sendMessage("       " + "&a" + Bukkit.getPlayer(entry.getKey()).getName() + "&8 came in 1st place!");
+                    }
+                    if (z == 2) {
+                        sendMessage("       " + "&6" + Bukkit.getPlayer(entry.getKey()).getName() + "&8 came in 2nd place!");
+                    }
+                    if (z == 3) {
+                        sendMessage("       " + "&7" + Bukkit.getPlayer(entry.getKey()).getName() + "&8 came in 2rd place!");
                     }
                     z = z - 1;
                     //Divvy rewards and send messages
                 }
+
+                sendMessage("");
+                sendMessage("");
+                sendMessage(MessageUtils.colorize("&7--------------------------"));
             }
 
             @Override

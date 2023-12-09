@@ -99,7 +99,7 @@ public class OITQ extends Game {
                     sendMessage(ChatColor.RED + "There was a draw.");
                 } else {
                     if (placements.containsKey(1))
-                        sendMessage("  " + "&a" + Bukkit.getPlayer(placements.get(1)).getName() + "&8 came in 1st place!");
+                        sendMessage("  " + "&b" + Bukkit.getPlayer(placements.get(1)).getName() + "&8 came in 1st place!");
                     if (placements.containsKey(2))
                         sendMessage("  " + "&6" + Bukkit.getPlayer(placements.get(2)).getName() + "&8 came in 2nd place!");
                     if (placements.containsKey(3))

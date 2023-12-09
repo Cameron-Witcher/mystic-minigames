@@ -97,33 +97,26 @@ public class CTW extends Game {
             @Override
             public void end() {
                 int z = getTeamScores().size();
-                Map<Team, Integer> scores = sortTeamScores();
-                Team winner = Team.NONE;
+                Map<Integer, Team> placements = new HashMap<>();
+
+                for (Map.Entry<Team, Integer> entry : sortTeamScores().entrySet()) {
+                    placements.put(z, entry.getKey());
+                    z = z - 1;
+                }
+
                 sendMessage(MessageUtils.colorize("&7--------------------------"));
                 sendMessage("");
                 sendMessage("");
-
-
-
-                for (Map.Entry<Team, Integer> entry : scores.entrySet()) {
-                    if (z == 1) {
-                        winner = entry.getKey();
-                        sendMessage("       " + entry.getKey().chatColor() + entry.getKey().name() + " " + MessageUtils.colorize("&8 team came in 1st!"));
-//                        for (GamePlayer player : getPlayers().values()) {
-//                            if (player.getTeam().equals(entry.getKey()))
-//                                Bukkit.getPlayer(player.getUUID()).sendMessage(MessageUtils.prefixes("game") + "You scored " + (30 + (10 * getScore(Bukkit.getPlayer(player.getUUID())))));
-//                        }
-                    }
-                    if (z == 2) {
-                        sendMessage("       " + entry.getKey().chatColor() + entry.getKey().name() + " " + MessageUtils.colorize("&8 team came in 1st!"));
-                    }
-                    if (z == 3) {
-                        sendMessage("       " + entry.getKey().chatColor() + entry.getKey().name() + " " + MessageUtils.colorize("&8 team came in 1st!"));
-                    }
-                    z = z - 1;
-                    //Divvy rewards and send messages
+                if (placements.isEmpty()) {
+                    sendMessage(ChatColor.RED + "There was a draw.");
+                } else {
+                    if (placements.containsKey(1))
+                        sendMessage("  " + placements.get(1).chatColor() + placements.get(1).name() + "&8 came in 1st place!");
+                    if (placements.containsKey(2))
+                        sendMessage("  " + placements.get(2).chatColor() + placements.get(1).name() + "&8 came in 2nd place!");
+                    if (placements.containsKey(3))
+                        sendMessage("  " + placements.get(3).chatColor() + placements.get(1).name() + "&8 came in 3rd place!");
                 }
-
                 sendMessage("");
                 sendMessage("");
                 sendMessage(MessageUtils.colorize("&7--------------------------"));
@@ -165,7 +158,7 @@ public class CTW extends Game {
             sendMessage(MessageUtils.colorize(getPlayer(uid).getTeam().chatColor() + "&l" + player.getName() + "&r &ehas dropped the " + flag.chatColor() + "&l" + flag.name() + "&r&e flag!"));
             player.removeMetadata("flag", Utils.getPlugin());
         }
-        super.removePlayer(uid,list);
+        super.removePlayer(uid, list);
 
     }
 

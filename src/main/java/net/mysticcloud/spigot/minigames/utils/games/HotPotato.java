@@ -89,23 +89,22 @@ public class HotPotato extends Game {
             public void end() {
                 int z = getPlayerScores().size();
 
+                Map<Integer, UUID> placements = new HashMap<>();
+
+                for (Map.Entry<UUID, Integer> entry : sortPlayerScores().entrySet()) {
+                    placements.put(z, entry.getKey());
+                    z = z - 1;
+                }
+
                 sendMessage(MessageUtils.colorize("&7--------------------------"));
                 sendMessage("");
                 sendMessage("");
-
-                for (Map.Entry<UUID, Integer> entry : sortPlayerScores().entrySet()) {
-                    if (z == 1) {
-                        sendMessage("       " + "&a" + Bukkit.getPlayer(entry.getKey()).getName() + "&8 came in 1st place!");
-                    }
-                    if (z == 2) {
-                        sendMessage("       " + "&6" + Bukkit.getPlayer(entry.getKey()).getName() + "&8 came in 2nd place!");
-                    }
-                    if (z == 3) {
-                        sendMessage("       " + "&7" + Bukkit.getPlayer(entry.getKey()).getName() + "&8 came in 3rd place!");
-                    }
-
-                    z = z - 1;
-                    //Divvy rewards and send messages
+                if(placements.isEmpty()){
+                    sendMessage(ChatColor.RED + "There was a draw.");
+                }else {
+                    if(placements.containsKey(1)) sendMessage("  " + "&a" + Bukkit.getPlayer(placements.get(1)).getName() + "&8 came in 1st place!");
+                    if(placements.containsKey(2)) sendMessage("  " + "&6" + Bukkit.getPlayer(placements.get(2)).getName() + "&8 came in 2nd place!");
+                    if(placements.containsKey(3)) sendMessage("  " + "&7" + Bukkit.getPlayer(placements.get(3)).getName() + "&8 came in 3rd place!");
                 }
                 sendMessage("");
                 sendMessage("");
@@ -158,6 +157,7 @@ public class HotPotato extends Game {
         from.sendMessage(MessageUtils.colorize("&aYou have passed the Potato to " + to.getName()));
         from.playSound(from, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
         to.playSound(to, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+        to.setVelocity(from.getVelocity().setY(0.3));
         setHolder(to);
     }
 

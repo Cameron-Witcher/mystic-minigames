@@ -328,6 +328,7 @@ public class Game {
         GamePlayer gamePlayer = players.get(player.getUniqueId());
         gamePlayer.setLives(gamePlayer.getLives() - 1);
         player.setHealth(player.getHealthScale());
+        player.setFoodLevel(20);
         if (gamePlayer.getLives() > 0) {
             player.setGameMode(GameMode.SPECTATOR);
             if (player.getLocation().getY() < 0)

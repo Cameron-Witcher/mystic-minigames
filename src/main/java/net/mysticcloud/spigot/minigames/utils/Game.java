@@ -408,8 +408,11 @@ public class Game {
                 kill(victim, cause);
                 return;
             }
+            victim.setMetadata("do_damage", new FixedMetadataValue(Utils.getPlugin(), damage));
             victim.damage(damage, perp);
-            Bukkit.getPluginManager().callEvent(new EntityDamageEvent(victim, EntityDamageEvent.DamageCause.CUSTOM, damage));
+//            Bukkit.getPluginManager().callEvent(new EntityDamageEvent(victim, EntityDamageEvent.DamageCause.CUSTOM, damage));
+
+
         }, 1);
     }
 

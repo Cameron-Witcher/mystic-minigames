@@ -45,6 +45,10 @@ public class DeathListener implements Listener {
 
     @EventHandler
     public void onPlayerDamage(EntityDamageByEntityEvent e) {
+        if (e.getEntity().hasMetadata("do_damage")) {
+            e.setCancelled(false);
+            return;
+        }
         if (e.getEntity().getWorld().hasMetadata("game")) {
             for (MetadataValue data : e.getEntity().getWorld().getMetadata("game")) {
                 Game game = (Game) data.value();
@@ -75,8 +79,9 @@ public class DeathListener implements Listener {
 
     @EventHandler
     public void onPlayerDeath(EntityDamageEvent e) {
-        if (e.getCause().equals(EntityDamageEvent.DamageCause.CUSTOM)) {
+        if (e.getEntity().hasMetadata("do_damage")) {
             e.setCancelled(false);
+            e.getEntity().removeMetadata("do_damage", Utils.getPlugin());
             return;
         }
         if (e.getEntity() instanceof Player && e.getEntity().getWorld().hasMetadata("game")) {

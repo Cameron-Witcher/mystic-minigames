@@ -99,12 +99,15 @@ public class HotPotato extends Game {
                 sendMessage(MessageUtils.colorize("&7--------------------------"));
                 sendMessage("");
                 sendMessage("");
-                if(placements.isEmpty()){
+                if (placements.isEmpty()) {
                     sendMessage(ChatColor.RED + "There was a draw.");
-                }else {
-                    if(placements.containsKey(1)) sendMessage("  " + "&a" + Bukkit.getPlayer(placements.get(1)).getName() + "&8 came in 1st place!");
-                    if(placements.containsKey(2)) sendMessage("  " + "&6" + Bukkit.getPlayer(placements.get(2)).getName() + "&8 came in 2nd place!");
-                    if(placements.containsKey(3)) sendMessage("  " + "&7" + Bukkit.getPlayer(placements.get(3)).getName() + "&8 came in 3rd place!");
+                } else {
+                    if (placements.containsKey(1))
+                        sendMessage("  " + "&a" + Bukkit.getPlayer(placements.get(1)).getName() + "&8 came in 1st place!");
+                    if (placements.containsKey(2))
+                        sendMessage("  " + "&6" + Bukkit.getPlayer(placements.get(2)).getName() + "&8 came in 2nd place!");
+                    if (placements.containsKey(3))
+                        sendMessage("  " + "&7" + Bukkit.getPlayer(placements.get(3)).getName() + "&8 came in 3rd place!");
                 }
                 sendMessage("");
                 sendMessage("");
@@ -139,7 +142,8 @@ public class HotPotato extends Game {
     public void removePlayer(UUID uid, boolean list) {
         if (getHolder().equals(uid)) {
             List<UUID> teamMembers = getTeam(Team.NONE);
-            setHolder(Bukkit.getPlayer(teamMembers.get(new Random().nextInt(teamMembers.size()))));
+            if (!teamMembers.isEmpty())
+                setHolder(Bukkit.getPlayer(teamMembers.get(new Random().nextInt(teamMembers.size()))));
         }
         super.removePlayer(uid, list);
     }

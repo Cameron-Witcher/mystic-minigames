@@ -261,7 +261,8 @@ public class Game {
 
     public void startGame() {
         for (GamePlayer player : players.values()) {
-            teamScores.put(player.getTeam(), 0);
+            if (!player.getTeam().equals(Team.NONE) && !player.getTeam().equals(Team.SPECTATOR))
+                teamScores.put(player.getTeam(), 0);
             playerScores.put(player.getUUID(), 0);
         }
         gameState.hasStarted(true);

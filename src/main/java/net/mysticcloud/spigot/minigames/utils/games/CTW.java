@@ -113,9 +113,9 @@ public class CTW extends Game {
                     if (placements.containsKey(1))
                         sendMessage("  " + placements.get(1).chatColor() + placements.get(1).name() + "&8 came in 1st place!");
                     if (placements.containsKey(2))
-                        sendMessage("  " + placements.get(2).chatColor() + placements.get(1).name() + "&8 came in 2nd place!");
+                        sendMessage("  " + placements.get(2).chatColor() + placements.get(2).name() + "&8 came in 2nd place!");
                     if (placements.containsKey(3))
-                        sendMessage("  " + placements.get(3).chatColor() + placements.get(1).name() + "&8 came in 3rd place!");
+                        sendMessage("  " + placements.get(3).chatColor() + placements.get(3).name() + "&8 came in 3rd place!");
                 }
                 sendMessage("");
                 sendMessage("");

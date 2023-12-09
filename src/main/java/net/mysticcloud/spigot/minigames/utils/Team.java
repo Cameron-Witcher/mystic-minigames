@@ -37,7 +37,6 @@ public enum Team {
         for (UUID uid : uids) {
             players.put(uid, teamArray[i]);
             Bukkit.getPlayer(uid).sendMessage(MessageUtils.colorize("&eYou're on the " + teamArray[i].chatColor + "&l" + teamArray[i].name() + "&r&e team!"));
-            game.getScoreboardManager().getScoreboard().getTeam(teamArray[i].name()).addEntry(Bukkit.getPlayer(uid).getName());
             i = i + 1;
             if (i >= teams) i = 0;
 

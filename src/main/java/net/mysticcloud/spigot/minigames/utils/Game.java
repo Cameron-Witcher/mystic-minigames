@@ -132,7 +132,7 @@ public class Game {
 
     public boolean addPlayer(UUID uid) {
         Player player = Bukkit.getPlayer(uid);
-        if(player.getWorld().hasMetadata("game")){
+        if (player.getWorld().hasMetadata("game")) {
             player.sendMessage(MessageUtils.prefixes("game") + "You can't join a game while you're already in one!");
             return false;
         }
@@ -140,8 +140,11 @@ public class Game {
             player.setGameMode(GameMode.SPECTATOR);
             UUID[] uids = getPlayers().keySet().toArray(new UUID[getPlayers().keySet().size()]);
             player.setScoreboard(gameScoreboard.getScoreboard());
-            players.put(player.getUniqueId(), new GamePlayer(player.getUniqueId()));
+            GamePlayer gamePlayer = new GamePlayer(uid);
+            gamePlayer.setTeam(Team.SPECTATOR);
+            players.put(player.getUniqueId(), gamePlayer);
             player.teleport(Bukkit.getPlayer(uids[(new Random().nextInt(uids.length))]));
+            player.sendMessage(MessageUtils.colorize("&7You are now spectating this game."));
             return true;
         }
         inventoryList.put(uid, player.getInventory().getContents());
@@ -389,7 +392,7 @@ public class Game {
         Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
             if (victim.hasMetadata("last_damager")) {
                 Entity perp = Bukkit.getEntity((UUID) victim.getMetadata("last_damager").get(0).value());
-                if(perp.hasMetadata("game"))
+                if (perp.hasMetadata("game"))
                     return;
                 if (perp instanceof Player) {
                     Player perp1 = (Player) perp;
@@ -570,6 +573,8 @@ public class Game {
 
         public void setTeam(Team team) {
             this.team = team;
+            Game.this.getScoreboardManager().getScoreboard().getTeam(team.name()).addEntry(Bukkit.getPlayer(uid).getName());
+
         }
 
         public int getLives() {

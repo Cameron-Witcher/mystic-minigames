@@ -410,6 +410,14 @@ public class Game {
         }, 1);
     }
 
+    public List<UUID> getTeam(Team team) {
+        List<UUID> uids = new ArrayList<>();
+        for (GamePlayer gamePlayer : getPlayers().values()) {
+            if (gamePlayer.getTeam().equals(team)) uids.add(gamePlayer.getUUID());
+        }
+        return uids;
+    }
+
 
     public class GameState {
 

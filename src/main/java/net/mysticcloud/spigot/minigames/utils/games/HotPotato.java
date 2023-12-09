@@ -57,8 +57,9 @@ public class HotPotato extends Game {
                 for (UUID uid : getPlayers().keySet()) {
                     spawnPlayer(Bukkit.getPlayer(uid));
                 }
-                UUID[] uids = getPlayers().keySet().toArray(new UUID[getPlayers().keySet().size()]);
-                setHolder(Bukkit.getPlayer(uids[(new Random().nextInt(uids.length))]));
+
+                List<UUID> teamMembers = getTeam(Team.NONE);
+                setHolder(Bukkit.getPlayer(teamMembers.get(new Random().nextInt(teamMembers.size()))));
                 STARTED = new Date().getTime();
 
             }
@@ -123,8 +124,8 @@ public class HotPotato extends Game {
     @Override
     public void removePlayer(UUID uid, boolean list) {
         if (getHolder().equals(uid)) {
-            UUID[] uids = getPlayers().keySet().toArray(new UUID[getPlayers().keySet().size()]);
-            setHolder(Bukkit.getPlayer(uids[(new Random().nextInt(uids.length))]));
+            List<UUID> teamMembers = getTeam(Team.NONE);
+            setHolder(Bukkit.getPlayer(teamMembers.get(new Random().nextInt(teamMembers.size()))));
         }
         super.removePlayer(uid, list);
     }

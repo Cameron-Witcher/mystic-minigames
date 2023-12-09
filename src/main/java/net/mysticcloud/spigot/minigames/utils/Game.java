@@ -391,9 +391,11 @@ public class Game {
     }
 
     public void processDamage(Player victim, double damage, EntityDamageEvent.DamageCause cause) {
+
         Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+            Entity perp = null;
             if (victim.hasMetadata("last_damager")) {
-                Entity perp = Bukkit.getEntity((UUID) victim.getMetadata("last_damager").get(0).value());
+                perp = Bukkit.getEntity((UUID) victim.getMetadata("last_damager").get(0).value());
                 if (perp == null) return;
                 if (perp instanceof Player) {
                     Player perp1 = (Player) perp;
@@ -406,7 +408,7 @@ public class Game {
                 kill(victim, cause);
                 return;
             }
-            victim.damage(damage);
+            victim.damage(damage, perp);
             Bukkit.getPluginManager().callEvent(new EntityDamageEvent(victim, EntityDamageEvent.DamageCause.CUSTOM, damage));
         }, 1);
     }

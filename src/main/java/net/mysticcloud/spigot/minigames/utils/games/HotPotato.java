@@ -77,7 +77,11 @@ public class HotPotato extends Game {
                     Player player = Bukkit.getPlayer(gamePlayer.getUUID());
                     scoresObjective.getScore(player.getName()).setScore(getScore(player));
                     if (CHECK_SCORE && !potatoHolder.equals(gamePlayer.getUUID())) score(player);
-                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.DARK_AQUA + MessageUtils.formatTimeRaw(DURATION - LASTED) + " | " + (getHolder().equals(gamePlayer.getUUID()) ? ChatColor.RED + "You have the potato!" : ChatColor.GREEN + "You don't have the potato!")));
+                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.DARK_AQUA +
+                            MessageUtils.formatTimeRaw(DURATION - LASTED) + " | " +
+                            (getHolder().equals(gamePlayer.getUUID()) ? ChatColor.RED + "You have the potato!"
+                                    : ChatColor.GREEN + "You don't have the potato!") + ChatColor.DARK_AQUA + " | " +
+                            getScore(player) + " " + ChatColor.GREEN + Symbols.STAR_1));
                 }
 
                 CHECK_SCORE = false;

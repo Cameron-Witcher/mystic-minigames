@@ -394,7 +394,7 @@ public class Game {
         Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
             if (victim.hasMetadata("last_damager")) {
                 Entity perp = Bukkit.getEntity((UUID) victim.getMetadata("last_damager").get(0).value());
-                if (perp.hasMetadata("game")) return;
+                if (perp == null) return;
                 if (perp instanceof Player) {
                     Player perp1 = (Player) perp;
                     if (perp1.equals(victim) || (!isFriendlyFire() && getPlayer(victim.getUniqueId()).getTeam().equals(getPlayer(perp1.getUniqueId()).getTeam())))

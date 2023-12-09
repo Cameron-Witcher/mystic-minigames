@@ -94,7 +94,8 @@ public class Game {
         player.setFallDistance(0);
         player.teleport(Bukkit.getWorlds().get(0).getSpawnLocation());
         player.setGameMode(GameMode.SURVIVAL);
-        player.getInventory().setContents(inventoryList.get(player.getUniqueId()));
+        if (inventoryList.containsKey(player.getUniqueId()))
+            player.getInventory().setContents(inventoryList.get(player.getUniqueId()));
         player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
         inventoryList.remove(player.getUniqueId());
     }
@@ -392,8 +393,7 @@ public class Game {
         Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
             if (victim.hasMetadata("last_damager")) {
                 Entity perp = Bukkit.getEntity((UUID) victim.getMetadata("last_damager").get(0).value());
-                if (perp.hasMetadata("game"))
-                    return;
+                if (perp.hasMetadata("game")) return;
                 if (perp instanceof Player) {
                     Player perp1 = (Player) perp;
                     if (perp1.equals(victim) || (!isFriendlyFire() && getPlayer(victim.getUniqueId()).getTeam().equals(getPlayer(perp1.getUniqueId()).getTeam())))

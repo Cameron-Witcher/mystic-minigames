@@ -33,7 +33,7 @@ public class Utils {
         ArenaManager.registerArenas();
         GameManager.init();
 
-        SQLUtils.createDatabase("results", SQLUtils.SQLDriver.MYSQL, "sql.vanillaflux.com", "minigame_results", 3363, "root", "Butter_Fingers203");
+        SQLUtils.createDatabase("results", SQLUtils.SQLDriver.MYSQL, "sql.vanillaflux.com", "minigame_results", 3306, "mystic", "9ah#G@RjPc@@Riki");
 
         CoreUtils.addPalpitation(() -> {
             for (Game game : GameManager.getGames().values()) {

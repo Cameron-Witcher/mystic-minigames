@@ -33,8 +33,8 @@ public class MysticMinigames extends JavaPlugin {
 
         for (Game game : GameManager.getGames().values()) {
 
-            for (UUID uid : game.getPlayers().keySet()) {
-                game.removePlayer(uid, false);
+            for (UUID uid : game.getGameState().getPlayers().keySet()) {
+                game.getGameState().removePlayer(uid, false);
             }
             game.getArena().delete();
         }

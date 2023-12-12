@@ -303,7 +303,7 @@ public class Game {
                         gameResults.getJSONObject("team_scores").put(entry.getKey().name(), entry.getValue());
                         for (UUID uid : getPlayers(entry.getKey())) {
                             MysticPlayer mp = AccountManager.getMysticPlayer(uid);
-                            mp.putData("points",mp.getInt("points")+entry.getValue());
+                            mp.putData("points", mp.getInt("points") + entry.getValue());
                         }
                     }
                 }
@@ -318,9 +318,8 @@ public class Game {
 
                 gameResults.put("duration", getCurrentDuration());
 
-                Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new GenerateRunnable(Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+                Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
                     gameResults.put("game_specific", controller.end());
-                }, 15 * 20), () -> {
                     for (UUID uid : players.keySet()) {
                         removePlayer(uid, false);
                     }
@@ -334,7 +333,7 @@ public class Game {
                     gameScoreboard.reset();
                     noBuildZones.clear();
                     Game.this.close();
-                }), 1);
+                }, 15 * 20);
 
 
             }

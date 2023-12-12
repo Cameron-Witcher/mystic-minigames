@@ -317,9 +317,9 @@ public class Game {
                 }
 
                 gameResults.put("duration", getCurrentDuration());
-
+                gameResults.put("game_specific", controller.end());
                 Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
-                    gameResults.put("game_specific", controller.end());
+
                     for (UUID uid : players.keySet()) {
                         removePlayer(uid, false);
                     }

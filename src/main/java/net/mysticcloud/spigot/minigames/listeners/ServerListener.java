@@ -44,7 +44,7 @@ public class ServerListener implements Listener {
         if (e.getPlayer().getWorld().hasMetadata("game")) {
             for (MetadataValue metadataValue : e.getPlayer().getWorld().getMetadata("game")) {
                 Game game = (Game) metadataValue.value();
-                game.removePlayer(e.getPlayer().getUniqueId());
+                game.getGameState().removePlayer(e.getPlayer().getUniqueId());
             }
         }
     }

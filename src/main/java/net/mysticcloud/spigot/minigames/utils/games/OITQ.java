@@ -43,6 +43,7 @@ public class OITQ extends Game {
 
     public OITQ(Arena arena) {
         super("OITQ", arena);
+        setGameState(new OITQGameState());
         setTeams(1);
         setMinPlayers(2);
         setMaxPlayers(20);
@@ -59,10 +60,10 @@ public class OITQ extends Game {
 
             @Override
             public void start() {
-                for (UUID uid : getPlayers().keySet()) {
+                for (UUID uid : getGameState().getPlayers().keySet()) {
                     livesObjective.getScore(Bukkit.getPlayer(uid).getName()).setScore(MAX_LIVES);
-                    getPlayer(uid).setMaxLives(MAX_LIVES);
-                    spawnPlayer(Bukkit.getPlayer(uid));
+                    getGameState().getPlayer(uid).setMaxLives(MAX_LIVES);
+                    getGameState().spawnPlayer(Bukkit.getPlayer(uid));
                 }
             }
 
@@ -70,10 +71,10 @@ public class OITQ extends Game {
             public boolean check() {
                 if (!getGameState().hasStarted()) return false;
                 players.clear();
-                for (GamePlayer player : getPlayers().values()) {
+                for (GamePlayer player : getGameState().getPlayers().values()) {
                     if (player.getTeam().equals(Team.SPECTATOR)) continue;
-                    if (getScore(player.getTeam()) >= MAX_SCORE) return true;
-                    Bukkit.getPlayer(player.getUUID()).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.DARK_AQUA + "Lives: " + player.getLives() + " | Score: " + getScore(Bukkit.getPlayer(player.getUUID())) + "/" + MAX_SCORE));
+                    if (getGameState().getScore(player.getTeam()) >= MAX_SCORE) return true;
+                    Bukkit.getPlayer(player.getUUID()).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.DARK_AQUA + "Lives: " + player.getLives() + " | Score: " + getGameState().getScore(Bukkit.getPlayer(player.getUUID())) + "/" + MAX_SCORE));
                     players.add(player.getUUID());
                 }
                 return players.size() <= 1;
@@ -83,12 +84,18 @@ public class OITQ extends Game {
 
 
             @Override
-            public void end() {
-                int z = getPlayerScores().size();
+            public JSONObject end() {
+                JSONObject extra = new JSONObject("{}");
+
+                int z = getGameState().getPlayerScores().size();
                 Map<Integer, UUID> placements = new HashMap<>();
 
-                for (Map.Entry<UUID, Integer> entry : sortPlayerScores().entrySet()) {
+
+
+                for (Map.Entry<UUID, Integer> entry : getGameState().sortPlayerScores().entrySet()) {
                     placements.put(z, entry.getKey());
+                    extra.put(entry.getKey().toString(), new JSONObject("{}"));
+                    extra.getJSONObject(entry.getKey().toString()).put("deaths", MAX_LIVES - getGameState().getPlayer(entry.getKey()).getLives());
                     z = z - 1;
                 }
 
@@ -108,6 +115,7 @@ public class OITQ extends Game {
                 sendMessage("");
                 sendMessage("");
                 sendMessage(MessageUtils.colorize("&7--------------------------"));
+                return extra;
             }
 
 
@@ -123,85 +131,59 @@ public class OITQ extends Game {
         });
     }
 
-    @Override
-    public void processDamage(Player victim, double damage, EntityDamageEvent.DamageCause cause) {
-        if (cause.equals(EntityDamageEvent.DamageCause.PROJECTILE)) damage = 100;
-        super.processDamage(victim, damage, cause);
-    }
-
-    @Override
-    protected void spawnPlayer(Player player) {
-        super.spawnPlayer(player);
-        player.getInventory().addItem(new ItemStack(Material.BOW), new ItemStack(Material.WOODEN_SWORD), new ItemStack(Material.ARROW));
-    }
-
-    @Override
-    public void kill(Player player, EntityDamageEvent.DamageCause cause) {
-
-        GamePlayer gamePlayer = getPlayer(player.getUniqueId());
-        Entity entity = player.hasMetadata("last_damager") ? Bukkit.getEntity((UUID) player.getMetadata("last_damager").get(0).value()) : null;
-        if (entity instanceof Player) {
-            Player killer = Bukkit.getPlayer(entity.getUniqueId());
-            score(killer);
-            killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.5f);
-            killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.11f);
-            killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 0.95f);
-            if (!killer.getInventory().contains(Material.ARROW))
-                killer.getInventory().addItem(new ItemStack(Material.ARROW));
-        }
-        String victim = (gamePlayer.getTeam().equals(Team.NONE) ? "&3" : gamePlayer.getTeam().chatColor()) + player.getName();
-        String action = " was killed";
-        String ending = "!";
-        switch (cause) {
-            case PROJECTILE:
-                action = " was shot";
-                ending = (entity == null ? " by a projectile!" : " by " + (entity instanceof Player ? (getPlayer(entity.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : getPlayer(entity.getUniqueId()).getTeam().chatColor()) : "&7") + entity.getName() + "&e!&7 (" + CoreUtils.distance(player.getLocation(), entity.getLocation()).intValue() + " blocks)");
-                break;
-            case VOID:
-                action = " fell out of the world";
-                ending = ".";
-                if (entity != null) {
-                    Player killer = (Player) entity;
-                    action = " was pushed over the edge";
-                    ending = " by " + (getPlayer(killer.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : getPlayer(killer.getUniqueId()).getTeam().chatColor()) + entity.getName() + "&e.";
-                }
-                break;
-            default:
-                if (entity != null) {
-                    ending = " by &7" + entity.getName() + "&e.";
-                    if (entity instanceof Player) {
-                        Player killer = (Player) entity;
-                        if (killer.getEquipment() != null && killer.getEquipment().getItemInMainHand().getType().name().endsWith("_AXE")) {
-                            action = " was decapitated";
-                        }
-                        ending = " by " + (getPlayer(killer.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : getPlayer(killer.getUniqueId()).getTeam().chatColor()) + entity.getName() + "&e.";
-                    }
-                }
-                break;
-        }
-        sendMessage("&3" + victim + "&e" + action + ending);
-        Firework rocket = spawnFirework(player.getLocation().clone().add(0, 1, 0), FireworkEffect.builder().flicker(true).with(FireworkEffect.Type.BALL).withColor(Color.RED).build());
-        rocket.detonate();
-        super.kill(player, cause);
-        livesObjective.getScore(player.getName()).setScore(gamePlayer.getLives());
-    }
-
-    @Override
-    public int score(Player player, int amount) {
-        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.5f);
-        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.11f);
-        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 0.95f);
-        return super.score(player, amount);
-    }
-
-    @Override
-    public int score(Team team, int amount) {
-        for (UUID uid : getPlayers(team)) {
-            Player player = Bukkit.getPlayer(uid);
+    public class OITQGameState extends GameState {
+        @Override
+        public int score(Player player, int amount) {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.5f);
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.11f);
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 0.95f);
+            return super.score(player, amount);
         }
-        return super.score(team, amount);
+
+        @Override
+        public int score(Team team, int amount) {
+            for (UUID uid : getPlayers(team)) {
+                Player player = Bukkit.getPlayer(uid);
+                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.5f);
+                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.11f);
+                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 0.95f);
+            }
+            return super.score(team, amount);
+        }
+
+        @Override
+        public void processDamage(Player victim, double damage, EntityDamageEvent.DamageCause cause) {
+            if (cause.equals(EntityDamageEvent.DamageCause.PROJECTILE)) damage = 100;
+            super.processDamage(victim, damage, cause);
+        }
+
+        @Override
+        public void spawnPlayer(Player player) {
+            super.spawnPlayer(player);
+            player.getInventory().addItem(new ItemStack(Material.BOW), new ItemStack(Material.WOODEN_SWORD), new ItemStack(Material.ARROW));
+        }
+
+        @Override
+        public void kill(Player player, EntityDamageEvent.DamageCause cause) {
+
+            GamePlayer gamePlayer = getGameState().getPlayer(player.getUniqueId());
+            Entity entity = player.hasMetadata("last_damager") ? Bukkit.getEntity((UUID) player.getMetadata("last_damager").get(0).value()) : null;
+            if (entity instanceof Player) {
+                Player killer = Bukkit.getPlayer(entity.getUniqueId());
+                getGameState().score(killer);
+                killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.5f);
+                killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.11f);
+                killer.playSound(entity.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 0.95f);
+                if (!killer.getInventory().contains(Material.ARROW))
+                    killer.getInventory().addItem(new ItemStack(Material.ARROW));
+            }
+            defaultDeathMessages(player, cause);
+            Firework rocket = spawnFirework(player.getLocation().clone().add(0, 1, 0), FireworkEffect.builder().flicker(true).with(FireworkEffect.Type.BALL).withColor(Color.RED).build());
+            rocket.detonate();
+            super.kill(player, cause);
+            livesObjective.getScore(player.getName()).setScore(gamePlayer.getLives());
+        }
     }
+
+
 }

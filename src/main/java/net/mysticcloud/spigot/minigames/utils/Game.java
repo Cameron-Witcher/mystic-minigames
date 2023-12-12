@@ -1,9 +1,9 @@
 package net.mysticcloud.spigot.minigames.utils;
 
+import net.mysticcloud.spigot.core.utils.CoreUtils;
 import net.mysticcloud.spigot.core.utils.MessageUtils;
-import net.mysticcloud.spigot.core.utils.placeholder.Symbols;
-import net.mysticcloud.spigot.minigames.utils.games.HotPotato;
-import net.mysticcloud.spigot.minigames.utils.games.OITQ;
+import net.mysticcloud.spigot.core.utils.accounts.AccountManager;
+import net.mysticcloud.spigot.core.utils.accounts.MysticPlayer;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
 import org.bukkit.*;
 import org.bukkit.entity.Entity;
@@ -14,8 +14,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.json2.JSONObject;
@@ -26,26 +24,25 @@ import java.util.concurrent.TimeUnit;
 public class Game {
     private final String gameName;
     private final Arena arena;
-    private final GameState gameState = new GameState();
+    private GameState gameState = new GameState();
     private final JSONObject data = new JSONObject("{}");
-    private final Map<UUID, Integer> playerScores = new HashMap<>();
-    private final Map<Team, Integer> teamScores = new HashMap<>();
-    private final Map<UUID, GamePlayer> players = new HashMap<>();
     private final List<Location> noBuildZones = new ArrayList<>();
     private final GameScoreboard gameScoreboard = new GameScoreboard();
+    private final Map<UUID, ItemStack[]> inventoryList = new HashMap<>();
     private int teams = 0, minPlayers = 2, maxPlayers = 10;
     private GameController controller = null;
     private boolean generated = false;
     private boolean friendlyFire = true;
 
 
-    private Map<UUID, ItemStack[]> inventoryList = new HashMap<>();
-
-
     public Game(String gameName, Arena arena) {
         this.gameName = gameName;
         this.arena = arena;
         arena.setGame(this);
+    }
+
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
     }
 
     public void setFriendlyFire(boolean friendlyFire) {
@@ -84,191 +81,11 @@ public class Game {
         this.controller = controller;
     }
 
-    public void removePlayer(UUID uid) {
-        removePlayer(uid, true);
-    }
-
-    public void removePlayer(UUID uid, boolean list) {
-        if (list) players.remove(uid);
-        Player player = Bukkit.getPlayer(uid);
-        player.setFallDistance(0);
-        player.teleport(Bukkit.getWorlds().get(0).getSpawnLocation());
-        player.setGameMode(GameMode.SURVIVAL);
-        if (inventoryList.containsKey(player.getUniqueId()))
-            player.getInventory().setContents(inventoryList.get(player.getUniqueId()));
-        player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
-        inventoryList.remove(player.getUniqueId());
-    }
-
-    public void end() {
-        if (!gameState.isEnding()) {
-            gameState.startEnding();
-
-            for (UUID uid : players.keySet()) {
-                Player player = Bukkit.getPlayer(uid);
-                player.setGameMode(GameMode.SPECTATOR);
-                getPlayer(player.getUniqueId()).setTeam(Team.SPECTATOR);
-            }
-
-
-            controller.end();
-
-            Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
-                for (UUID uid : players.keySet()) {
-                    removePlayer(uid, false);
-                }
-                players.clear();
-                teamScores.clear();
-                playerScores.clear();
-                arena.delete();
-
-                generated = false;
-                gameState.reset();
-                gameScoreboard.reset();
-                noBuildZones.clear();
-            }, 15 * 20);
-        }
-
-    }
-
-    public boolean addPlayer(UUID uid) {
-        Player player = Bukkit.getPlayer(uid);
-        if (player.getWorld().hasMetadata("game")) {
-            player.sendMessage(MessageUtils.prefixes("game") + "You can't join a game while you're already in one!");
-            return false;
-        }
-        if (players.size() >= maxPlayers || !gameState.acceptingPlayers()) {
-            player.setGameMode(GameMode.SPECTATOR);
-            UUID[] uids = getPlayers().keySet().toArray(new UUID[getPlayers().keySet().size()]);
-            player.setScoreboard(gameScoreboard.getScoreboard());
-            GamePlayer gamePlayer = new GamePlayer(uid);
-            gamePlayer.setTeam(Team.SPECTATOR);
-            players.put(player.getUniqueId(), gamePlayer);
-            player.teleport(Bukkit.getPlayer(uids[(new Random().nextInt(uids.length))]));
-            player.sendMessage(MessageUtils.colorize("&7You are now spectating this game."));
-            return true;
-        }
-        inventoryList.put(uid, player.getInventory().getContents());
-        BukkitTask task = null;
-
-        Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new GenerateRunnable(Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
-            if (!generated) {
-                player.sendMessage(MessageUtils.prefixes("game") + "Generating world... Please wait.");
-                generate();
-            }
-        }, 0), () -> {
-            try {
-                List<Arena.Spawn> spawns = arena.getSpawns(Team.SPECTATOR);
-                player.teleport(spawns.get(new Random().nextInt(spawns.size())).getLocation());
-            } catch (IllegalArgumentException ex) {
-                List<Arena.Spawn> spawns = arena.getSpawns(Team.NONE);
-                player.teleport(spawns.get(new Random().nextInt(spawns.size())).getLocation());
-            }
-            player.setScoreboard(gameScoreboard.getScoreboard());
-            players.put(player.getUniqueId(), new GamePlayer(player.getUniqueId()));
-            player.setGameMode(GameMode.SPECTATOR);
-            sendMessage("&3" + player.getName() + "&e has joined! (&3" + players.size() + "&e/&3" + maxPlayers + "&e)");
-            if (players.size() >= minPlayers && !gameState.countdown()) {
-                gameState.startCountdown();
-
-            }
-        }), 0);
-
-
-        return true;
-    }
-
-    public int score(Player player) {
-        return score(player, 1);
-    }
-
-    public int score(Player player, int amount) {
-        playerScores.put(player.getUniqueId(), getScore(player) + amount);
-        return playerScores.get(player.getUniqueId());
-    }
-
-    public int score(Team team) {
-        return score(team, 1);
-    }
-
-    public int score(Team team, int amount) {
-        return teamScores.put(team, getScore(team) + amount);
-    }
-
-    public int getScore(Player player) {
-        if (!playerScores.containsKey(player.getUniqueId())) playerScores.put(player.getUniqueId(), 0);
-        return playerScores.get(player.getUniqueId());
-    }
-
-    public int getScore(Team team) {
-        if (!teamScores.containsKey(team)) teamScores.put(team, 0);
-        return teamScores.get(team);
-    }
-
-    public Map<Team, Integer> getTeamScores() {
-        return teamScores;
-    }
-
-    public Map<UUID, Integer> getPlayerScores() {
-        return playerScores;
-    }
-
-    public LinkedHashMap<Team, Integer> sortTeamScores() {
-        List<Map.Entry<Team, Integer>> list = new LinkedList<Map.Entry<Team, Integer>>(teamScores.entrySet());
-        Collections.sort(list, new Comparator<Map.Entry<Team, Integer>>() {
-
-            @Override
-            public int compare(Map.Entry<Team, Integer> o1, Map.Entry<Team, Integer> o2) {
-                // TODO Auto-generated method stub
-                return (o1.getValue()).compareTo(o2.getValue());
-            }
-        });
-
-        LinkedHashMap<Team, Integer> temp = new LinkedHashMap<>();
-        for (Map.Entry<Team, Integer> aa : list) {
-            temp.put(aa.getKey(), aa.getValue());
-        }
-
-        return temp;
-
-    }
-
-    public LinkedHashMap<UUID, Integer> sortPlayerScores() {
-        List<Map.Entry<UUID, Integer>> list = new LinkedList<Map.Entry<UUID, Integer>>(playerScores.entrySet());
-        Collections.sort(list, new Comparator<Map.Entry<UUID, Integer>>() {
-
-            @Override
-            public int compare(Map.Entry<UUID, Integer> o1, Map.Entry<UUID, Integer> o2) {
-                // TODO Auto-generated method stub
-                return (o1.getValue()).compareTo(o2.getValue());
-            }
-        });
-
-        LinkedHashMap<UUID, Integer> temp = new LinkedHashMap<>();
-        for (Map.Entry<UUID, Integer> aa : list) {
-            temp.put(aa.getKey(), aa.getValue());
-        }
-
-        return temp;
-
-    }
-
 
     public GameState getGameState() {
         return gameState;
     }
 
-
-    public void startGame() {
-        for (GamePlayer player : players.values()) {
-            if (!player.getTeam().equals(Team.NONE) && !player.getTeam().equals(Team.SPECTATOR))
-                teamScores.put(player.getTeam(), 0);
-            playerScores.put(player.getUUID(), 0);
-        }
-        gameState.hasStarted(true);
-        controller.start();
-
-    }
 
     public void sendMessage(String message) {
         for (Team team : Team.values())
@@ -277,7 +94,7 @@ public class Game {
 
 
     public void sendMessage(Team team, String message) {
-        for (UUID uid : getPlayers(team))
+        for (UUID uid : getGameState().getPlayers(team))
             Bukkit.getPlayer(uid).sendMessage(MessageUtils.colorize(message));
     }
 
@@ -285,18 +102,6 @@ public class Game {
         generated = false;
         arena.regenerate();
         generated = true;
-    }
-
-    public Map<UUID, GamePlayer> getPlayers() {
-        return players;
-    }
-
-    public List<UUID> getPlayers(Team team) {
-        List<UUID> players = new ArrayList<>();
-        for (Map.Entry<UUID, GamePlayer> entry : this.players.entrySet()) {
-            if (entry.getValue().getTeam().equals(team)) players.add(entry.getKey());
-        }
-        return players;
     }
 
     public int getTeams() {
@@ -324,48 +129,42 @@ public class Game {
         return controller;
     }
 
-    public void kill(Player player, EntityDamageEvent.DamageCause cause) {
-        GamePlayer gamePlayer = players.get(player.getUniqueId());
-        gamePlayer.setLives(gamePlayer.getLives() - 1);
-        player.setHealth(player.getHealthScale());
-        player.setFoodLevel(20);
-        if (gamePlayer.getLives() > 0) {
-            player.setGameMode(GameMode.SPECTATOR);
-            if (player.getLocation().getY() < 0)
-                player.teleport(player.getLocation().clone().add(0, Math.abs(player.getLocation().getY()) + 50, 0));
-            Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new CountdownRunnable(3, (timer) -> {
-                player.sendTitle("", ChatColor.RED + "Respawning in " + timer + " second" + (timer == 1 ? "" : "s"), 0, 25, 50);
-                return false;
-            }, () -> {
-                player.setGameMode(GameMode.SURVIVAL);
-                spawnPlayer(player);
-            }), 0);
+
+    public void defaultDeathMessages(Player player, EntityDamageEvent.DamageCause cause) {
+        GamePlayer gamePlayer = gameState.getPlayer(player.getUniqueId());
+        Entity entity = player.hasMetadata("last_damager") ? Bukkit.getEntity((UUID) player.getMetadata("last_damager").get(0).value()) : null;
+
+        String victim = (gamePlayer.getTeam().equals(Team.NONE) ? "&3" : gamePlayer.getTeam().chatColor()) + player.getName();
+        String action = " was killed";
+        String ending = "!";
+        switch (cause) {
+            case PROJECTILE:
+                action = " was shot";
+                ending = (entity == null ? " by a projectile!" : " by " + (entity instanceof Player ? (gameState.getPlayer(entity.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : gameState.getPlayer(entity.getUniqueId()).getTeam().chatColor()) : "&7") + entity.getName() + "&e!&7 (" + CoreUtils.distance(player.getLocation(), entity.getLocation()).intValue() + " blocks)");
+                break;
+            case VOID:
+                action = " fell out of the world";
+                ending = ".";
+                if (entity != null) {
+                    Player killer = (Player) entity;
+                    action = " was pushed over the edge";
+                    ending = " by " + (gameState.getPlayer(killer.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : gameState.getPlayer(killer.getUniqueId()).getTeam().chatColor()) + entity.getName() + "&e.";
+                }
+                break;
+            default:
+                if (entity != null) {
+                    ending = " by &7" + entity.getName() + "&e.";
+                    if (entity instanceof Player) {
+                        Player killer = (Player) entity;
+                        if (killer.getEquipment() != null && killer.getEquipment().getItemInMainHand().getType().name().endsWith("_AXE")) {
+                            action = " was decapitated";
+                        }
+                        ending = " by " + (gameState.getPlayer(killer.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : gameState.getPlayer(killer.getUniqueId()).getTeam().chatColor()) + entity.getName() + "&e.";
+                    }
+                }
+                break;
         }
-        if (gamePlayer.getLives() == 0) {
-            setSpectator(player);
-        }
-    }
-
-    private void setSpectator(Player player) {
-        player.setGameMode(GameMode.SPECTATOR);
-        player.getWorld().strikeLightningEffect(player.getLocation());
-        getPlayer(player.getUniqueId()).setTeam(Team.SPECTATOR);
-        if (player.getLocation().getY() < 0)
-            player.teleport(player.getLocation().clone().add(0, Math.abs(player.getLocation().getY()) + 50, 0));
-    }
-
-    public GamePlayer getPlayer(UUID uid) {
-        return players.get(uid);
-    }
-
-
-    protected void spawnPlayer(Player player) {
-        player.getInventory().clear();
-        player.setGameMode(GameMode.SURVIVAL);
-        GamePlayer gamePlayer = getPlayer(player.getUniqueId());
-        player.setHealth(player.getHealthScale());
-        List<Arena.Spawn> spawns = arena.getSpawns(gamePlayer.getTeam());
-        player.teleport(spawns.get(new Random().nextInt(spawns.size())).getLocation());
+        sendMessage("&3" + victim + "&e" + action + ending);
     }
 
 
@@ -391,48 +190,18 @@ public class Game {
         return gameScoreboard;
     }
 
-    public void processDamage(Player victim, double damage, EntityDamageEvent.DamageCause cause) {
-
-        Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
-            Entity perp = null;
-            if (victim.hasMetadata("last_damager")) {
-                perp = Bukkit.getEntity((UUID) victim.getMetadata("last_damager").get(0).value());
-                if (perp == null) return;
-                if (perp instanceof Player) {
-                    Player perp1 = (Player) perp;
-                    if (perp1.equals(victim) || (!isFriendlyFire() && getPlayer(victim.getUniqueId()).getTeam().equals(getPlayer(perp1.getUniqueId()).getTeam())))
-                        return;
-
-                }
-            }
-            if (victim.getHealth() - damage <= 0) {
-                kill(victim, cause);
-                return;
-            }
-            victim.setMetadata("do_damage", new FixedMetadataValue(Utils.getPlugin(), damage));
-            victim.damage(damage, perp);
-//            Bukkit.getPluginManager().callEvent(new EntityDamageEvent(victim, EntityDamageEvent.DamageCause.CUSTOM, damage));
-
-
-        }, 1);
-    }
-
-    public List<UUID> getTeam(Team team) {
-        List<UUID> uids = new ArrayList<>();
-        for (GamePlayer gamePlayer : getPlayers().values()) {
-            if (gamePlayer.getTeam().equals(team)) uids.add(gamePlayer.getUUID());
-        }
-        return uids;
-    }
-
-
     public class GameState {
+
+        private Map<UUID, Integer> playerScores = new HashMap<>();
+        private Map<Team, Integer> teamScores = new HashMap<>();
+        private Map<UUID, GamePlayer> players = new HashMap<>();
 
         boolean lobbyOpen = true;
         boolean gameRunning = false;
         boolean countdown = false;
         boolean ending = false;
-        long started = 0;
+        long STARTED = 0;
+
 
         public boolean acceptingPlayers() {
             return lobbyOpen && !gameRunning;
@@ -460,7 +229,7 @@ public class Game {
                     }
                     return false;
                 }, () -> {
-                    startGame();
+                    start();
                     for (UUID uid : getPlayers().keySet()) {
                         Player player = Bukkit.getPlayer(uid);
                         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 1f, 0.5f);
@@ -476,8 +245,17 @@ public class Game {
             return gameRunning;
         }
 
-        public void hasStarted(boolean gameRunning) {
-            this.gameRunning = gameRunning;
+        public void start() {
+            controller.start();
+            STARTED = new Date().getTime();
+            for (GamePlayer player : gameState.getPlayers().values()) {
+                if (!player.getTeam().equals(Team.NONE) && !player.getTeam().equals(Team.SPECTATOR))
+                    teamScores.put(player.getTeam(), 0);
+                Bukkit.getPlayer(player.getUUID()).setMetadata("original_team", new FixedMetadataValue(Utils.getPlugin(), player.getTeam()));
+                playerScores.put(player.getUUID(), 0);
+            }
+            this.gameRunning = true;
+
         }
 
         public void startEnding() {
@@ -488,12 +266,302 @@ public class Game {
             return ending;
         }
 
+        public void removePlayer(UUID uid) {
+            removePlayer(uid, true);
+        }
+
+        public void removePlayer(UUID uid, boolean list) {
+            if (list) players.remove(uid);
+            Player player = Bukkit.getPlayer(uid);
+            player.setFallDistance(0);
+            player.teleport(Bukkit.getWorlds().get(0).getSpawnLocation());
+            player.setFoodLevel(20);
+            player.setGameMode(GameMode.SURVIVAL);
+            if (inventoryList.containsKey(player.getUniqueId()))
+                player.getInventory().setContents(inventoryList.get(player.getUniqueId()));
+            player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+            inventoryList.remove(player.getUniqueId());
+            player.removeMetadata("original_team", Utils.getPlugin());
+        }
+
+        public List<UUID> getPlayers(Team team) {
+            List<UUID> uids = new ArrayList<>();
+            for (GamePlayer gamePlayer : gameState.getPlayers().values()) {
+                if (gamePlayer.getTeam().equals(team)) uids.add(gamePlayer.getUUID());
+            }
+            return uids;
+        }
+
+        public void end() {
+            if (!isEnding()) {
+                JSONObject gameResults = new JSONObject("{}");
+                startEnding();
+                gameResults.put("player_scores", new JSONObject("{}"));
+                if (teams > 1) {
+                    gameResults.put("team_scores", new JSONObject("{}"));
+                    for (Map.Entry<Team, Integer> entry : getTeamScores().entrySet()) {
+                        gameResults.getJSONObject("team_scores").put(entry.getKey().name(), entry.getValue());
+                        for (UUID uid : getPlayers(entry.getKey())) {
+                            MysticPlayer mp = AccountManager.getMysticPlayer(uid);
+                            mp.putData("points",mp.getInt("points")+entry.getValue());
+                        }
+                    }
+                }
+                for (Map.Entry<UUID, GamePlayer> entry : players.entrySet()) {
+                    Player player = Bukkit.getPlayer(entry.getKey());
+                    player.setGameMode(GameMode.SPECTATOR);
+                    getPlayer(player.getUniqueId()).setTeam(Team.SPECTATOR);
+                    gameResults.getJSONObject("player_scores").put(entry.getKey().toString(), getPlayerScores().get(entry.getKey()));
+                    MysticPlayer mp = AccountManager.getMysticPlayer(entry.getKey());
+                    mp.putData("points", mp.getInt("points") + getGameState().getScore(player));
+                }
+
+                gameResults.put("duration", getCurrentDuration());
+
+                Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new GenerateRunnable(Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+                    gameResults.put("game_specific", controller.end());
+                }, 15 * 20), () -> {
+                    for (UUID uid : players.keySet()) {
+                        removePlayer(uid, false);
+                    }
+                    players.clear();
+                    teamScores.clear();
+                    playerScores.clear();
+                    arena.delete();
+
+                    generated = false;
+                    gameState.reset();
+                    gameScoreboard.reset();
+                    noBuildZones.clear();
+                    Game.this.close();
+                }), 1);
+
+
+            }
+
+        }
+
+        public void addPlayer(UUID uid) {
+            Player player = Bukkit.getPlayer(uid);
+            if (player.getWorld().hasMetadata("game")) {
+                player.sendMessage(MessageUtils.prefixes("game") + "You can't join a game while you're already in one!");
+                return;
+            }
+            if (players.size() >= maxPlayers || !gameState.acceptingPlayers()) {
+                player.setGameMode(GameMode.SPECTATOR);
+                UUID[] uids = getPlayers().keySet().toArray(new UUID[getPlayers().keySet().size()]);
+                player.setScoreboard(gameScoreboard.getScoreboard());
+                GamePlayer gamePlayer = new GamePlayer(uid);
+                gamePlayer.setTeam(Team.SPECTATOR);
+                players.put(player.getUniqueId(), gamePlayer);
+                player.teleport(Bukkit.getPlayer(uids[(new Random().nextInt(uids.length))]));
+                player.sendMessage(MessageUtils.colorize("&7You are now spectating this game."));
+                return;
+            }
+            inventoryList.put(uid, player.getInventory().getContents());
+            BukkitTask task = null;
+
+            Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new GenerateRunnable(Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+                if (!generated) {
+                    player.sendMessage(MessageUtils.prefixes("game") + "Generating world... Please wait.");
+                    generate();
+                }
+            }, 0), () -> {
+                try {
+                    List<Arena.Spawn> spawns = arena.getSpawns(Team.SPECTATOR);
+                    player.teleport(spawns.get(new Random().nextInt(spawns.size())).getLocation());
+                } catch (IllegalArgumentException ex) {
+                    List<Arena.Spawn> spawns = arena.getSpawns(Team.NONE);
+                    player.teleport(spawns.get(new Random().nextInt(spawns.size())).getLocation());
+                }
+                player.setScoreboard(gameScoreboard.getScoreboard());
+                players.put(player.getUniqueId(), new GamePlayer(player.getUniqueId()));
+                player.setGameMode(GameMode.SPECTATOR);
+                sendMessage("&3" + player.getName() + "&e has joined! (&3" + players.size() + "&e/&3" + maxPlayers + "&e)");
+                if (players.size() >= minPlayers && !gameState.countdown()) {
+                    gameState.startCountdown();
+
+                }
+            }), 0);
+
+
+        }
+
+        public int score(Player player) {
+            return score(player, 1);
+        }
+
+        public int score(Player player, int amount) {
+            playerScores.put(player.getUniqueId(), getScore(player) + amount);
+            return playerScores.get(player.getUniqueId());
+        }
+
+        public int score(Team team) {
+            return score(team, 1);
+        }
+
+        public int score(Team team, int amount) {
+            return teamScores.put(team, getScore(team) + amount);
+        }
+
+        public int getScore(Player player) {
+            if (!playerScores.containsKey(player.getUniqueId())) playerScores.put(player.getUniqueId(), 0);
+            return playerScores.get(player.getUniqueId());
+        }
+
+        public int getScore(Team team) {
+            if (!teamScores.containsKey(team)) teamScores.put(team, 0);
+            return teamScores.get(team);
+        }
+
+        public Map<Team, Integer> getTeamScores() {
+            return teamScores;
+        }
+
+        public Map<UUID, Integer> getPlayerScores() {
+            return playerScores;
+        }
+
+        public LinkedHashMap<Team, Integer> sortTeamScores() {
+            List<Map.Entry<Team, Integer>> list = new LinkedList<Map.Entry<Team, Integer>>(teamScores.entrySet());
+            Collections.sort(list, new Comparator<Map.Entry<Team, Integer>>() {
+
+                @Override
+                public int compare(Map.Entry<Team, Integer> o1, Map.Entry<Team, Integer> o2) {
+                    // TODO Auto-generated method stub
+                    return (o1.getValue()).compareTo(o2.getValue());
+                }
+            });
+
+            LinkedHashMap<Team, Integer> temp = new LinkedHashMap<>();
+            for (Map.Entry<Team, Integer> aa : list) {
+                temp.put(aa.getKey(), aa.getValue());
+            }
+
+            return temp;
+
+        }
+
+        public Map<UUID, GamePlayer> getPlayers() {
+            return players;
+        }
+
+        public GamePlayer getPlayer(UUID uid) {
+            return players.get(uid);
+        }
+
+        public LinkedHashMap<UUID, Integer> sortPlayerScores() {
+            List<Map.Entry<UUID, Integer>> list = new LinkedList<Map.Entry<UUID, Integer>>(playerScores.entrySet());
+            Collections.sort(list, new Comparator<Map.Entry<UUID, Integer>>() {
+
+                @Override
+                public int compare(Map.Entry<UUID, Integer> o1, Map.Entry<UUID, Integer> o2) {
+                    // TODO Auto-generated method stub
+                    return (o1.getValue()).compareTo(o2.getValue());
+                }
+            });
+
+            LinkedHashMap<UUID, Integer> temp = new LinkedHashMap<>();
+            for (Map.Entry<UUID, Integer> aa : list) {
+                temp.put(aa.getKey(), aa.getValue());
+            }
+
+            return temp;
+
+        }
+
+        public void kill(Player player, EntityDamageEvent.DamageCause cause) {
+            GamePlayer gamePlayer = getPlayers().get(player.getUniqueId());
+            gamePlayer.setLives(gamePlayer.getLives() - 1);
+            player.setHealth(player.getHealthScale());
+            player.setFoodLevel(20);
+            if (gamePlayer.getLives() > 0) {
+                player.setGameMode(GameMode.SPECTATOR);
+                if (player.getLocation().getY() < 0)
+                    player.teleport(player.getLocation().clone().add(0, Math.abs(player.getLocation().getY()) + 50, 0));
+                Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new CountdownRunnable(3, (timer) -> {
+                    player.sendTitle("", ChatColor.RED + "Respawning in " + timer + " second" + (timer == 1 ? "" : "s"), 0, 25, 50);
+                    return false;
+                }, () -> {
+                    player.setGameMode(GameMode.SURVIVAL);
+                    spawnPlayer(player);
+                }), 0);
+            }
+            if (gamePlayer.getLives() == 0) {
+                setSpectator(player);
+            }
+        }
+
+        private void setSpectator(Player player) {
+            player.setGameMode(GameMode.SPECTATOR);
+            player.getWorld().strikeLightningEffect(player.getLocation());
+            getPlayer(player.getUniqueId()).setTeam(Team.SPECTATOR);
+            if (player.getLocation().getY() < 0)
+                player.teleport(player.getLocation().clone().add(0, Math.abs(player.getLocation().getY()) + 50, 0));
+        }
+
+
+        public void spawnPlayer(Player player) {
+            player.getInventory().clear();
+            player.setGameMode(GameMode.SURVIVAL);
+            GamePlayer gamePlayer = getPlayer(player.getUniqueId());
+            player.setHealth(player.getHealthScale());
+            List<Arena.Spawn> spawns = arena.getSpawns(gamePlayer.getTeam());
+            player.teleport(spawns.get(new Random().nextInt(spawns.size())).getLocation());
+        }
+
+        public void processDamage(Player victim, double damage, EntityDamageEvent.DamageCause cause) {
+
+            Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+                Entity perp = null;
+                if (victim.hasMetadata("last_damager")) {
+                    perp = Bukkit.getEntity((UUID) victim.getMetadata("last_damager").get(0).value());
+                    if (perp == null) return;
+                    if (perp instanceof Player) {
+                        Player perp1 = (Player) perp;
+                        if (perp1.equals(victim) || (!isFriendlyFire() && getPlayer(victim.getUniqueId()).getTeam().equals(getPlayer(perp1.getUniqueId()).getTeam())))
+                            return;
+
+                    }
+                }
+                if (victim.getHealth() - damage <= 0) {
+                    kill(victim, cause);
+                    return;
+                }
+                victim.setMetadata("do_damage", new FixedMetadataValue(Utils.getPlugin(), damage));
+                victim.damage(damage, perp);
+            }, 1);
+        }
+
         public void reset() {
             lobbyOpen = true;
             gameRunning = false;
             countdown = false;
-            started = 0;
+            STARTED = 0;
             ending = false;
+        }
+
+        public GameState clone() {
+            GameState state = new GameState();
+            state.playerScores = playerScores;
+            state.teamScores = teamScores;
+            state.players = players;
+
+            state.lobbyOpen = lobbyOpen;
+            state.gameRunning = gameRunning;
+            state.countdown = countdown;
+            state.ending = ending;
+            state.STARTED = STARTED;
+
+            return state;
+        }
+
+        public long getCurrentDuration() {
+            return new Date().getTime() - getStarted();
+        }
+
+        public long getStarted() {
+            return STARTED;
         }
     }
 
@@ -552,11 +620,9 @@ public class Game {
         }
     }
 
-
     private interface TimerTick {
         public abstract boolean go(int timer);
     }
-
 
     public interface GameController {
 
@@ -564,7 +630,7 @@ public class Game {
 
         public boolean check();
 
-        public void end();
+        public JSONObject end();
 
         public void generate();
     }

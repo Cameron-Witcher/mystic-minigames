@@ -20,7 +20,7 @@ public class ChatListener implements Listener {
         if (e.getPlayer().getWorld().hasMetadata("game")) {
             Game game = (Game) e.getPlayer().getWorld().getMetadata("game").get(0).value();
             assert game != null;
-            Team team = game.getPlayers().get(e.getPlayer().getUniqueId()).getTeam();
+            Team team = game.getGameState().getPlayers().get(e.getPlayer().getUniqueId()).getTeam();
             if (!team.equals(Team.SPECTATOR))
                 game.sendMessage(MessageUtils.colorize("&3" + (team.equals(Team.NONE) ? "" : team.chatColor() + "[&l" + team.name() + "&r" + team.chatColor() + "] ") + e.getPlayer().getName() + "&e: ") + e.getMessage());
             else
@@ -34,7 +34,7 @@ public class ChatListener implements Listener {
         }
 
         Game game = e.getPlayer().getWorld().hasMetadata("game") ? (Game) e.getPlayer().getWorld().getMetadata("game").get(0).value() : null;
-        Game.GamePlayer player = game == null ? null : game.getPlayer(e.getPlayer().getUniqueId());
+        Game.GamePlayer player = game == null ? null : game.getGameState().getPlayer(e.getPlayer().getUniqueId());
 
         MessageUtils.log("[CHAT] " +
                 (game != null ?

@@ -36,6 +36,7 @@ public class HotPotato extends Game {
 
     public HotPotato(Arena arena) {
         super("HotPotato", arena);
+        setGameState(new HotPotatoGameState());
         setTeams(1);
         setMinPlayers(2);
         setMaxPlayers(20);
@@ -54,11 +55,11 @@ public class HotPotato extends Game {
 
             @Override
             public void start() {
-                for (UUID uid : getPlayers().keySet()) {
-                    spawnPlayer(Bukkit.getPlayer(uid));
+                for (UUID uid : getGameState().getPlayers().keySet()) {
+                    getGameState().spawnPlayer(Bukkit.getPlayer(uid));
                 }
 
-                List<UUID> teamMembers = getTeam(Team.NONE);
+                List<UUID> teamMembers = getGameState().getPlayers(Team.NONE);
                 setHolder(Bukkit.getPlayer(teamMembers.get(new Random().nextInt(teamMembers.size()))));
                 STARTED = new Date().getTime();
 
@@ -73,11 +74,11 @@ public class HotPotato extends Game {
                     CHECK_SCORE = true;
                     SCORE_CHECK = NOW;
                 }
-                for (GamePlayer gamePlayer : getPlayers().values()) {
+                for (GamePlayer gamePlayer : getGameState().getPlayers().values()) {
                     Player player = Bukkit.getPlayer(gamePlayer.getUUID());
-                    scoresObjective.getScore(player.getName()).setScore(getScore(player));
-                    if (CHECK_SCORE && !potatoHolder.equals(gamePlayer.getUUID())) score(player);
-                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.DARK_AQUA + MessageUtils.formatTimeRaw(DURATION - LASTED) + " | " + (getHolder().equals(gamePlayer.getUUID()) ? ChatColor.RED + "You have the potato!" : ChatColor.GREEN + "You don't have the potato!") + ChatColor.DARK_AQUA + " | " + getScore(player) + " " + ChatColor.GREEN + Symbols.STAR_1));
+                    scoresObjective.getScore(player.getName()).setScore(getGameState().getScore(player));
+                    if (CHECK_SCORE && !potatoHolder.equals(gamePlayer.getUUID())) getGameState().score(player);
+                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.DARK_AQUA + MessageUtils.formatTimeRaw(DURATION - LASTED) + " | " + (getHolder().equals(gamePlayer.getUUID()) ? ChatColor.RED + "You have the potato!" : ChatColor.GREEN + "You don't have the potato!") + ChatColor.DARK_AQUA + " | " + getGameState().getScore(player) + " " + ChatColor.GREEN + Symbols.STAR_1));
                 }
 
                 CHECK_SCORE = false;
@@ -86,12 +87,13 @@ public class HotPotato extends Game {
 
 
             @Override
-            public void end() {
-                int z = getPlayerScores().size();
+            public JSONObject end() {
+                int z = getGameState().getPlayerScores().size();
+                JSONObject extra = new JSONObject("{}");
 
                 Map<Integer, UUID> placements = new HashMap<>();
 
-                for (Map.Entry<UUID, Integer> entry : sortPlayerScores().entrySet()) {
+                for (Map.Entry<UUID, Integer> entry : getGameState().sortPlayerScores().entrySet()) {
                     placements.put(z, entry.getKey());
                     z = z - 1;
                 }
@@ -112,6 +114,8 @@ public class HotPotato extends Game {
                 sendMessage("");
                 sendMessage("");
                 sendMessage(MessageUtils.colorize("&7--------------------------"));
+
+                return extra;
             }
 
             @Override
@@ -126,27 +130,7 @@ public class HotPotato extends Game {
         });
     }
 
-    @Override
-    public void processDamage(Player victim, double damage, EntityDamageEvent.DamageCause cause) {
-        Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
-            if (victim.hasMetadata("last_damager")) {
-                Entity perp = Bukkit.getEntity((UUID) victim.getMetadata("last_damager").get(0).value());
-                if (getHolder().equals(perp.getUniqueId())) swapHolder(((Player) perp), victim);
-            }
-            super.processDamage(victim, 0, cause);
-        }, 0);
 
-    }
-
-    @Override
-    public void removePlayer(UUID uid, boolean list) {
-        if (getHolder().equals(uid)) {
-            List<UUID> teamMembers = getTeam(Team.NONE);
-            if (!teamMembers.isEmpty())
-                setHolder(Bukkit.getPlayer(teamMembers.get(new Random().nextInt(teamMembers.size()))));
-        }
-        super.removePlayer(uid, list);
-    }
 
     private void setHolder(Player player) {
         potatoHolder = player.getUniqueId();
@@ -163,6 +147,31 @@ public class HotPotato extends Game {
         to.playSound(to, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
         to.setVelocity(from.getVelocity().setY(0.3));
         setHolder(to);
+    }
+
+    public class HotPotatoGameState extends GameState {
+
+        @Override
+        public void processDamage(Player victim, double damage, EntityDamageEvent.DamageCause cause) {
+            Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+                if (victim.hasMetadata("last_damager")) {
+                    Entity perp = Bukkit.getEntity((UUID) victim.getMetadata("last_damager").get(0).value());
+                    if (getHolder().equals(perp.getUniqueId())) swapHolder(((Player) perp), victim);
+                }
+                super.processDamage(victim, 0, cause);
+            }, 0);
+
+        }
+
+        @Override
+        public void removePlayer(UUID uid, boolean list) {
+            if (getHolder().equals(uid)) {
+                List<UUID> teamMembers = getPlayers(Team.NONE);
+                if (!teamMembers.isEmpty())
+                    setHolder(Bukkit.getPlayer(teamMembers.get(new Random().nextInt(teamMembers.size()))));
+            }
+            super.removePlayer(uid, list);
+        }
     }
 
 }

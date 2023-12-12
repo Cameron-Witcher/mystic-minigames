@@ -120,7 +120,7 @@ public class GameCommands implements CommandExecutor {
                 if (sender instanceof Player)
                     for (MetadataValue metadataValue : ((Player) sender).getWorld().getMetadata("game")) {
                         Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
-                            ((Game) metadataValue.value()).removePlayer(((Player) sender).getUniqueId());
+                            ((Game) metadataValue.value()).getGameState().removePlayer(((Player) sender).getUniqueId());
                         }, 1);
                     }
                 else sender.sendMessage(MessageUtils.prefixes("game") + "Sorry that is a player only command.");
@@ -132,7 +132,7 @@ public class GameCommands implements CommandExecutor {
                         return true;
                     }
                     Game game = GameManager.getGame(args[1]);
-                    game.addPlayer(((Player) sender).getUniqueId());
+                    game.getGameState().addPlayer(((Player) sender).getUniqueId());
 
                 } else sender.sendMessage(MessageUtils.prefixes("game") + "Sorry that is a player only command.");
             }

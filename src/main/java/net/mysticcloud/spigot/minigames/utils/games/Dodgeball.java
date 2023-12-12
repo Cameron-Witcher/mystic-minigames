@@ -34,27 +34,24 @@ import org.yaml.snakeyaml.Yaml;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public class CTW extends Game {
+public class Dodgeball extends Game {
 
     Map<Team, Item> flags = new HashMap<>();
 
-    int MAX_SCORE = 5;
-    int MAX_LIVES = 10;
-
-    private final long DURATION = TimeUnit.MILLISECONDS.convert(10, TimeUnit.MINUTES);
+    private long STARTED;
 
     private Objective livesObjective = getScoreboardManager().getScoreboard().registerNewObjective("lives", "dummy", "Lives");
 
 
-    public CTW(Arena arena, int teams) {
-        super("CTW", arena);
-        setGameState(new CTWGameState());
+    public Dodgeball(Arena arena, int teams) {
+        super("Dodgeball", arena);
+        setGameState(new DodgeballGameState());
         setTeams(teams);
         setMinPlayers(teams);
         setMaxPlayers(teams * 4);
         setFriendlyFire(false);
         livesObjective.setDisplaySlot(DisplaySlot.BELOW_NAME);
-        livesObjective.setDisplayName(ChatColor.RED + Symbols.HEART_1.toString());
+        livesObjective.setDisplayName(ChatColor.GREEN + Symbols.STAR_1.toString());
         setController(new GameController() {
 
             Map<Team, ArrayList<UUID>> teamListMap = new HashMap<>();
@@ -62,33 +59,27 @@ public class CTW extends Game {
 
             @Override
             public void start() {
-                Map<UUID, Team> teamAssignments = Team.sort(getGameState().getPlayers().keySet(), getTeams(), CTW.this);
+                STARTED = new Date().getTime();
+                Map<UUID, Team> teamAssignments = Team.sort(getGameState().getPlayers().keySet(), getTeams(), Dodgeball.this);
                 for (UUID uid : getGameState().getPlayers().keySet()) {
-                    livesObjective.getScore(Bukkit.getPlayer(uid).getName()).setScore(MAX_LIVES);
-                    getGameState().getPlayer(uid).setMaxLives(MAX_LIVES);
+                    livesObjective.getScore(Bukkit.getPlayer(uid).getName()).setScore(0);
                     getGameState().spawnPlayer(Bukkit.getPlayer(uid));
-                }
-                for (Team team : teamAssignments.values()) {
-                    dropFlag(team, ((Location) getData().get(team.name().toLowerCase() + "_flag")));
-
                 }
             }
 
             @Override
             public boolean check() {
                 if (!getGameState().hasStarted()) return false;
-
+                LASTED = new Date().getTime() - STARTED;
 
                 teamListMap.clear();
                 for (GamePlayer player : getGameState().getPlayers().values()) {
                     if (player.getTeam().equals(Team.NONE) || player.getTeam().equals(Team.SPECTATOR)) continue;
-                    if (getGameState().getScore(player.getTeam()) >= MAX_SCORE) return true;
-                    Bukkit.getPlayer(player.getUUID()).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(player.getTeam().chatColor() + "Lives: " + player.getLives() + " | " + MessageUtils.formatTimeRaw(DURATION - LASTED) + " | Team Score: " + getGameState().getScore(player.getTeam()) + "/" + MAX_SCORE));
                     if (!teamListMap.containsKey(player.getTeam()))
                         teamListMap.put(player.getTeam(), new ArrayList<>());
                     teamListMap.get(player.getTeam()).add(player.getUUID());
                 }
-                return teamListMap.size() == 1 || getGameState().getCurrentDuration() >= DURATION;
+                return teamListMap.size() == 1;
 
                 //check scores and timer
             }
@@ -135,15 +126,6 @@ public class CTW extends Game {
                     addNoBuildZone(loc);
                 }
 
-                JSONArray flags = arena.getData().getJSONArray("flags");
-                for (int i = 0; i < flags.length(); i++) {
-                    JSONObject flagData = flags.getJSONObject(i);
-                    Location loc = Utils.decryptLocation(arena.getWorld(), flagData.getJSONObject("location"));
-                    loc.getBlock().setType(Material.OAK_FENCE);
-                    addNoBuildZone(loc);
-                    Team team = Team.valueOf(flagData.getString("team").toUpperCase());
-                    getData().put(team.name().toLowerCase() + "_flag", loc);
-                }
             }
 
 
@@ -151,65 +133,7 @@ public class CTW extends Game {
     }
 
 
-    private void dropFlag(Team team, Location loc) {
-        World world = loc.getWorld();
-        assert world != null;
-        Item item = world.dropItem(loc.getBlock().getLocation().clone().add(0.5, 1.51, 0.5), new ItemStack(Material.valueOf(team.name() + "_WOOL")));
-        item.setVelocity(new Vector(0, 0, 0));
-        item.setUnlimitedLifetime(true);
-        item.setMetadata("flag", new FixedMetadataValue(Utils.getPlugin(), team));
-        item.setInvulnerable(true);
-        flags.put(team, item);
-    }
-
-
-    public void pickupFlag(Player player, Item item) {
-        GamePlayer gamePlayer = getGameState().getPlayer(player.getUniqueId());
-        Team team = (Team) item.getMetadata("flag").get(0).value();
-        sendMessage(MessageUtils.colorize(gamePlayer.getTeam().chatColor() + "&l" + player.getName() + "&r &ehas stolen the " + team.chatColor() + "&l" + team.name() + "&r&e flag!"));
-        player.getEquipment().setHelmet(item.getItemStack());
-        player.playSound(player, Sound.ENTITY_ITEM_PICKUP, 1f, 0.5f);
-        player.playSound(player, Sound.UI_BUTTON_CLICK, 1f, 1f);
-        item.remove();
-        player.setMetadata("flag", new FixedMetadataValue(Utils.getPlugin(), team));
-    }
-
-    public void captureFlag(Player player, Team flag) {
-        getGameState().score(getGameState().getPlayer(player.getUniqueId()).getTeam());
-        GamePlayer gamePlayer = getGameState().getPlayer(player.getUniqueId());
-
-        sendMessage(MessageUtils.colorize(gamePlayer.getTeam().chatColor() + "&l" + player.getName() + "&r &ehas captured the " + flag.chatColor() + "&l" + flag.name() + "&r&e flag! (&7" + getGameState().getScore(gamePlayer.getTeam()) + "/" + MAX_SCORE + "&e)"));
-        ItemStack hat = new ItemStack(Material.LEATHER_HELMET);
-
-        LeatherArmorMeta hatMeta = (LeatherArmorMeta) hat.getItemMeta();
-        hatMeta.setColor(gamePlayer.getTeam().getDyeColor());
-        hat.setItemMeta(hatMeta);
-
-        player.getEquipment().setHelmet(hat);
-
-        player.removeMetadata("flag", Utils.getPlugin());
-
-        dropFlag(flag, ((Location) getData().get(flag.name().toLowerCase() + "_flag")));
-
-
-    }
-
-    public class CTWGameState extends GameState {
-        @Override
-        public void removePlayer(UUID uid, boolean list) {
-            Player player = Bukkit.getPlayer(uid);
-            if (player.hasMetadata("flag")) {
-
-                Team flag = (Team) player.getMetadata("flag").get(0).value();
-
-                dropFlag(flag, ((Location) getData().get(flag.name().toLowerCase() + "_flag")));
-                sendMessage(MessageUtils.colorize(getPlayer(uid).getTeam().chatColor() + "&l" + player.getName() + "&r &ehas dropped the " + flag.chatColor() + "&l" + flag.name() + "&r&e flag!"));
-                player.removeMetadata("flag", Utils.getPlugin());
-            }
-            super.removePlayer(uid, list);
-
-        }
-
+    public class DodgeballGameState extends GameState {
         @Override
         public void spawnPlayer(Player player) {
             super.spawnPlayer(player);
@@ -237,7 +161,7 @@ public class CTW extends Game {
 
             player.getEquipment().setArmorContents(new ItemStack[]{shoes, pants, shirt, hat});
 
-            player.getInventory().addItem(new ItemStack(Material.BOW), new ItemStack(Material.IRON_SWORD), new ItemStack(Material.IRON_AXE), new ItemStack(Material.IRON_SHOVEL), new ItemStack(Material.IRON_PICKAXE), new ItemStack(Material.OAK_PLANKS, 64), new ItemStack(Material.OAK_PLANKS, 64), new ItemStack(Material.ARROW, 64), new ItemStack(Material.BREAD, 64));
+            player.getInventory().addItem(new ItemStack(Material.BOW));
 
 
         }
@@ -246,29 +170,17 @@ public class CTW extends Game {
         public void kill(Player player, EntityDamageEvent.DamageCause cause) {
             GamePlayer gamePlayer = getPlayer(player.getUniqueId());
             Entity entity = player.hasMetadata("last_damager") ? Bukkit.getEntity((UUID) player.getMetadata("last_damager").get(0).value()) : null;
-            if (entity instanceof Player) score(Bukkit.getPlayer(entity.getUniqueId()));
-
-            defaultDeathMessages(player, cause);
-            if (player.hasMetadata("flag")) {
-
-                Team flag = (Team) player.getMetadata("flag").get(0).value();
-
-                dropFlag(flag, ((Location) getData().get(flag.name().toLowerCase() + "_flag")));
-                sendMessage(MessageUtils.colorize(gamePlayer.getTeam().chatColor() + "&l" + player.getName() + "&r &ehas dropped the " + flag.chatColor() + "&l" + flag.name() + "&r&e flag!"));
-                player.removeMetadata("flag", Utils.getPlugin());
+            if (entity instanceof Player) {
+                Player killer = Bukkit.getPlayer(entity.getUniqueId());
+                score(killer);
+                if (!killer.getInventory().contains(Material.ARROW))
+                    killer.getInventory().addItem(new ItemStack(Material.ARROW));
             }
+            defaultDeathMessages(player, cause);
             Firework rocket = spawnFirework(player.getLocation().clone().add(0, 1, 0), FireworkEffect.builder().flicker(true).with(FireworkEffect.Type.BALL).withColor(gamePlayer.getTeam().getDyeColor()).build());
             rocket.detonate();
             super.kill(player, cause);
             livesObjective.getScore(player.getName()).setScore(gamePlayer.getLives());
-        }
-
-        @Override
-        public int score(Player player, int amount) {
-            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.5f);
-            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.11f);
-            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 0.95f);
-            return super.score(player, amount);
         }
 
         @Override
@@ -282,6 +194,4 @@ public class CTW extends Game {
             return super.score(team, amount);
         }
     }
-
-
 }

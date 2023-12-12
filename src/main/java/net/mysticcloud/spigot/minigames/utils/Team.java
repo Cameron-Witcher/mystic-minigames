@@ -42,7 +42,7 @@ public enum Team {
 
         }
         for (Map.Entry<UUID, Team> e : players.entrySet()) {
-            game.getPlayer(e.getKey()).setTeam(e.getValue());
+            game.getGameState().getPlayer(e.getKey()).setTeam(e.getValue());
         }
         return players;
     }

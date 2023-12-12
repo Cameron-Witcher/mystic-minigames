@@ -29,7 +29,7 @@ public class ItemListener implements Listener {
         if (e.getEntity().getWorld().hasMetadata("game")) {
             for (MetadataValue value : e.getEntity().getWorld().getMetadata("game")) {
                 Game game = (Game) value.value();
-                Game.GamePlayer player = game.getPlayer(e.getEntity().getUniqueId());
+                Game.GamePlayer player = game.getGameState().getPlayer(e.getEntity().getUniqueId());
                 if (game instanceof CTW) {
                     if (e.getItem().hasMetadata("flag")) {
                         Team team = (Team) e.getItem().getMetadata("flag").get(0).value();

@@ -2,28 +2,42 @@ package net.mysticcloud.spigot.minigames.utils;
 
 import net.mysticcloud.spigot.core.utils.CoreUtils;
 import net.mysticcloud.spigot.core.utils.placeholder.PlaceholderUtils;
+import net.mysticcloud.spigot.core.utils.sql.SQLUtils;
 import net.mysticcloud.spigot.minigames.MysticMinigames;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.ArenaManager;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.ScoreboardManager;
 import org.json2.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class Utils {
 
     private static MysticMinigames plugin;
 
+    private static Scoreboard scoreboard;
+
     public static void init(MysticMinigames mainClass) {
         plugin = mainClass;
+        scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         PlaceholderUtils.registerPlaceholder("team", (player) -> {
             if (!player.getWorld().hasMetadata("game")) return "NO-GAME";
-            return ((Game) player.getWorld().getMetadata("game").get(0).value()).getPlayer(player.getUniqueId()).getTeam().name();
+            return ((Game) player.getWorld().getMetadata("game").get(0).value()).getGameState().getPlayer(player.getUniqueId()).getTeam().name();
         });
         ArenaManager.registerArenas();
         GameManager.init();
 
+        SQLUtils.createDatabase("results", SQLUtils.SQLDriver.MYSQL, "sql.vanillaflux.com", "minigame_results", 3363, "root", "Butter_Fingers203");
+
         CoreUtils.addPalpitation(() -> {
             for (Game game : GameManager.getGames().values()) {
-                if (game.getController().check()) game.end();
+                if (game.getController().check()) game.getGameState().end();
             }
         });
     }
@@ -44,6 +58,12 @@ public class Utils {
         json.put("yaw", location.getYaw());
         json.put("pitch", location.getPitch());
         return json;
+
+    }
+
+    public static class ScoreboardManager {
+        Map<UUID, Scoreboard> scoreboards = new HashMap<>();
+
 
     }
 }

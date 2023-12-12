@@ -43,6 +43,13 @@ public class Utils {
             for (Game game : GameManager.getGames().values()) {
                 if (game.getController().check()) game.getGameState().end();
             }
+            for(World world : Bukkit.getWorlds()){
+                if(world.hasMetadata("game")) continue;
+                for(Player player : world.getPlayers()){
+                    ScoreboardManager.getScoreboard(player);
+                    ScoreboardManager.updateScoreboard(player);
+                }
+            }
         });
     }
 

@@ -279,7 +279,7 @@ public class Game {
             player.setGameMode(GameMode.SURVIVAL);
             if (inventoryList.containsKey(player.getUniqueId()))
                 player.getInventory().setContents(inventoryList.get(player.getUniqueId()));
-            player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+            player.setScoreboard(Utils.ScoreboardManager.getScoreboard(player));
             inventoryList.remove(player.getUniqueId());
             player.removeMetadata("original_team", Utils.getPlugin());
         }

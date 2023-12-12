@@ -29,6 +29,7 @@ public class ServerListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
         e.setJoinMessage(null);
+        e.getPlayer().setScoreboard(Utils.ScoreboardManager.getScoreboard(e.getPlayer()));
         for (Player player : Bukkit.getOnlinePlayers())
             if (!player.getWorld().hasMetadata("game"))
                 player.sendMessage(MessageUtils.colorize("&a[+] " + e.getPlayer().getName()));
@@ -38,6 +39,7 @@ public class ServerListener implements Listener {
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent e) {
         e.setQuitMessage(null);
+        e.getPlayer().setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
         for (Player player : Bukkit.getOnlinePlayers())
             if (!player.getWorld().hasMetadata("game"))
                 player.sendMessage(MessageUtils.colorize("&c[-] " + e.getPlayer().getName()));

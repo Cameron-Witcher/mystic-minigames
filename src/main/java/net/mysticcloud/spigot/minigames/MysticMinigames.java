@@ -6,6 +6,8 @@ import net.mysticcloud.spigot.minigames.listeners.*;
 import net.mysticcloud.spigot.minigames.utils.Game;
 import net.mysticcloud.spigot.minigames.utils.GameManager;
 import net.mysticcloud.spigot.minigames.utils.Utils;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.UUID;
@@ -25,6 +27,12 @@ public class MysticMinigames extends JavaPlugin {
         new ServerListener(this);
         new InventoryListener(this);
         new GameCommands(this, "game", "arena");
+
+
+        //For reloading
+        for(Player player : Bukkit.getOnlinePlayers()){
+            player.setScoreboard(Utils.ScoreboardManager.getScoreboard(player));
+        }
 
 
     }

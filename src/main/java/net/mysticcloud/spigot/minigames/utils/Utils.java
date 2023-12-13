@@ -72,6 +72,7 @@ public class Utils {
             Game game = (Game) player.getWorld().getMetadata("game").get(0).value();
             return game.getGameState().getScore(player) + "";
         }));
+
     }
 
     public static MysticMinigames getPlugin() {

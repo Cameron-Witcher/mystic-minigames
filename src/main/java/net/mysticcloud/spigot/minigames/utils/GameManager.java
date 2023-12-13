@@ -1,19 +1,14 @@
 package net.mysticcloud.spigot.minigames.utils;
 
-import net.mysticcloud.spigot.core.utils.CoreUtils;
 import net.mysticcloud.spigot.core.utils.MessageUtils;
-import net.mysticcloud.spigot.minigames.utils.Game;
+import net.mysticcloud.spigot.core.utils.placeholder.PlaceholderUtils;
 import net.mysticcloud.spigot.minigames.utils.games.CTW;
 import net.mysticcloud.spigot.minigames.utils.games.Dodgeball;
 import net.mysticcloud.spigot.minigames.utils.games.HotPotato;
 import net.mysticcloud.spigot.minigames.utils.games.OITQ;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.ArenaManager;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.Structure;
-import org.bukkit.util.Vector;
-import org.json2.JSONArray;
+import org.bukkit.ChatColor;
 import org.json2.JSONObject;
 
 import java.io.File;
@@ -28,7 +23,7 @@ public class GameManager {
 
     private static final File gameDir = new File(Utils.getPlugin().getDataFolder() + "/games");
 
-    private static Map<String, Game> games = new HashMap<>();
+    private static final Map<String, Game> games = new HashMap<>();
 
     public static void init() {
         MessageUtils.prefixes("game", "&3&lGames &7> &f");
@@ -114,7 +109,17 @@ public class GameManager {
                 game = null;
                 break;
         }
-        games.put(game.getName() + "-" + game.getArena().getName(), game);
+        String key = game.getId();
+        games.put(key, game);
+        PlaceholderUtils.registerPlaceholder("game_info_players_" + key, (player) -> {
+            return game.getGameState().getPlayers().size() + "";
+        });
+        PlaceholderUtils.registerPlaceholder("game_info_max_players_" + key, (player) -> {
+            return game.getMAX_PLAYERS() + "";
+        });
+        PlaceholderUtils.registerPlaceholder("game_info_status_" + key, (player) -> {
+            return game.getGameState().gameRunning ? ChatColor.RED + "Running" : (game.getGameState().countdown ? ChatColor.YELLOW + "Starting" : (game.getGameState().lobbyOpen ? ChatColor.GREEN + "Ready" : ChatColor.DARK_RED + "Error"));
+        });
         saveGame(game);
         return game;
     }

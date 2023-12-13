@@ -1,39 +1,27 @@
 package net.mysticcloud.spigot.minigames.utils.games;
 
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.mysticcloud.spigot.core.utils.CoreUtils;
 import net.mysticcloud.spigot.core.utils.MessageUtils;
 import net.mysticcloud.spigot.core.utils.placeholder.Symbols;
-import net.mysticcloud.spigot.core.utils.regions.RegionUtils;
 import net.mysticcloud.spigot.minigames.utils.Team;
 import net.mysticcloud.spigot.minigames.utils.Utils;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
 import net.mysticcloud.spigot.minigames.utils.Game;
 import org.bukkit.*;
-import org.bukkit.block.Structure;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
-import org.bukkit.util.Vector;
 import org.json2.JSONArray;
 import org.json2.JSONObject;
-import org.yaml.snakeyaml.Yaml;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public class Dodgeball extends Game {
 
@@ -45,9 +33,9 @@ public class Dodgeball extends Game {
     public Dodgeball(Arena arena, int teams) {
         super("Dodgeball", arena);
         setGameState(new DodgeballGameState());
-        setTeams(teams);
-        setMinPlayers(teams);
-        setMaxPlayers(teams * 4);
+        setTEAMS(teams);
+        setMIN_PLAYERS(teams);
+        setMAX_PLAYERS(teams * 4);
         setFriendlyFire(false);
         setController(new GameController() {
 
@@ -57,7 +45,7 @@ public class Dodgeball extends Game {
             @Override
             public void start() {
                 STARTED = new Date().getTime();
-                Map<UUID, Team> teamAssignments = Team.sort(getGameState().getPlayers().keySet(), getTeams(), Dodgeball.this);
+                Map<UUID, Team> teamAssignments = Team.sort(getGameState().getPlayers().keySet(), getTEAMS(), Dodgeball.this);
                 for (UUID uid : getGameState().getPlayers().keySet()) {
                     Objective ob = getScoreboards().get(uid).getScoreboard().registerNewObjective("score", Criteria.DUMMY, "score");
                     ob.setDisplaySlot(DisplaySlot.BELOW_NAME);

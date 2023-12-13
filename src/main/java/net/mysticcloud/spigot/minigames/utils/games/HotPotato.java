@@ -3,7 +3,6 @@ package net.mysticcloud.spigot.minigames.utils.games;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.mysticcloud.spigot.core.utils.CoreUtils;
 import net.mysticcloud.spigot.core.utils.MessageUtils;
 import net.mysticcloud.spigot.core.utils.placeholder.Symbols;
 import net.mysticcloud.spigot.minigames.utils.Team;
@@ -12,10 +11,8 @@ import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
 import net.mysticcloud.spigot.minigames.utils.Game;
 import org.bukkit.*;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -37,9 +34,9 @@ public class HotPotato extends Game {
     public HotPotato(Arena arena) {
         super("HotPotato", arena);
         setGameState(new HotPotatoGameState());
-        setTeams(1);
-        setMinPlayers(2);
-        setMaxPlayers(20);
+        setTEAMS(1);
+        setMIN_PLAYERS(2);
+        setMAX_PLAYERS(20);
 
         setFriendlyFire(true);
 

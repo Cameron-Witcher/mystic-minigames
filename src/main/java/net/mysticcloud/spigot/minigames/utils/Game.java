@@ -29,7 +29,7 @@ public class Game {
     private final List<Location> noBuildZones = new ArrayList<>();
     private final Map<UUID, ScoreboardManager> scoreboards = new HashMap<UUID, ScoreboardManager>();
     private final Map<UUID, ItemStack[]> inventoryList = new HashMap<>();
-    private int teams = 0, minPlayers = 2, maxPlayers = 10;
+    private int TEAMS = 0, MIN_PLAYERS = 2, MAX_PLAYERS = 10;
     private GameController controller = null;
     private boolean generated = false;
     private boolean friendlyFire = true;
@@ -43,6 +43,10 @@ public class Game {
 
     public void setGameState(GameState gameState) {
         this.gameState = gameState;
+    }
+
+    public String getId() {
+        return gameName + "-" + arena.getName();
     }
 
     public void setFriendlyFire(boolean friendlyFire) {
@@ -65,16 +69,16 @@ public class Game {
         return noBuildZones;
     }
 
-    protected void setTeams(int i) {
-        teams = i;
+    protected void setTEAMS(int i) {
+        TEAMS = i;
     }
 
-    protected void setMinPlayers(int i) {
-        minPlayers = i;
+    protected void setMIN_PLAYERS(int i) {
+        MIN_PLAYERS = i;
     }
 
-    protected void setMaxPlayers(int i) {
-        maxPlayers = i;
+    protected void setMAX_PLAYERS(int i) {
+        MAX_PLAYERS = i;
     }
 
     protected void setController(GameController controller) {
@@ -104,8 +108,8 @@ public class Game {
         generated = true;
     }
 
-    public int getTeams() {
-        return teams;
+    public int getTEAMS() {
+        return TEAMS;
     }
 
     public String getName() {
@@ -120,7 +124,7 @@ public class Game {
         JSONObject json = new JSONObject("{}");
         json.put("game", gameName);
         json.put("arena", arena.getName());
-        if (teams > 1) json.put("teams", teams);
+        if (TEAMS > 1) json.put("teams", TEAMS);
         json.put("extra", data);
         return json;
     }
@@ -195,6 +199,10 @@ public class Game {
         return rocket;
     }
 
+    public int getMAX_PLAYERS() {
+        return MAX_PLAYERS;
+    }
+
 
     public class GameState {
 
@@ -221,7 +229,7 @@ public class Game {
             if (!countdown) {
                 countdown = true;
                 Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new CountdownRunnable(20, (int t) -> {
-                    if (getPlayers().size() < minPlayers) {
+                    if (getPlayers().size() < MIN_PLAYERS) {
                         sendMessage(MessageUtils.colorize("&cNot enough players. Cancelling countdown."));
                         return true;
                     }
@@ -309,7 +317,7 @@ public class Game {
                 JSONObject gameResults = new JSONObject("{}");
                 startEnding();
                 gameResults.put("player_scores", new JSONObject("{}"));
-                if (teams > 1) {
+                if (TEAMS > 1) {
                     gameResults.put("team_scores", new JSONObject("{}"));
                     for (Map.Entry<Team, Integer> entry : getTeamScores().entrySet()) {
                         gameResults.getJSONObject("team_scores").put(entry.getKey().name(), entry.getValue());
@@ -322,7 +330,7 @@ public class Game {
                     gameResults.getJSONObject("player_scores").put(entry.getKey().toString(), getPlayerScores().get(entry.getKey()));
                     MysticPlayer mp = AccountManager.getMysticPlayer(entry.getKey());
                     mp.putData("points", mp.getInt("points") + getGameState().getScore(player));
-                    if (teams > 1) {
+                    if (TEAMS > 1) {
                         Team team = (Team) player.getMetadata("original_team").get(0).value();
                         mp.putData("points", mp.getInt("points") + getGameState().getScore(team));
                     }
@@ -359,7 +367,7 @@ public class Game {
                 return;
             }
             getScoreboardManager(uid).set();
-            if (players.size() >= maxPlayers || !gameState.acceptingPlayers()) {
+            if (players.size() >= MAX_PLAYERS || !gameState.acceptingPlayers()) {
                 player.setGameMode(GameMode.SPECTATOR);
                 UUID[] uids = getPlayers().keySet().toArray(new UUID[getPlayers().keySet().size()]);
 
@@ -389,8 +397,8 @@ public class Game {
 
                 players.put(player.getUniqueId(), new GamePlayer(player.getUniqueId()));
                 player.setGameMode(GameMode.SPECTATOR);
-                sendMessage("&3" + player.getName() + "&e has joined! (&3" + players.size() + "&e/&3" + maxPlayers + "&e)");
-                if (players.size() >= minPlayers && !gameState.countdown()) {
+                sendMessage("&3" + player.getName() + "&e has joined! (&3" + players.size() + "&e/&3" + MAX_PLAYERS + "&e)");
+                if (players.size() >= MIN_PLAYERS && !gameState.countdown()) {
                     gameState.startCountdown();
 
                 }

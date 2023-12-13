@@ -18,8 +18,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -29,7 +27,6 @@ import org.json2.JSONObject;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 public class CTW extends Game {
 
@@ -43,9 +40,9 @@ public class CTW extends Game {
     public CTW(Arena arena, int teams) {
         super("CTW", arena);
         setGameState(new CTWGameState());
-        setTeams(teams);
-        setMinPlayers(teams);
-        setMaxPlayers(teams * 4);
+        setTEAMS(teams);
+        setMIN_PLAYERS(teams);
+        setMAX_PLAYERS(teams * 4);
         setFriendlyFire(false);
 
 
@@ -64,7 +61,7 @@ public class CTW extends Game {
                     sidebarList.add(" " + team.chatColor() + "&l" + team.name() + "&8: " + team.chatColor() + "%team_" + team.name() + "_score%");
                 }
                 sidebarList.add("&2");
-                Map<UUID, Team> teamAssignments = Team.sort(getGameState().getPlayers().keySet(), getTeams(), CTW.this);
+                Map<UUID, Team> teamAssignments = Team.sort(getGameState().getPlayers().keySet(), getTEAMS(), CTW.this);
                 for (UUID uid : getGameState().getPlayers().keySet()) {
                     Objective ob1 = getScoreboards().get(uid).getScoreboard().registerNewObjective("lives", Criteria.DUMMY, "lives");
                     ob1.setDisplaySlot(DisplaySlot.BELOW_NAME);

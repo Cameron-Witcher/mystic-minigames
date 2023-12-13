@@ -678,6 +678,7 @@ public class Game {
                 assert player != null;
                 player.setPlayerListName(MessageUtils.colorize(prefix) + player.getName() + MessageUtils.colorize(suffix));
                 player.setCustomName(MessageUtils.colorize(prefix) + player.getName() + MessageUtils.colorize(suffix));
+                player.setCustomNameVisible(true);
                 player.setDisplayName(MessageUtils.colorize(prefix) + player.getName() + MessageUtils.colorize(suffix));
             }
         }

@@ -87,7 +87,7 @@ public class Utils {
     public static ScoreboardManager getScoreboardManager(UUID uid) {
         if (scoreboards.containsKey(uid)) return scoreboards.get(uid);
         ScoreboardManager manager = new ScoreboardManager(Bukkit.getPlayer(uid));
-        manager.sidebar("&3&lMYSTIC&7&lCLOUD", Arrays.asList(new String[]{"&1", "&a&lPLAYER&8:", "&7 Points&8: &a%points%" + Symbols.STAR_1, "&2", "&c&lSERVER&8:", "&7 Online: &c%online%"}));
+        manager.sidebar("&3&lMYSTIC&7&lCLOUD", Arrays.asList(new String[]{"&1", "&a&lPLAYER&8:", "&7 Points&8: &a%points%" + Symbols.STAR_1, "&2", "&c&lSERVER&8:", "&7 Online: &c%online%","&3"}));
         scoreboards.put(uid, manager);
         return manager;
     }

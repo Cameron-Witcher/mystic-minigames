@@ -670,6 +670,8 @@ public class Game {
 //            Game.this.getScoreboardManager(uid).getScoreboard().getTeam(team.name()).addEntry(Bukkit.getPlayer(uid).getName());
             if (Bukkit.getPlayer(uid) != null) {
                 Player player = Bukkit.getPlayer(uid);
+                assert player != null;
+                player.setPlayerListName(team.chatColor() + "[" + team.name() + "] " + player.getName());
                 player.setDisplayName(team.chatColor() + "[" + team.name() + "] " + player.getName());
             }
 

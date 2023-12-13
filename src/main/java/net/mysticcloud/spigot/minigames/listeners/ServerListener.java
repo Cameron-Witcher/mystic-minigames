@@ -32,7 +32,6 @@ public class ServerListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent e) {
         e.setJoinMessage(null);
         Utils.getScoreboardManager(e.getPlayer().getUniqueId()).set();
-        Utils.getScoreboardManager(e.getPlayer().getUniqueId()).sidebar("&3&lMYSTIC&7&lCLOUD", Arrays.asList(new String[] {"&1","&a&lPLAYER&8:", "&7 Points&8: &a%points%","&2","&c&lSERVER&8:","&7 Online&8: %online%"}));
         for (Player player : Bukkit.getOnlinePlayers())
             if (!player.getWorld().hasMetadata("game"))
                 player.sendMessage(MessageUtils.colorize("&a[+] " + e.getPlayer().getName()));

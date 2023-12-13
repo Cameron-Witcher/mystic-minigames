@@ -85,6 +85,7 @@ public class DeathListener implements Listener {
             return;
         }
         if (e.getEntity() instanceof Player && e.getEntity().getWorld().hasMetadata("game")) {
+
             Game game = (Game) e.getEntity().getWorld().getMetadata("game").get(0).value();
             if (!game.getGameState().hasStarted()) e.setCancelled(true);
             game.getGameState().processDamage((Player)e.getEntity(), e.getDamage(), e.getCause());

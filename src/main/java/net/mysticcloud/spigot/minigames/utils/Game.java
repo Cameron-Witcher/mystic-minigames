@@ -311,10 +311,6 @@ public class Game {
                     gameResults.put("team_scores", new JSONObject("{}"));
                     for (Map.Entry<Team, Integer> entry : getTeamScores().entrySet()) {
                         gameResults.getJSONObject("team_scores").put(entry.getKey().name(), entry.getValue());
-                        for (UUID uid : getPlayers(entry.getKey())) {
-                            MysticPlayer mp = AccountManager.getMysticPlayer(uid);
-                            mp.putData("points", mp.getInt("points") + entry.getValue());
-                        }
                     }
                 }
                 for (Map.Entry<UUID, GamePlayer> entry : players.entrySet()) {
@@ -324,6 +320,10 @@ public class Game {
                     gameResults.getJSONObject("player_scores").put(entry.getKey().toString(), getPlayerScores().get(entry.getKey()));
                     MysticPlayer mp = AccountManager.getMysticPlayer(entry.getKey());
                     mp.putData("points", mp.getInt("points") + getGameState().getScore(player));
+                    if(teams > 1){
+                        Team team = (Team) player.getMetadata("original_team").get(0).value();
+                        mp.putData("points", mp.getInt("points") + getGameState().getScore(team));
+                    }
                 }
 
                 gameResults.put("duration", getCurrentDuration());
@@ -517,11 +517,32 @@ public class Game {
             player.setGameMode(GameMode.SURVIVAL);
             GamePlayer gamePlayer = getPlayer(player.getUniqueId());
             player.setHealth(player.getHealthScale());
+            player.setFoodLevel(20);
             List<Arena.Spawn> spawns = arena.getSpawns(gamePlayer.getTeam());
-            player.teleport(spawns.get(new Random().nextInt(spawns.size())).getLocation());
+            Location spawn = spawns.get(new Random().nextInt(spawns.size())).getLocation();
+            int i = 0;
+            while(!checkSpawn(spawn)){
+                if(i>=5)
+                    break;
+                spawn = spawns.get(new Random().nextInt(spawns.size())).getLocation();
+                i=i+1;
+            }
+            player.teleport(spawn);
+        }
+
+        private boolean checkSpawn(Location location){
+            for(GamePlayer gamePlayer : getPlayers().values()){
+                if(CoreUtils.distance(Bukkit.getPlayer(gamePlayer.getUUID()).getLocation(), location) < 2)
+                    return false;
+            }
+            return true;
         }
 
         public void processDamage(Player victim, double damage, EntityDamageEvent.DamageCause cause) {
+            if(cause.equals(EntityDamageEvent.DamageCause.VOID)){
+                kill(victim, cause);
+                return;
+            }
 
             Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
                 Entity perp = null;
@@ -678,7 +699,6 @@ public class Game {
                 assert player != null;
                 player.setPlayerListName(MessageUtils.colorize(prefix) + player.getName() + MessageUtils.colorize(suffix));
                 player.setCustomName(MessageUtils.colorize(prefix) + player.getName() + MessageUtils.colorize(suffix));
-                player.setCustomNameVisible(true);
                 player.setDisplayName(MessageUtils.colorize(prefix) + player.getName() + MessageUtils.colorize(suffix));
             }
         }

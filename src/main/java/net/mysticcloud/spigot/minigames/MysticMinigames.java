@@ -26,6 +26,7 @@ public class MysticMinigames extends JavaPlugin {
         new BlockListener(this);
         new ServerListener(this);
         new InventoryListener(this);
+        new EntityListener(this);
         new GameCommands(this, "game", "arena");
 
 

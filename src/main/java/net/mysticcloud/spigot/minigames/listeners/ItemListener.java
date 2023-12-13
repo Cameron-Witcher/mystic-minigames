@@ -35,9 +35,9 @@ public class ItemListener implements Listener {
                         Team team = (Team) e.getItem().getMetadata("flag").get(0).value();
                         e.setCancelled(true);
                         if (!team.equals(player.getTeam()))
-                            ((CTW) game).pickupFlag(((Player)e.getEntity()), e.getItem());
+                            ((CTW.CTWGameState) game.getGameState()).pickupFlag(((Player) e.getEntity()), e.getItem());
                         else if (e.getEntity().hasMetadata("flag")) {
-                            ((CTW) game).captureFlag(((Player)e.getEntity()), ((Team)e.getEntity().getMetadata("flag").get(0).value()));
+                            ((CTW.CTWGameState) game.getGameState()).captureFlag(((Player) e.getEntity()), ((Team) e.getEntity().getMetadata("flag").get(0).value()));
                         }
                     }
                 }

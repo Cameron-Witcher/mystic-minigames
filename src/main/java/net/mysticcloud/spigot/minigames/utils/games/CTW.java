@@ -3,42 +3,36 @@ package net.mysticcloud.spigot.minigames.utils.games;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.mysticcloud.spigot.core.utils.CoreUtils;
 import net.mysticcloud.spigot.core.utils.MessageUtils;
 import net.mysticcloud.spigot.core.utils.placeholder.Symbols;
-import net.mysticcloud.spigot.core.utils.regions.RegionUtils;
 import net.mysticcloud.spigot.minigames.utils.Team;
 import net.mysticcloud.spigot.minigames.utils.Utils;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
 import net.mysticcloud.spigot.minigames.utils.Game;
 import org.bukkit.*;
-import org.bukkit.block.Structure;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.util.Vector;
 import org.json2.JSONArray;
 import org.json2.JSONObject;
-import org.yaml.snakeyaml.Yaml;
-import sun.reflect.generics.tree.ArrayTypeSignature;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 public class CTW extends Game {
 
-    Map<Team, Item> flags = new HashMap<>();
 
     int MAX_SCORE = 5;
     int MAX_LIVES = 10;
@@ -81,7 +75,7 @@ public class CTW extends Game {
                     getGameState().spawnPlayer(Bukkit.getPlayer(uid));
                 }
                 for (Team team : teamAssignments.values()) {
-                    dropFlag(team, ((Location) getData().get(team.name().toLowerCase() + "_flag")));
+                    ((CTWGameState) getGameState()).returnFlag(team, false);
 
                 }
             }
@@ -164,50 +158,72 @@ public class CTW extends Game {
     }
 
 
-    private void dropFlag(Team team, Location loc) {
-        World world = loc.getWorld();
-        assert world != null;
-        Item item = world.dropItem(loc.getBlock().getLocation().clone().add(0.5, 1.51, 0.5), new ItemStack(Material.valueOf(team.name() + "_WOOL")));
-        item.setVelocity(new Vector(0, 0, 0));
-        item.setUnlimitedLifetime(true);
-        item.setMetadata("flag", new FixedMetadataValue(Utils.getPlugin(), team));
-        item.setInvulnerable(true);
-        flags.put(team, item);
-    }
-
-
-    public void pickupFlag(Player player, Item item) {
-        GamePlayer gamePlayer = getGameState().getPlayer(player.getUniqueId());
-        Team team = (Team) item.getMetadata("flag").get(0).value();
-        sendMessage(MessageUtils.colorize(gamePlayer.getTeam().chatColor() + "&l" + player.getName() + "&r &ehas stolen the " + team.chatColor() + "&l" + team.name() + "&r&e flag!"));
-        player.getEquipment().setHelmet(item.getItemStack());
-        player.playSound(player, Sound.ENTITY_ITEM_PICKUP, 1f, 0.5f);
-        player.playSound(player, Sound.UI_BUTTON_CLICK, 1f, 1f);
-        item.remove();
-        player.setMetadata("flag", new FixedMetadataValue(Utils.getPlugin(), team));
-    }
-
-    public void captureFlag(Player player, Team flag) {
-        getGameState().score(getGameState().getPlayer(player.getUniqueId()).getTeam());
-        GamePlayer gamePlayer = getGameState().getPlayer(player.getUniqueId());
-
-        sendMessage(MessageUtils.colorize(gamePlayer.getTeam().chatColor() + "&l" + player.getName() + "&r &ehas captured the " + flag.chatColor() + "&l" + flag.name() + "&r&e flag! (&7" + getGameState().getScore(gamePlayer.getTeam()) + "/" + MAX_SCORE + "&e)"));
-        ItemStack hat = new ItemStack(Material.LEATHER_HELMET);
-
-        LeatherArmorMeta hatMeta = (LeatherArmorMeta) hat.getItemMeta();
-        hatMeta.setColor(gamePlayer.getTeam().getDyeColor());
-        hat.setItemMeta(hatMeta);
-
-        player.getEquipment().setHelmet(hat);
-
-        player.removeMetadata("flag", Utils.getPlugin());
-
-        dropFlag(flag, ((Location) getData().get(flag.name().toLowerCase() + "_flag")));
-
-
-    }
-
     public class CTWGameState extends GameState {
+
+        Map<Team, Item> flags = new HashMap<>();
+
+        private void returnFlag(Team team, boolean message) {
+            Location loc = ((Location) getData().get(team.name().toLowerCase() + "_flag"));
+            World world = loc.getWorld();
+            assert world != null;
+            Item item = world.dropItem(loc.getBlock().getLocation().clone().add(0.5, 1.51, 0.5), new ItemStack(Material.valueOf(team.name() + "_WOOL")));
+            item.setVelocity(new Vector(0, 0, 0));
+            item.setUnlimitedLifetime(true);
+            item.setMetadata("flag", new FixedMetadataValue(Utils.getPlugin(), team));
+            item.setInvulnerable(true);
+            flags.put(team, item);
+            if (message)
+                sendMessage(MessageUtils.colorize("&eThe " + team.chatColor() + "&l" + team.name() + "&r&e flag has been returned!"));
+        }
+
+        private void dropFlag(Team team, Player player) {
+            GamePlayer gamePlayer = getPlayer(player.getUniqueId());
+            World world = player.getWorld();
+            assert world != null;
+            Item item = world.dropItem(player.getLocation(), new ItemStack(Material.valueOf(team.name() + "_WOOL")));
+            item.setVelocity(new Vector(0, 0, 0));
+            item.setUnlimitedLifetime(true);
+            item.setMetadata("flag", new FixedMetadataValue(Utils.getPlugin(), team));
+            item.setInvulnerable(true);
+            flags.put(team, item);
+            sendMessage(MessageUtils.colorize(gamePlayer.getTeam().chatColor() + "&l" + player.getName() + "&r &ehas dropped the " + team.chatColor() + "&l" + team.name() + "&r&e flag!"));
+            Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new RogueFlagTracker(item), 0);
+
+
+        }
+
+
+        public void pickupFlag(Player player, Item item) {
+            GamePlayer gamePlayer = getGameState().getPlayer(player.getUniqueId());
+            Team team = (Team) item.getMetadata("flag").get(0).value();
+            sendMessage(MessageUtils.colorize(gamePlayer.getTeam().chatColor() + "&l" + player.getName() + "&r &ehas stolen the " + team.chatColor() + "&l" + team.name() + "&r&e flag!"));
+            player.getEquipment().setHelmet(item.getItemStack());
+            player.playSound(player, Sound.ENTITY_ITEM_PICKUP, 1f, 0.5f);
+            player.playSound(player, Sound.UI_BUTTON_CLICK, 1f, 1f);
+            item.remove();
+            player.setMetadata("flag", new FixedMetadataValue(Utils.getPlugin(), team));
+        }
+
+        public void captureFlag(Player player, Team flag) {
+            getGameState().score(getGameState().getPlayer(player.getUniqueId()).getTeam());
+            GamePlayer gamePlayer = getGameState().getPlayer(player.getUniqueId());
+
+            sendMessage(MessageUtils.colorize(gamePlayer.getTeam().chatColor() + "&l" + player.getName() + "&r &ehas captured the " + flag.chatColor() + "&l" + flag.name() + "&r&e flag! (&7" + getGameState().getScore(gamePlayer.getTeam()) + "/" + MAX_SCORE + "&e)"));
+            ItemStack hat = new ItemStack(Material.LEATHER_HELMET);
+
+            LeatherArmorMeta hatMeta = (LeatherArmorMeta) hat.getItemMeta();
+            hatMeta.setColor(gamePlayer.getTeam().getDyeColor());
+            hat.setItemMeta(hatMeta);
+
+            player.getEquipment().setHelmet(hat);
+
+            player.removeMetadata("flag", Utils.getPlugin());
+
+            returnFlag(flag, false);
+
+
+        }
+
         @Override
         public void removePlayer(UUID uid, boolean list) {
             Player player = Bukkit.getPlayer(uid);
@@ -215,7 +231,7 @@ public class CTW extends Game {
 
                 Team flag = (Team) player.getMetadata("flag").get(0).value();
 
-                dropFlag(flag, ((Location) getData().get(flag.name().toLowerCase() + "_flag")));
+                returnFlag(flag, true);
                 sendMessage(MessageUtils.colorize(getPlayer(uid).getTeam().chatColor() + "&l" + player.getName() + "&r &ehas dropped the " + flag.chatColor() + "&l" + flag.name() + "&r&e flag!"));
                 player.removeMetadata("flag", Utils.getPlugin());
             }
@@ -265,9 +281,9 @@ public class CTW extends Game {
             if (player.hasMetadata("flag")) {
 
                 Team flag = (Team) player.getMetadata("flag").get(0).value();
+                if (player.getLocation().getY() < 0) returnFlag(flag, true);
+                else dropFlag(flag, player);
 
-                dropFlag(flag, ((Location) getData().get(flag.name().toLowerCase() + "_flag")));
-                sendMessage(MessageUtils.colorize(gamePlayer.getTeam().chatColor() + "&l" + player.getName() + "&r &ehas dropped the " + flag.chatColor() + "&l" + flag.name() + "&r&e flag!"));
                 player.removeMetadata("flag", Utils.getPlugin());
             }
             Firework rocket = spawnFirework(player.getLocation().clone().add(0, 1, 0), FireworkEffect.builder().flicker(true).with(FireworkEffect.Type.BALL).withColor(gamePlayer.getTeam().getDyeColor()).build());
@@ -293,6 +309,25 @@ public class CTW extends Game {
                 player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 0.95f);
             }
             return super.score(team, amount);
+        }
+
+        private class RogueFlagTracker extends BukkitRunnable implements Runnable {
+            Item item;
+            Team team;
+            long DROPPED;
+
+            public RogueFlagTracker(Item item) {
+                this.item = item;
+                this.team = (Team) item.getMetadata("flag").get(0).value();
+                this.DROPPED = new Date().getTime();
+            }
+
+            @Override
+            public void run() {
+                if (item == null || item.getLocation() == null) {
+                    ((CTWGameState) getGameState()).returnFlag(team,true);
+                } else Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), this, 1);
+            }
         }
     }
 

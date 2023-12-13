@@ -5,6 +5,8 @@ import net.mysticcloud.spigot.core.utils.MessageUtils;
 import net.mysticcloud.spigot.core.utils.accounts.AccountManager;
 import net.mysticcloud.spigot.core.utils.accounts.MysticPlayer;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
+
+import net.mysticcloud.spigot.minigames.utils.misc.ScoreboardManager;
 import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Firework;
@@ -14,8 +16,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.ScoreboardManager;
 import org.json2.JSONObject;
 
 import java.util.*;
@@ -27,7 +27,7 @@ public class Game {
     private GameState gameState = new GameState();
     private final JSONObject data = new JSONObject("{}");
     private final List<Location> noBuildZones = new ArrayList<>();
-    private final GameScoreboard gameScoreboard = new GameScoreboard();
+    private final Map<UUID, ScoreboardManager> scoreboards = new HashMap<UUID, ScoreboardManager>();
     private final Map<UUID, ItemStack[]> inventoryList = new HashMap<>();
     private int teams = 0, minPlayers = 2, maxPlayers = 10;
     private GameController controller = null;
@@ -125,6 +125,10 @@ public class Game {
         return json;
     }
 
+    public Map<UUID, ScoreboardManager> getScoreboards() {
+        return scoreboards;
+    }
+
     public GameController getController() {
         return controller;
     }
@@ -186,9 +190,7 @@ public class Game {
         return rocket;
     }
 
-    public GameScoreboard getScoreboardManager() {
-        return gameScoreboard;
-    }
+
 
     public class GameState {
 
@@ -236,6 +238,8 @@ public class Game {
                         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, SoundCategory.MASTER, 1f, 0.5f);
                     }
 
+                }, ()->{
+                    countdown = false;
                 }), 0);
             }
 
@@ -279,7 +283,7 @@ public class Game {
             player.setGameMode(GameMode.SURVIVAL);
             if (inventoryList.containsKey(player.getUniqueId()))
                 player.getInventory().setContents(inventoryList.get(player.getUniqueId()));
-            player.setScoreboard(Utils.ScoreboardManager.getScoreboard(player));
+            Utils.getScoreboardManager(uid).set();
             inventoryList.remove(player.getUniqueId());
             player.removeMetadata("original_team", Utils.getPlugin());
         }
@@ -330,7 +334,7 @@ public class Game {
 
                     generated = false;
                     gameState.reset();
-                    gameScoreboard.reset();
+
                     noBuildZones.clear();
                     Game.this.close();
                 }, 15 * 20);
@@ -349,7 +353,8 @@ public class Game {
             if (players.size() >= maxPlayers || !gameState.acceptingPlayers()) {
                 player.setGameMode(GameMode.SPECTATOR);
                 UUID[] uids = getPlayers().keySet().toArray(new UUID[getPlayers().keySet().size()]);
-                player.setScoreboard(gameScoreboard.getScoreboard());
+                if(!scoreboards.containsKey(uid)) scoreboards.put(uid, new ScoreboardManager(player));
+                scoreboards.get(uid).set();
                 GamePlayer gamePlayer = new GamePlayer(uid);
                 gamePlayer.setTeam(Team.SPECTATOR);
                 players.put(player.getUniqueId(), gamePlayer);
@@ -373,7 +378,7 @@ public class Game {
                     List<Arena.Spawn> spawns = arena.getSpawns(Team.NONE);
                     player.teleport(spawns.get(new Random().nextInt(spawns.size())).getLocation());
                 }
-                player.setScoreboard(gameScoreboard.getScoreboard());
+
                 players.put(player.getUniqueId(), new GamePlayer(player.getUniqueId()));
                 player.setGameMode(GameMode.SPECTATOR);
                 sendMessage("&3" + player.getName() + "&e has joined! (&3" + players.size() + "&e/&3" + maxPlayers + "&e)");
@@ -484,7 +489,7 @@ public class Game {
                 }, () -> {
                     player.setGameMode(GameMode.SURVIVAL);
                     spawnPlayer(player);
-                }), 0);
+                }, ()->{}), 0);
             }
             if (gamePlayer.getLives() == 0) {
                 setSpectator(player);
@@ -588,14 +593,16 @@ public class Game {
         long date;
         int timer;
         Runnable finish;
+        Runnable reset;
         TimerTick tick;
         boolean cancel = false;
 
-        CountdownRunnable(int timer, TimerTick tick, Runnable finish) {
+        CountdownRunnable(int timer, TimerTick tick, Runnable finish, Runnable reset) {
             this.timer = timer;
             this.date = new Date().getTime();
             this.finish = finish;
             this.tick = tick;
+            this.reset = reset;
             tick();
         }
 
@@ -616,6 +623,7 @@ public class Game {
 
             }
             if (!cancel) Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), this, 1);
+            else reset.run();
         }
     }
 
@@ -653,7 +661,7 @@ public class Game {
 
         public void setTeam(Team team) {
             this.team = team;
-            Game.this.getScoreboardManager().getScoreboard().getTeam(team.name()).addEntry(Bukkit.getPlayer(uid).getName());
+            Game.this.scoreboards.get(uid).getScoreboard().getTeam(team.name()).addEntry(Bukkit.getPlayer(uid).getName());
 
         }
 
@@ -670,28 +678,5 @@ public class Game {
         }
     }
 
-    public class GameScoreboard {
-        ScoreboardManager scoreboardManager;
-        Scoreboard scoreboard;
 
-
-        public GameScoreboard() {
-            setup();
-        }
-
-        public Scoreboard getScoreboard() {
-            return scoreboard;
-        }
-
-        public void reset() {
-            setup();
-        }
-
-        private void setup() {
-            scoreboardManager = Bukkit.getScoreboardManager();
-            scoreboard = scoreboardManager.getNewScoreboard();
-            for (Team team : Team.values())
-                scoreboard.registerNewTeam(team.name()).setColor(team.chatColor());
-        }
-    }
 }

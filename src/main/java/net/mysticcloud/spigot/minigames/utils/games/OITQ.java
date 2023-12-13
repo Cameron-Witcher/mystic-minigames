@@ -25,6 +25,7 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.util.Vector;
@@ -38,8 +39,6 @@ public class OITQ extends Game {
     int MAX_SCORE = 50;
     int MAX_LIVES = 5;
 
-    private Objective livesObjective = getScoreboardManager().getScoreboard().registerNewObjective("lives", "dummy", "Lives");
-
 
     public OITQ(Arena arena) {
         super("OITQ", arena);
@@ -50,9 +49,6 @@ public class OITQ extends Game {
 
         setFriendlyFire(true);
 
-        livesObjective.setDisplaySlot(DisplaySlot.BELOW_NAME);
-        livesObjective.setDisplayName(ChatColor.RED + Symbols.HEART_1.toString());
-
 
         setController(new GameController() {
 
@@ -61,7 +57,10 @@ public class OITQ extends Game {
             @Override
             public void start() {
                 for (UUID uid : getGameState().getPlayers().keySet()) {
-                    livesObjective.getScore(Bukkit.getPlayer(uid).getName()).setScore(MAX_LIVES);
+                    Objective ob = getScoreboards().get(uid).getScoreboard().registerNewObjective("lives", Criteria.DUMMY, "lives");
+                    ob.setDisplaySlot(DisplaySlot.BELOW_NAME);
+                    ob.setDisplayName(ChatColor.RED + Symbols.HEART_1.toString());
+                    ob.getScore(Bukkit.getPlayer(uid).getName()).setScore(MAX_LIVES);
                     getGameState().getPlayer(uid).setMaxLives(MAX_LIVES);
                     getGameState().spawnPlayer(Bukkit.getPlayer(uid));
                 }
@@ -131,6 +130,8 @@ public class OITQ extends Game {
         });
     }
 
+
+
     public class OITQGameState extends GameState {
         @Override
         public int score(Player player, int amount) {
@@ -181,7 +182,7 @@ public class OITQ extends Game {
             Firework rocket = spawnFirework(player.getLocation().clone().add(0, 1, 0), FireworkEffect.builder().flicker(true).with(FireworkEffect.Type.BALL).withColor(Color.RED).build());
             rocket.detonate();
             super.kill(player, cause);
-            livesObjective.getScore(player.getName()).setScore(gamePlayer.getLives());
+            getScoreboards().get(player.getUniqueId()).getScoreboard().getObjective("lives").getScore(player.getName()).setScore(gamePlayer.getLives());
         }
     }
 

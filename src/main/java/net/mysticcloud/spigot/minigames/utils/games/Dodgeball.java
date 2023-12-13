@@ -24,6 +24,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.util.Vector;
@@ -40,8 +41,6 @@ public class Dodgeball extends Game {
 
     private long STARTED;
 
-    private Objective livesObjective = getScoreboardManager().getScoreboard().registerNewObjective("lives", "dummy", "Lives");
-
 
     public Dodgeball(Arena arena, int teams) {
         super("Dodgeball", arena);
@@ -50,8 +49,6 @@ public class Dodgeball extends Game {
         setMinPlayers(teams);
         setMaxPlayers(teams * 4);
         setFriendlyFire(false);
-        livesObjective.setDisplaySlot(DisplaySlot.BELOW_NAME);
-        livesObjective.setDisplayName(ChatColor.GREEN + Symbols.STAR_1.toString());
         setController(new GameController() {
 
             Map<Team, ArrayList<UUID>> teamListMap = new HashMap<>();
@@ -62,7 +59,10 @@ public class Dodgeball extends Game {
                 STARTED = new Date().getTime();
                 Map<UUID, Team> teamAssignments = Team.sort(getGameState().getPlayers().keySet(), getTeams(), Dodgeball.this);
                 for (UUID uid : getGameState().getPlayers().keySet()) {
-                    livesObjective.getScore(Bukkit.getPlayer(uid).getName()).setScore(0);
+                    Objective ob = getScoreboards().get(uid).getScoreboard().registerNewObjective("score", Criteria.DUMMY, "score");
+                    ob.setDisplaySlot(DisplaySlot.BELOW_NAME);
+                    ob.setDisplayName(ChatColor.GREEN + Symbols.STAR_1.toString());
+                    ob.getScore(Bukkit.getPlayer(uid).getName()).setScore(0);
                     getGameState().spawnPlayer(Bukkit.getPlayer(uid));
                 }
             }
@@ -180,7 +180,7 @@ public class Dodgeball extends Game {
             Firework rocket = spawnFirework(player.getLocation().clone().add(0, 1, 0), FireworkEffect.builder().flicker(true).with(FireworkEffect.Type.BALL).withColor(gamePlayer.getTeam().getDyeColor()).build());
             rocket.detonate();
             super.kill(player, cause);
-            livesObjective.getScore(player.getName()).setScore(gamePlayer.getLives());
+            getScoreboards().get(player.getUniqueId()).getScoreboard().getObjective("score").getScore(player.getName()).setScore(gamePlayer.getLives());
         }
 
         @Override

@@ -16,6 +16,7 @@ import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.json2.JSONArray;
@@ -31,7 +32,6 @@ public class HotPotato extends Game {
 
     private UUID potatoHolder = null;
 
-    private Objective scoresObjective = getScoreboardManager().getScoreboard().registerNewObjective("lives", "dummy", "Lives");
 
 
     public HotPotato(Arena arena) {
@@ -43,8 +43,6 @@ public class HotPotato extends Game {
 
         setFriendlyFire(true);
 
-        scoresObjective.setDisplaySlot(DisplaySlot.BELOW_NAME);
-        scoresObjective.setDisplayName(ChatColor.GREEN + Symbols.STAR_1.toString());
 
         setController(new GameController() {
 
@@ -57,6 +55,10 @@ public class HotPotato extends Game {
             public void start() {
                 for (UUID uid : getGameState().getPlayers().keySet()) {
                     getGameState().spawnPlayer(Bukkit.getPlayer(uid));
+                    Objective ob = getScoreboards().get(uid).getScoreboard().registerNewObjective("score", Criteria.DUMMY, "score");
+                    ob.setDisplaySlot(DisplaySlot.BELOW_NAME);
+                    ob.setDisplayName(ChatColor.GREEN + Symbols.STAR_1.toString());
+                    ob.getScore(Bukkit.getPlayer(uid).getName()).setScore(0);
                 }
 
                 List<UUID> teamMembers = getGameState().getPlayers(Team.NONE);
@@ -76,7 +78,7 @@ public class HotPotato extends Game {
                 }
                 for (GamePlayer gamePlayer : getGameState().getPlayers().values()) {
                     Player player = Bukkit.getPlayer(gamePlayer.getUUID());
-                    scoresObjective.getScore(player.getName()).setScore(getGameState().getScore(player));
+                    getScoreboards().get(gamePlayer.getUUID()).getScoreboard().getObjective("score").getScore(player.getName()).setScore(getGameState().getScore(player));
                     if (CHECK_SCORE && !potatoHolder.equals(gamePlayer.getUUID())) getGameState().score(player);
                     player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.DARK_AQUA + MessageUtils.formatTimeRaw(DURATION - LASTED) + " | " + (getHolder().equals(gamePlayer.getUUID()) ? ChatColor.RED + "You have the potato!" : ChatColor.GREEN + "You don't have the potato!") + ChatColor.DARK_AQUA + " | " + getGameState().getScore(player) + " " + ChatColor.GREEN + Symbols.STAR_1));
                 }

@@ -311,7 +311,7 @@ public class CTW extends Game {
             return super.score(team, amount);
         }
 
-        private class RogueFlagTracker extends BukkitRunnable implements Runnable {
+        private class RogueFlagTracker implements Runnable {
             Item item;
             Team team;
             long DROPPED;

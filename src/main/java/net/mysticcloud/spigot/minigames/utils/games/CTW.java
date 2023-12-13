@@ -163,6 +163,8 @@ public class CTW extends Game {
         Map<Team, Item> flags = new HashMap<>();
 
         public void returnFlag(Team team, boolean message) {
+            if(flags.containsKey(team))
+                flags.get(team).remove();
             Location loc = ((Location) getData().get(team.name().toLowerCase() + "_flag"));
             World world = loc.getWorld();
             assert world != null;
@@ -177,6 +179,8 @@ public class CTW extends Game {
         }
 
         private void dropFlag(Team team, Player player) {
+            if(flags.containsKey(team))
+                flags.get(team).remove();
             GamePlayer gamePlayer = getPlayer(player.getUniqueId());
             World world = player.getWorld();
             assert world != null;
@@ -195,8 +199,11 @@ public class CTW extends Game {
 
 
         public void pickupFlag(Player player, Item item) {
-            GamePlayer gamePlayer = getGameState().getPlayer(player.getUniqueId());
             Team team = (Team) item.getMetadata("flag").get(0).value();
+            if(flags.containsKey(team))
+                flags.get(team).remove();
+            GamePlayer gamePlayer = getGameState().getPlayer(player.getUniqueId());
+
             sendMessage(MessageUtils.colorize(gamePlayer.getTeam().chatColor() + "&l" + player.getName() + "&r &ehas stolen the " + team.chatColor() + "&l" + team.name() + "&r&e flag!"));
             player.getEquipment().setHelmet(item.getItemStack());
             player.playSound(player, Sound.ENTITY_ITEM_PICKUP, 1f, 0.5f);
@@ -325,7 +332,7 @@ public class CTW extends Game {
 
             @Override
             public void run() {
-                if (item == null || item.getLocation() == null || new Date().getTime() - DROPPED >= TimeUnit.MILLISECONDS.convert(20, TimeUnit.SECONDS)) {
+                if (item == null || item.getLocation() == null || new Date().getTime() - DROPPED >= TimeUnit.MILLISECONDS.convert(30, TimeUnit.SECONDS)) {
                     ((CTWGameState) getGameState()).returnFlag(team,true);
                 } else Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), this, 1);
             }

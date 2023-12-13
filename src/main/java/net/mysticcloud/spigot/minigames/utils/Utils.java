@@ -3,6 +3,7 @@ package net.mysticcloud.spigot.minigames.utils;
 import net.mysticcloud.spigot.core.utils.CoreUtils;
 import net.mysticcloud.spigot.core.utils.accounts.AccountManager;
 import net.mysticcloud.spigot.core.utils.placeholder.PlaceholderUtils;
+import net.mysticcloud.spigot.core.utils.placeholder.Symbols;
 import net.mysticcloud.spigot.core.utils.sql.SQLUtils;
 import net.mysticcloud.spigot.minigames.MysticMinigames;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.ArenaManager;
@@ -85,6 +86,7 @@ public class Utils {
     public static ScoreboardManager getScoreboardManager(UUID uid) {
         if (scoreboards.containsKey(uid)) return scoreboards.get(uid);
         ScoreboardManager manager = new ScoreboardManager(Bukkit.getPlayer(uid));
+        manager.sidebar("&3&lMYSTIC&7&lCLOUD", Arrays.asList(new String[] {"%1","&a&lPLAYER&8:","&7 Points&8: &a%points% " + Symbols.STAR_1, "&2","&c&lSERVER&8:","&7 Online: &c%online%"}));
         scoreboards.put(uid, manager);
         return manager;
     }

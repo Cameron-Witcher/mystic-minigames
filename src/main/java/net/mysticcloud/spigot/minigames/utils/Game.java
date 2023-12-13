@@ -129,8 +129,8 @@ public class Game {
         return scoreboards;
     }
 
-    public ScoreboardManager getScoreboardManager(UUID uid){
-        if(!scoreboards.containsKey(uid)) scoreboards.put(uid, new ScoreboardManager(Bukkit.getPlayer(uid)));
+    public ScoreboardManager getScoreboardManager(UUID uid) {
+        if (!scoreboards.containsKey(uid)) scoreboards.put(uid, new ScoreboardManager(Bukkit.getPlayer(uid)));
         return scoreboards.get(uid);
     }
 
@@ -196,7 +196,6 @@ public class Game {
     }
 
 
-
     public class GameState {
 
         private Map<UUID, Integer> playerScores = new HashMap<>();
@@ -243,7 +242,7 @@ public class Game {
                         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, SoundCategory.MASTER, 1f, 0.5f);
                     }
 
-                }, ()->{
+                }, () -> {
                     countdown = false;
                 }), 0);
             }
@@ -291,6 +290,7 @@ public class Game {
             Utils.getScoreboardManager(uid).set();
             inventoryList.remove(player.getUniqueId());
             player.removeMetadata("original_team", Utils.getPlugin());
+            player.setDisplayName(ChatColor.RESET + player.getName());
         }
 
         public List<UUID> getPlayers(Team team) {
@@ -494,7 +494,8 @@ public class Game {
                 }, () -> {
                     player.setGameMode(GameMode.SURVIVAL);
                     spawnPlayer(player);
-                }, ()->{}), 0);
+                }, () -> {
+                }), 0);
             }
             if (gamePlayer.getLives() == 0) {
                 setSpectator(player);
@@ -666,8 +667,11 @@ public class Game {
 
         public void setTeam(Team team) {
             this.team = team;
-            Game.this.getScoreboardManager(uid).getScoreboard().getTeam(team.name()).addEntry(Bukkit.getPlayer(uid).getName());
-
+//            Game.this.getScoreboardManager(uid).getScoreboard().getTeam(team.name()).addEntry(Bukkit.getPlayer(uid).getName());
+            if (Bukkit.getPlayer(uid) != null) {
+                Player player = Bukkit.getPlayer(uid);
+                player.setDisplayName(team.chatColor() + "[" + team.name() + "] " + player.getName());
+            }
 
         }
 

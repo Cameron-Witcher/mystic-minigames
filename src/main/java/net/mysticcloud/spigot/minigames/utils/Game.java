@@ -539,10 +539,7 @@ public class Game {
         }
 
         public void processDamage(Player victim, double damage, EntityDamageEvent.DamageCause cause) {
-            if(cause.equals(EntityDamageEvent.DamageCause.VOID)){
-                kill(victim, cause);
-                return;
-            }
+
 
             Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
                 Entity perp = null;
@@ -556,7 +553,7 @@ public class Game {
 
                     }
                 }
-                if (victim.getHealth() - damage <= 0) {
+                if (victim.getHealth() - damage <= 0 || cause.equals(EntityDamageEvent.DamageCause.VOID)) {
                     kill(victim, cause);
                     return;
                 }

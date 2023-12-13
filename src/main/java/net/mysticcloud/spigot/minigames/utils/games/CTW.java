@@ -162,7 +162,7 @@ public class CTW extends Game {
 
         Map<Team, Item> flags = new HashMap<>();
 
-        private void returnFlag(Team team, boolean message) {
+        public void returnFlag(Team team, boolean message) {
             Location loc = ((Location) getData().get(team.name().toLowerCase() + "_flag"));
             World world = loc.getWorld();
             assert world != null;
@@ -187,7 +187,8 @@ public class CTW extends Game {
             item.setInvulnerable(true);
             flags.put(team, item);
             sendMessage(MessageUtils.colorize(gamePlayer.getTeam().chatColor() + "&l" + player.getName() + "&r &ehas dropped the " + team.chatColor() + "&l" + team.name() + "&r&e flag!"));
-            Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new RogueFlagTracker(item), 0);
+            item.setMetadata("rogue_flag", new FixedMetadataValue(Utils.getPlugin(), Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new RogueFlagTracker(item), 0)));
+
 
 
         }
@@ -324,7 +325,7 @@ public class CTW extends Game {
 
             @Override
             public void run() {
-                if (item == null || item.getLocation() == null) {
+                if (item == null || item.getLocation() == null || new Date().getTime() - DROPPED >= TimeUnit.MILLISECONDS.convert(20, TimeUnit.SECONDS)) {
                     ((CTWGameState) getGameState()).returnFlag(team,true);
                 } else Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), this, 1);
             }

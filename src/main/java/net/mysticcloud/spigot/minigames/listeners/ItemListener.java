@@ -32,12 +32,19 @@ public class ItemListener implements Listener {
                 Game.GamePlayer player = game.getGameState().getPlayer(e.getEntity().getUniqueId());
                 if (game instanceof CTW) {
                     if (e.getItem().hasMetadata("flag")) {
-                        Team team = (Team) e.getItem().getMetadata("flag").get(0).value();
                         e.setCancelled(true);
-                        if (!team.equals(player.getTeam()))
-                            ((CTW.CTWGameState) game.getGameState()).pickupFlag(((Player) e.getEntity()), e.getItem());
-                        else if (e.getEntity().hasMetadata("flag")) {
-                            ((CTW.CTWGameState) game.getGameState()).captureFlag(((Player) e.getEntity()), ((Team) e.getEntity().getMetadata("flag").get(0).value()));
+                        Team flag = (Team) e.getItem().getMetadata("flag").get(0).value();
+
+                        if (!flag.equals(player.getTeam())) {
+                            if (!e.getEntity().hasMetadata("flag"))
+                                ((CTW.CTWGameState) game.getGameState()).pickupFlag(((Player) e.getEntity()), e.getItem());
+                        } else {
+                            if (e.getEntity().hasMetadata("flag")) {
+                                ((CTW.CTWGameState) game.getGameState()).captureFlag(((Player) e.getEntity()), ((Team) e.getEntity().getMetadata("flag").get(0).value()));
+                            }
+                            if (e.getItem().hasMetadata("rogue_flag")) {
+                                ((CTW.CTWGameState) game.getGameState()).returnFlag(flag, true);
+                            }
                         }
                     }
                 }

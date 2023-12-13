@@ -43,7 +43,7 @@ public class CTW extends Game {
     int MAX_SCORE = 5;
     int MAX_LIVES = 10;
 
-    private final long DURATION = TimeUnit.MILLISECONDS.convert(10, TimeUnit.MINUTES);
+    private final long MAX_DURATION = TimeUnit.MILLISECONDS.convert(10, TimeUnit.MINUTES);
 
 
     public CTW(Arena arena, int teams) {
@@ -58,7 +58,7 @@ public class CTW extends Game {
         setController(new GameController() {
 
             Map<Team, ArrayList<UUID>> teamListMap = new HashMap<>();
-            
+
 
             @Override
             public void start() {
@@ -96,12 +96,12 @@ public class CTW extends Game {
                     getScoreboards().get(player.getUUID()).update();
                     if (player.getTeam().equals(Team.NONE) || player.getTeam().equals(Team.SPECTATOR)) continue;
                     if (getGameState().getScore(player.getTeam()) >= MAX_SCORE) return true;
-                    Bukkit.getPlayer(player.getUUID()).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(player.getTeam().chatColor() + "Lives: " + player.getLives() + " | " + MessageUtils.formatTimeRaw(getGameState().getCurrentDuration()) + " | Team Score: " + getGameState().getScore(player.getTeam()) + "/" + MAX_SCORE));
+                    Bukkit.getPlayer(player.getUUID()).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(player.getTeam().chatColor() + "Lives: " + player.getLives() + " | " + MessageUtils.formatTimeRaw(MAX_DURATION - getGameState().getCurrentDuration()) + " | Team Score: " + getGameState().getScore(player.getTeam()) + "/" + MAX_SCORE));
                     if (!teamListMap.containsKey(player.getTeam()))
                         teamListMap.put(player.getTeam(), new ArrayList<>());
                     teamListMap.get(player.getTeam()).add(player.getUUID());
                 }
-                return teamListMap.size() == 1 || getGameState().getCurrentDuration() >= DURATION;
+                return teamListMap.size() == 1 || getGameState().getCurrentDuration() >= MAX_DURATION;
 
                 //check scores and timer
             }

@@ -90,7 +90,7 @@ public class GameManager {
     }
 
     public static Game createGame(String gameName, Arena arena, int teams, JSONObject data) {
-        Game game;
+        final Game game;
         if (data == null) data = new JSONObject("{}");
         switch (gameName.toLowerCase()) {
             case "ctw":

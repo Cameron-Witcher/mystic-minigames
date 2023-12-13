@@ -4,6 +4,7 @@ import net.mysticcloud.spigot.core.utils.CoreUtils;
 import net.mysticcloud.spigot.core.utils.MessageUtils;
 import net.mysticcloud.spigot.core.utils.accounts.AccountManager;
 import net.mysticcloud.spigot.core.utils.accounts.MysticPlayer;
+import net.mysticcloud.spigot.core.utils.placeholder.PlaceholderUtils;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
 
 import net.mysticcloud.spigot.minigames.utils.misc.ScoreboardManager;
@@ -99,7 +100,7 @@ public class Game {
 
     public void sendMessage(Team team, String message) {
         for (UUID uid : getGameState().getPlayers(team))
-            Bukkit.getPlayer(uid).sendMessage(MessageUtils.colorize(message));
+            Bukkit.getPlayer(uid).sendMessage(MessageUtils.colorize(PlaceholderUtils.replace(Bukkit.getPlayer(uid), message)));
     }
 
     public void close() {

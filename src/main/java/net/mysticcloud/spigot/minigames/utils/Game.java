@@ -279,6 +279,7 @@ public class Game {
         }
 
         public void removePlayer(UUID uid, boolean list) {
+            players.get(uid).setDisplayName(ChatColor.RESET + "", ChatColor.RESET + "");
             if (list) players.remove(uid);
             Player player = Bukkit.getPlayer(uid);
             player.setFallDistance(0);
@@ -668,13 +669,17 @@ public class Game {
         public void setTeam(Team team) {
             this.team = team;
 //            Game.this.getScoreboardManager(uid).getScoreboard().getTeam(team.name()).addEntry(Bukkit.getPlayer(uid).getName());
+            setDisplayName(team.chatColor() + "[" + team.name() + "] ", ChatColor.RESET + "");
+        }
+
+        public void setDisplayName(String prefix, String suffix) {
             if (Bukkit.getPlayer(uid) != null) {
                 Player player = Bukkit.getPlayer(uid);
                 assert player != null;
-                player.setPlayerListName(team.chatColor() + "[" + team.name() + "] " + player.getName());
-                player.setDisplayName(team.chatColor() + "[" + team.name() + "] " + player.getName());
+                player.setPlayerListName(MessageUtils.colorize(prefix) + player.getName() + MessageUtils.colorize(suffix));
+                player.setCustomName(MessageUtils.colorize(prefix) + player.getName() + MessageUtils.colorize(suffix));
+                player.setDisplayName(MessageUtils.colorize(prefix) + player.getName() + MessageUtils.colorize(suffix));
             }
-
         }
 
         public int getLives() {

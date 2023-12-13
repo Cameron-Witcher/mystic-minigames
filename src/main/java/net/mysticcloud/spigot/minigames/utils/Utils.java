@@ -12,7 +12,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.Score;
 import org.json2.JSONObject;
 
 import java.util.*;
@@ -50,17 +49,18 @@ public class Utils {
         SQLUtils.createDatabase("results", SQLUtils.SQLDriver.MYSQL, "sql.vanillaflux.com", "minigame_results", 3306, "mystic", "9ah#G@RjPc@@Riki");
 
         CoreUtils.addPalpitation(() -> {
-            for (Game game : GameManager.getGames().values()) {
-                for (Map.Entry<UUID, ScoreboardManager> entry : game.getScoreboards().entrySet()) {
-                    if (Bukkit.getPlayer(entry.getKey()) == null || Bukkit.getPlayer(entry.getKey()).getWorld().hasMetadata("game"))
-                        continue;
-                    entry.getValue().update();
+            for(World world : Bukkit.getWorlds()){
+                for(Player player : world.getPlayers()) {
+                    if (world.hasMetadata("game")) {
+                        Game game = (Game) world.getMetadata("game").get(0).value();
+                        game.getScoreboardManager(player.getUniqueId()).update();
+                    } else Utils.getScoreboardManager(player.getUniqueId()).update();
                 }
-                if (game.getController().check()) game.getGameState().end();
+
             }
-            for (Map.Entry<UUID, ScoreboardManager> entry : scoreboards.entrySet()) {
-                if (Bukkit.getPlayer(entry.getKey()) == null) continue;
-                if (!Bukkit.getPlayer(entry.getKey()).getWorld().hasMetadata("game")) entry.getValue().update();
+
+            for (Game game : GameManager.getGames().values()) {
+                if (game.getController().check()) game.getGameState().end();
             }
         });
     }

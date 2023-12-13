@@ -129,6 +129,11 @@ public class Game {
         return scoreboards;
     }
 
+    public ScoreboardManager getScoreboardManager(UUID uid){
+        if(!scoreboards.containsKey(uid)) scoreboards.put(uid, new ScoreboardManager(Bukkit.getPlayer(uid)));
+        return scoreboards.get(uid);
+    }
+
     public GameController getController() {
         return controller;
     }
@@ -661,8 +666,8 @@ public class Game {
 
         public void setTeam(Team team) {
             this.team = team;
-            if(!scoreboards.containsKey(uid)) scoreboards.put(uid, new ScoreboardManager(Bukkit.getPlayer(uid)));
-            Game.this.scoreboards.get(uid).getScoreboard().getTeam(team.name()).addEntry(Bukkit.getPlayer(uid).getName());
+            Game.this.getScoreboardManager(uid).getScoreboard().getTeam(team.name()).addEntry(Bukkit.getPlayer(uid).getName());
+
 
         }
 

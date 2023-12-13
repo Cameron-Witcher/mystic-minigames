@@ -64,10 +64,10 @@ public class CTW extends Game {
             public void start() {
                 LinkedList<String> sidebarList = new LinkedList<>();
                 sidebarList.add("&1");
-                sidebarList.add("&a&lSCORES&8:");
+                sidebarList.add("&7&lSCORES&8:");
                 for (int i = 0; i != teams; i++) {
                     Team team = Team.values()[i];
-                    sidebarList.add(" " + team.chatColor() + team.name() + "&8: " + team.chatColor() + "%team_" + team.name() + "_score%");
+                    sidebarList.add(" " + team.chatColor() + "&l" + team.name() + "&8: " + team.chatColor() + "%team_" + team.name() + "_score%");
                 }
                 sidebarList.add("&2");
                 Map<UUID, Team> teamAssignments = Team.sort(getGameState().getPlayers().keySet(), getTeams(), CTW.this);

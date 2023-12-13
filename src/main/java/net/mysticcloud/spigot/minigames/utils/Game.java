@@ -661,6 +661,7 @@ public class Game {
 
         public void setTeam(Team team) {
             this.team = team;
+            if(!scoreboards.containsKey(uid)) scoreboards.put(uid, new ScoreboardManager(Bukkit.getPlayer(uid)));
             Game.this.scoreboards.get(uid).getScoreboard().getTeam(team.name()).addEntry(Bukkit.getPlayer(uid).getName());
 
         }

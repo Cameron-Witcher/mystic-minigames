@@ -220,19 +220,21 @@ public class Game {
         public void startCountdown() {
             if (!countdown) {
                 countdown = true;
-                Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new CountdownRunnable(10, (int t) -> {
+                Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new CountdownRunnable(20, (int t) -> {
                     if (getPlayers().size() < minPlayers) {
                         sendMessage(MessageUtils.colorize("&cNot enough players. Cancelling countdown."));
                         return true;
                     }
-                    sendMessage(MessageUtils.colorize("&3Starting in " + t + " second" + (t == 1 ? "" : "s") + "!"));
-                    for (UUID uid : getPlayers().keySet()) {
-                        Player player = Bukkit.getPlayer(uid);
-                        if (t <= 5) {
+                    if (t == 20 || t == 10 || t <= 5) {
+                        sendMessage(MessageUtils.colorize("&3Starting in " + t + " second" + (t == 1 ? "" : "s") + "!"));
+                        if (t <= 3) for (UUID uid : getPlayers().keySet()) {
+                            Player player = Bukkit.getPlayer(uid);
                             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BIT, SoundCategory.MASTER, 1f, 0.5f);
 
                         }
+
                     }
+
                     return false;
                 }, () -> {
                     start();
@@ -320,7 +322,7 @@ public class Game {
                     gameResults.getJSONObject("player_scores").put(entry.getKey().toString(), getPlayerScores().get(entry.getKey()));
                     MysticPlayer mp = AccountManager.getMysticPlayer(entry.getKey());
                     mp.putData("points", mp.getInt("points") + getGameState().getScore(player));
-                    if(teams > 1){
+                    if (teams > 1) {
                         Team team = (Team) player.getMetadata("original_team").get(0).value();
                         mp.putData("points", mp.getInt("points") + getGameState().getScore(team));
                     }
@@ -521,18 +523,17 @@ public class Game {
             List<Arena.Spawn> spawns = arena.getSpawns(gamePlayer.getTeam());
             Location spawn = spawns.get(new Random().nextInt(spawns.size())).getLocation();
             int i = 0;
-            while(!checkSpawn(spawn)){
-                if(i>=5)
-                    break;
+            while (!checkSpawn(spawn)) {
+                if (i >= 5) break;
                 spawn = spawns.get(new Random().nextInt(spawns.size())).getLocation();
-                i=i+1;
+                i = i + 1;
             }
             player.teleport(spawn);
         }
 
-        private boolean checkSpawn(Location location){
-            for(GamePlayer gamePlayer : getPlayers().values()){
-                if(CoreUtils.distance(Bukkit.getPlayer(gamePlayer.getUUID()).getLocation(), location) < 2)
+        private boolean checkSpawn(Location location) {
+            for (GamePlayer gamePlayer : getPlayers().values()) {
+                if (CoreUtils.distance(Bukkit.getPlayer(gamePlayer.getUUID()).getLocation(), location) < 2)
                     return false;
             }
             return true;

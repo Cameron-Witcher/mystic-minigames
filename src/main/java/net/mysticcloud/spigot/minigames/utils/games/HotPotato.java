@@ -70,6 +70,9 @@ public class HotPotato extends Game {
             @Override
             public boolean check() {
                 if (!getGameState().hasStarted()) return false;
+                if(NOW == 0){
+                    //First run. Set delay
+                }
                 NOW = new Date().getTime();
                 LASTED = NOW - STARTED;
                 if (NOW - SCORE_CHECK >= TimeUnit.MILLISECONDS.convert(1, TimeUnit.SECONDS)) {

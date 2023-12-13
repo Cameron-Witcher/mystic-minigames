@@ -163,8 +163,7 @@ public class CTW extends Game {
         Map<Team, Item> flags = new HashMap<>();
 
         public void returnFlag(Team team, boolean message) {
-            if(flags.containsKey(team))
-                flags.get(team).remove();
+            if (flags.containsKey(team)) flags.get(team).remove();
             Location loc = ((Location) getData().get(team.name().toLowerCase() + "_flag"));
             World world = loc.getWorld();
             assert world != null;
@@ -179,8 +178,7 @@ public class CTW extends Game {
         }
 
         private void dropFlag(Team team, Player player) {
-            if(flags.containsKey(team))
-                flags.get(team).remove();
+            if (flags.containsKey(team)) flags.get(team).remove();
             GamePlayer gamePlayer = getPlayer(player.getUniqueId());
             World world = player.getWorld();
             assert world != null;
@@ -194,14 +192,12 @@ public class CTW extends Game {
             item.setMetadata("rogue_flag", new FixedMetadataValue(Utils.getPlugin(), Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new RogueFlagTracker(item), 0)));
 
 
-
         }
 
 
         public void pickupFlag(Player player, Item item) {
             Team team = (Team) item.getMetadata("flag").get(0).value();
-            if(flags.containsKey(team))
-                flags.get(team).remove();
+            if (flags.containsKey(team)) flags.get(team).remove();
             GamePlayer gamePlayer = getGameState().getPlayer(player.getUniqueId());
 
             sendMessage(MessageUtils.colorize(gamePlayer.getTeam().chatColor() + "&l" + player.getName() + "&r &ehas stolen the " + team.chatColor() + "&l" + team.name() + "&r&e flag!"));
@@ -334,7 +330,11 @@ public class CTW extends Game {
             public void run() {
 
                 if (new Date().getTime() - DROPPED >= TimeUnit.MILLISECONDS.convert(30, TimeUnit.SECONDS)) {
-                    if(!item.isDead() || !item.isEmpty()) ((CTWGameState) getGameState()).returnFlag(team,true);
+                    if (!item.isDead() || !item.isEmpty()) {
+                        ((CTWGameState) getGameState()).returnFlag(team, true);
+                    } else {
+                        returnFlag(team, false);
+                    }
                 } else Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), this, 1);
             }
         }

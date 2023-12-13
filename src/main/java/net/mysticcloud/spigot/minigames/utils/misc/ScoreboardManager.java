@@ -37,7 +37,7 @@ public class ScoreboardManager {
 
         Player player = Bukkit.getPlayer(uid);
 
-        Objective obj = board.registerNewObjective("sidebar", Criteria.DUMMY.getName(), MessageUtils.colorize(PlaceholderUtils.markup(player, PlaceholderUtils.replace(player, title))));
+        Objective obj = board.registerNewObjective("sidebar", Criteria.DUMMY, MessageUtils.colorize(PlaceholderUtils.markup(player, PlaceholderUtils.replace(player, title))));
         obj.setDisplaySlot(DisplaySlot.SIDEBAR);
 
         List<String> usedColors = new ArrayList<>();

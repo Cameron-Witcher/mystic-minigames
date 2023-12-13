@@ -332,8 +332,9 @@ public class CTW extends Game {
 
             @Override
             public void run() {
-                if (item == null || item.getLocation() == null || new Date().getTime() - DROPPED >= TimeUnit.MILLISECONDS.convert(30, TimeUnit.SECONDS)) {
-                    ((CTWGameState) getGameState()).returnFlag(team,true);
+
+                if (new Date().getTime() - DROPPED >= TimeUnit.MILLISECONDS.convert(30, TimeUnit.SECONDS)) {
+                    if(!item.isDead() || !item.isEmpty()) ((CTWGameState) getGameState()).returnFlag(team,true);
                 } else Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), this, 1);
             }
         }

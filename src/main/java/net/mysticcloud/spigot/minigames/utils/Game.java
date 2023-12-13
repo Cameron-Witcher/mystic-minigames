@@ -355,11 +355,11 @@ public class Game {
                 player.sendMessage(MessageUtils.prefixes("game") + "You can't join a game while you're already in one!");
                 return;
             }
+            getScoreboardManager(uid).set();
             if (players.size() >= maxPlayers || !gameState.acceptingPlayers()) {
                 player.setGameMode(GameMode.SPECTATOR);
                 UUID[] uids = getPlayers().keySet().toArray(new UUID[getPlayers().keySet().size()]);
-                if(!scoreboards.containsKey(uid)) scoreboards.put(uid, new ScoreboardManager(player));
-                scoreboards.get(uid).set();
+
                 GamePlayer gamePlayer = new GamePlayer(uid);
                 gamePlayer.setTeam(Team.SPECTATOR);
                 players.put(player.getUniqueId(), gamePlayer);

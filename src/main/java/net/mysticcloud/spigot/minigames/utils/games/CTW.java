@@ -370,9 +370,11 @@ public class CTW extends Game {
         }
 
         public ItemGenerator(Location loc, long delay) {
+            loc.setPitch(0);
+            loc.setYaw(0);
             this.loc = loc.getBlock().getLocation().add(0.5, 0.5, 0.5);
             this.DELAY = delay;
-            this.holo = HologramManager.createHologram(loc);
+            this.holo = HologramManager.createHologram(loc.clone().add(0,2,0));
             TextDisplay line1 = loc.getWorld().spawn(loc, TextDisplay.class);
             line1.setText(MessageUtils.colorize("&a&lEmerald Generator"));
             holo.setLine(0, line1);

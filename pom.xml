@@ -12,13 +12,14 @@
     <url>http://www.mysticcloud.net</url>
 
     <repositories>
-        <repository>
-            <id>ranull-repo-external</id>
-            <url>https://repo.ranull.com/maven/external/</url>
-        </repository>
+
         <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
+        </repository>
+        <repository>
+            <id>ranull-repo-external</id>
+            <url>https://repo.ranull.com/maven/external/</url>
         </repository>
         <repository>
             <id>spigot-repo</id>
@@ -37,7 +38,7 @@
         <dependency>
             <groupId>com.github.Cameron-Witcher</groupId>
             <artifactId>mystic-core</artifactId>
-            <version>0.0.6-R01-SNAPSHOT</version>
+            <version>0.0.7-R01-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>dev.sergiferry</groupId>

@@ -374,10 +374,11 @@ public class CTW extends Game {
             loc.setYaw(0);
             this.loc = loc.getBlock().getLocation().add(0.5, 0.5, 0.5);
             this.DELAY = delay;
-            this.holo = HologramManager.createClassicHologram(loc.clone().add(0, 0.75, 0));
+            this.holo = HologramManager.createClassicHologram(loc.clone().add(0, 1.55, 0));
             holo.setLine(0, "&a&lEmerald Generator");
-            holo.setLine(1, "&7-------------");
-            holo.setLine(2, "00");
+            holo.setLine(1, "&7-----------------");
+            holo.setLine(2, "&a00&7:&a00");
+            holo.setLine(3, "&7-----------------");
         }
 
         public void changeDelay(long delay) {

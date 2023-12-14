@@ -1,6 +1,5 @@
 package net.mysticcloud.spigot.minigames.commands;
 
-import net.mysticcloud.spigot.core.commands.listeners.AdminCommandTabCompleter;
 import net.mysticcloud.spigot.core.utils.MessageUtils;
 import net.mysticcloud.spigot.minigames.MysticMinigames;
 import net.mysticcloud.spigot.minigames.commands.listeners.GameCommandTabCompleter;
@@ -76,6 +75,14 @@ public class GameCommands implements CommandExecutor {
                             obj.put("location", Utils.encryptLocation(player.getLocation()));
                             data.getJSONArray("flags").put(obj);
                             sender.sendMessage(MessageUtils.prefixes("game") + "Added flag for " + (team.equals(Team.NONE) || team.equals(Team.SPECTATOR) ? ChatColor.DARK_AQUA : team.chatColor()) + team.name() + ChatColor.RESET + " team.");
+                        }
+                        if (args[2].equalsIgnoreCase("addgenerator")) {
+                            JSONObject data = arena.getData();
+                            if (!data.has("generators")) data.put("generators", new JSONArray());
+                            JSONObject obj = new JSONObject("{}");
+                            obj.put("location", Utils.encryptLocation(player.getLocation()));
+                            data.getJSONArray("generators").put(obj);
+                            sender.sendMessage(MessageUtils.prefixes("game") + "Added Item Generator.");
                         }
                     }
                 }

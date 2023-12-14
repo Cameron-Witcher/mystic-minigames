@@ -1,5 +1,6 @@
 package net.mysticcloud.spigot.minigames.utils.games;
 
+import dev.sergiferry.playernpc.api.NPC;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -10,10 +11,7 @@ import net.mysticcloud.spigot.minigames.utils.Utils;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
 import net.mysticcloud.spigot.minigames.utils.Game;
 import org.bukkit.*;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Firework;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -24,15 +22,20 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.util.Vector;
 import org.json2.JSONArray;
 import org.json2.JSONObject;
+import org.w3c.dom.Text;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+
+import net.mysticcloud.spigot.core.utils.holograms.*;
 
 public class CTW extends Game {
 
 
     int MAX_SCORE = 5;
     int MAX_LIVES = 10;
+
+    List<ItemGenerator> generators = new ArrayList<ItemGenerator>();
 
     private final long MAX_DURATION = TimeUnit.MILLISECONDS.convert(10, TimeUnit.MINUTES);
 
@@ -81,6 +84,9 @@ public class CTW extends Game {
             public boolean check() {
                 if (!getGameState().hasStarted()) return false;
 
+                for (ItemGenerator gen : getGenerators()) {
+                    gen.check();
+                }
 
                 teamListMap.clear();
                 for (GamePlayer player : getGameState().getPlayers().values()) {
@@ -148,10 +154,25 @@ public class CTW extends Game {
                     Team team = Team.valueOf(flagData.getString("team").toUpperCase());
                     getData().put(team.name().toLowerCase() + "_flag", loc);
                 }
+
+                if (arena.getData().has("generators")) {
+                    JSONArray generators = arena.getData().getJSONArray("generators");
+                    for (int i = 0; i < generators.length(); i++) {
+                        JSONObject generatorData = generators.getJSONObject(i);
+                        Location loc = Utils.decryptLocation(arena.getWorld(), generatorData.getJSONObject("location"));
+                        addNoBuildZone(loc);
+                        getGenerators().add(new ItemGenerator(loc));
+
+                    }
+                }
             }
 
 
         });
+    }
+
+    public List<ItemGenerator> getGenerators() {
+        return generators;
     }
 
 
@@ -338,4 +359,44 @@ public class CTW extends Game {
     }
 
 
+    private class ItemGenerator {
+        final Location loc;
+        long DELAY;
+        long LAST_DROP = 0;
+        final Hologram holo;
+
+        public ItemGenerator(Location loc) {
+            this(loc, TimeUnit.MILLISECONDS.convert(1, TimeUnit.MINUTES));
+        }
+
+        public ItemGenerator(Location loc, long delay) {
+            this.loc = loc.getBlock().getLocation().add(0.5, 0.5, 0.5);
+            this.DELAY = delay;
+            this.holo = HologramManager.createHologram(loc);
+            TextDisplay line1 = loc.getWorld().spawn(loc, TextDisplay.class);
+            line1.setText(MessageUtils.colorize("&a&lEmerald Generator"));
+            holo.setLine(0, line1);
+            TextDisplay line2 = loc.getWorld().spawn(loc, TextDisplay.class);
+            line2.setText("placeholder");
+            holo.setLine(1, line2);
+        }
+
+        public void changeDelay(long delay) {
+            this.DELAY = delay;
+        }
+
+        public boolean check() {
+            long NOW = new Date().getTime();
+            ((TextDisplay) holo.getLine(1)).setText(ChatColor.GREEN + MessageUtils.formatTimeRaw(DELAY - (NOW - LAST_DROP)));
+            if (NOW - LAST_DROP >= DELAY) {
+                LAST_DROP = NOW;
+                Item item = loc.getWorld().dropItem(loc, new ItemStack(Material.EMERALD));
+                item.setVelocity(new Vector(0, 0, 0));
+
+                return true;
+            }
+            return false;
+        }
+
+    }
 }

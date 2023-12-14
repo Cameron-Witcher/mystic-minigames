@@ -374,9 +374,10 @@ public class CTW extends Game {
             loc.setYaw(0);
             this.loc = loc.getBlock().getLocation().add(0.5, 0.5, 0.5);
             this.DELAY = delay;
-            this.holo = HologramManager.createClassicHologram(loc.clone().add(0,2,0));
+            this.holo = HologramManager.createClassicHologram(loc.clone().add(0, 0.75, 0));
             holo.setLine(0, "&a&lEmerald Generator");
-            holo.setLine(1, "00");
+            holo.setLine(1, "&7-------------");
+            holo.setLine(2, "00");
         }
 
         public void changeDelay(long delay) {
@@ -385,7 +386,7 @@ public class CTW extends Game {
 
         public boolean check() {
             long NOW = new Date().getTime();
-            holo.setLine(1, ChatColor.GREEN + MessageUtils.formatTimeRaw(DELAY - (NOW - LAST_DROP)));
+            holo.setLine(2, MessageUtils.colorize(MessageUtils.formatTime(DELAY - (NOW - LAST_DROP), "&a", "&7")));
             if (NOW - LAST_DROP >= DELAY) {
                 LAST_DROP = NOW;
                 Item item = loc.getWorld().dropItem(loc, new ItemStack(Material.EMERALD));

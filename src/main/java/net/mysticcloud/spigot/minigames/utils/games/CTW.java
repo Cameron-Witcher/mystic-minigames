@@ -178,6 +178,7 @@ public class CTW extends Game {
                         Npc npc = NpcManager.createNpc(loc);
                         npc.setCustomName(MessageUtils.colorize("&c&lShop"));
                         npc.setCustomNameVisible(true);
+                        npc.setMetadata("shop", new FixedMetadataValue(Utils.getPlugin(), npc));
 
                     }
                 }

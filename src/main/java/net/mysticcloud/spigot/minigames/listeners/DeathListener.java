@@ -47,6 +47,11 @@ public class DeathListener implements Listener {
     public void onPlayerDamage(EntityDamageByEntityEvent e) {
         if (e.getEntity().hasMetadata("do_damage")) {
             e.setCancelled(false);
+            e.getEntity().removeMetadata("do_damage", Utils.getPlugin());
+            return;
+        }
+        if(e.getEntity().hasMetadata("shop") || e.getEntity().hasMetadata("do_not_damage")){
+            e.setCancelled(true);
             return;
         }
         if (e.getEntity().getWorld().hasMetadata("game")) {

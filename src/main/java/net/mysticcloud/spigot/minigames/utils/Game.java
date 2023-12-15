@@ -4,6 +4,8 @@ import net.mysticcloud.spigot.core.utils.CoreUtils;
 import net.mysticcloud.spigot.core.utils.MessageUtils;
 import net.mysticcloud.spigot.core.utils.accounts.AccountManager;
 import net.mysticcloud.spigot.core.utils.accounts.MysticPlayer;
+import net.mysticcloud.spigot.core.utils.gui.GuiInventory;
+import net.mysticcloud.spigot.core.utils.gui.GuiManager;
 import net.mysticcloud.spigot.core.utils.placeholder.PlaceholderUtils;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
 
@@ -34,6 +36,7 @@ public class Game {
     private GameController controller = null;
     private boolean generated = false;
     private boolean friendlyFire = true;
+    protected GuiInventory shop = null;
 
 
     public Game(String gameName, Arena arena) {
@@ -202,6 +205,13 @@ public class Game {
 
     public int getMAX_PLAYERS() {
         return MAX_PLAYERS;
+    }
+
+    public void openShop(Player player) {
+        if(shop!=null)
+            GuiManager.openGui(player,shop);
+
+
     }
 
 

@@ -5,6 +5,9 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.mysticcloud.spigot.core.utils.MessageUtils;
+import net.mysticcloud.spigot.core.utils.gui.GuiInventory;
+import net.mysticcloud.spigot.core.utils.gui.GuiItem;
+import net.mysticcloud.spigot.core.utils.gui.GuiManager;
 import net.mysticcloud.spigot.core.utils.npc.Npc;
 import net.mysticcloud.spigot.core.utils.npc.NpcManager;
 import net.mysticcloud.spigot.core.utils.placeholder.Symbols;
@@ -50,6 +53,8 @@ public class CTW extends Game {
         setMIN_PLAYERS(teams);
         setMAX_PLAYERS(teams * 4);
         setFriendlyFire(false);
+
+        buildShop();
 
 
         setController(new GameController() {
@@ -186,6 +191,16 @@ public class CTW extends Game {
 
 
         });
+    }
+
+    private void buildShop() {
+        shop = new GuiInventory(getId() + "_shop", "&3&l  Shop", 36, "XXXXXXXXXXXAXXXBXXXXXXXXXXXXXXXYXXXX");
+        shop.addItem("X", new GuiItem("X").setMaterial(Material.GRAY_STAINED_GLASS_PANE).setDisplayName(""));
+        shop.addItem("Y", new GuiItem("Y").setMaterial(Material.BARRIER).setDisplayName("&cClose Menu").setActions(new JSONArray().put(new JSONObject("{\"action\":\"close_gui\"}"))));
+        shop.addItem("A", new GuiItem("A").setMaterial(Material.ENDER_PEARL).setDisplayName("&rEnder Pearls").setAmount(2).setLore((List<String>) Arrays.asList(new String[]{"&1", "&e1 Emerald"})).setActions(new JSONArray().put(new JSONObject("{\"action\":\"buy\",\"buy_type\":\"inventory\",\"item\":\"EMERALD\",\"price\":1}")).put(new JSONObject("{\"action\":\"command\",\"command\":\"give %name% minecraft:ender_pearl 2\"}"))));
+        shop.addItem("B", new GuiItem("B").setMaterial(Material.DIAMOND_AXE).setDisplayName("&rDiamond Axe").setLore(Arrays.asList(new String[]{"&1", "&e4 Emeralds"})).setActions(new JSONArray().put(new JSONObject("{\"action\":\"buy\",\"buy_type\":\"inventory\",\"item\":\"EMERALD\",\"price\":4}")).put(new JSONObject("{\"action\":\"command\",\"command\":\"give %name% minecraft:diamond_axe 1\"}"))));
+
+
     }
 
     public List<ItemGenerator> getGenerators() {

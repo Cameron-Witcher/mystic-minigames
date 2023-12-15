@@ -5,6 +5,8 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.mysticcloud.spigot.core.utils.MessageUtils;
+import net.mysticcloud.spigot.core.utils.npc.Npc;
+import net.mysticcloud.spigot.core.utils.npc.NpcManager;
 import net.mysticcloud.spigot.core.utils.placeholder.Symbols;
 import net.mysticcloud.spigot.minigames.utils.Team;
 import net.mysticcloud.spigot.minigames.utils.Utils;
@@ -36,6 +38,7 @@ public class CTW extends Game {
     int MAX_LIVES = 10;
 
     List<ItemGenerator> generators = new ArrayList<ItemGenerator>();
+    List<Npc> shops = new ArrayList<>();
 
     private final long MAX_DURATION = TimeUnit.MILLISECONDS.convert(10, TimeUnit.MINUTES);
 
@@ -162,6 +165,19 @@ public class CTW extends Game {
                         Location loc = Utils.decryptLocation(arena.getWorld(), generatorData.getJSONObject("location"));
                         addNoBuildZone(loc);
                         getGenerators().add(new ItemGenerator(loc));
+
+                    }
+                }
+
+                if (arena.getData().has("shops")) {
+                    JSONArray shops = arena.getData().getJSONArray("shops");
+                    for (int i = 0; i < shops.length(); i++) {
+                        JSONObject shopData = shops.getJSONObject(i);
+                        Location loc = Utils.decryptLocation(arena.getWorld(), shopData.getJSONObject("location"));
+                        addNoBuildZone(loc);
+                        Npc npc = NpcManager.createNpc(loc);
+                        npc.setCustomName(MessageUtils.colorize("&c&lShop"));
+                        npc.setCustomNameVisible(true);
 
                     }
                 }

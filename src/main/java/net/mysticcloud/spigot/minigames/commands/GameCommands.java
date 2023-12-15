@@ -84,6 +84,14 @@ public class GameCommands implements CommandExecutor {
                             data.getJSONArray("generators").put(obj);
                             sender.sendMessage(MessageUtils.prefixes("game") + "Added Item Generator.");
                         }
+                        if (args[2].equalsIgnoreCase("addshop")) {
+                            JSONObject data = arena.getData();
+                            if (!data.has("shops")) data.put("shops", new JSONArray());
+                            JSONObject obj = new JSONObject("{}");
+                            obj.put("location", Utils.encryptLocation(player.getLocation()));
+                            data.getJSONArray("shops").put(obj);
+                            sender.sendMessage(MessageUtils.prefixes("game") + "Added Shop.");
+                        }
                     }
                 }
                 if (args[0].equalsIgnoreCase("create")) {

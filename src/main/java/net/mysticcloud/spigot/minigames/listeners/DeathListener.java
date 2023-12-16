@@ -60,12 +60,15 @@ public class DeathListener implements Listener {
                 if (e.getDamager() instanceof Firework && e.getDamager().hasMetadata("game")) {
                     e.setCancelled(true);
                 }
+
                 if (e.getEntity() instanceof Item && e.getEntity().hasMetadata("flag")) {
                     e.setCancelled(true);
                     e.getEntity().setVelocity(new Vector(0, 0, 0));
                     return;
                 }
-
+                if(e.getDamager() instanceof TNTPrimed){
+                    return;
+                }
                 if (e.getEntity() instanceof Player) {
                     if (e.getEntity().hasMetadata("last_damager")) {
                         e.getEntity().removeMetadata("last_damager", Utils.getPlugin());

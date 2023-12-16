@@ -59,15 +59,22 @@ public class BlockListener implements Listener {
         if (e.getBlock().getWorld().hasMetadata("game")) {
             for (MetadataValue value : e.getBlock().getWorld().getMetadata("game")) {
                 Game game = (Game) value.value();
+                boolean canPlace = true;
                 for (Location location : game.getNoBuildZones())
                     if (CoreUtils.distance(location, e.getBlock().getLocation()) <= 5) {
-                        e.setCancelled(true);
-                        e.getPlayer().sendMessage(MessageUtils.colorize("&3Sorry, you can't edit blocks right here."));
-                    } else if(e.getBlock().getType().equals(Material.TNT)){
-                        e.setCancelled(true);
-                        TNTPrimed tnt = e.getBlock().getWorld().spawn(e.getBlock().getLocation().clone().add(0.5,0,0.5), TNTPrimed.class);
-                        tnt.setFuseTicks(60);
+                        canPlace = false;
+                        break;
                     }
+                if (!canPlace) {
+                    e.setCancelled(true);
+                    e.getPlayer().sendMessage(MessageUtils.colorize("&3Sorry, you can't edit blocks right here."));
+                    return;
+                }
+                if (e.getBlock().getType().equals(Material.TNT)) {
+                    e.setCancelled(true);
+                    TNTPrimed tnt = e.getBlock().getWorld().spawn(e.getBlock().getLocation().clone().add(0.5, 0, 0.5), TNTPrimed.class);
+                    tnt.setFuseTicks(60);
+                }
             }
         }
     }

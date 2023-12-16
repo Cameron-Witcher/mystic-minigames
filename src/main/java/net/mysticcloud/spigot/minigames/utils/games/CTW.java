@@ -411,7 +411,7 @@ public class CTW extends Game {
             public void run() {
 
                 if(flags.get(team).equals(item)){
-                    item.teleport(((Location) getData().get(team.name().toLowerCase() + "_flag")));
+                    item.teleport(((Location) getData().get(team.name().toLowerCase() + "_flag")).getBlock().getLocation().clone().add(0.5, 1.51, 0.5));
                     Bukkit.getScheduler().runTaskLater(Utils.getPlugin(),this,15);
                 }
             }

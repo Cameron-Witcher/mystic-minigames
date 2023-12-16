@@ -30,7 +30,6 @@ public class HotPotato extends Game {
     private UUID potatoHolder = null;
 
 
-
     public HotPotato(Arena arena) {
         super("HotPotato", arena);
         setGameState(new HotPotatoGameState());
@@ -58,8 +57,7 @@ public class HotPotato extends Game {
                     ob.getScore(Bukkit.getPlayer(uid).getName()).setScore(0);
                 }
 
-                List<UUID> teamMembers = getGameState().getPlayers(Team.NONE);
-                setHolder(Bukkit.getPlayer(teamMembers.get(new Random().nextInt(teamMembers.size()))));
+
                 STARTED = new Date().getTime();
 
             }
@@ -67,8 +65,17 @@ public class HotPotato extends Game {
             @Override
             public boolean check() {
                 if (!getGameState().hasStarted()) return false;
-                if(NOW == 0){
+                if (NOW == 0) {
                     //First run. Set delay
+                    NOW = 1;
+                    Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+                        List<UUID> teamMembers = getGameState().getPlayers(Team.NONE);
+                        setHolder(Bukkit.getPlayer(teamMembers.get(new Random().nextInt(teamMembers.size()))));
+                        NOW = 2;
+                    }, 5 * 20);
+                }
+                if (NOW == 1) {
+                    return false;
                 }
                 NOW = new Date().getTime();
                 LASTED = NOW - STARTED;
@@ -133,7 +140,6 @@ public class HotPotato extends Game {
     }
 
 
-
     private void setHolder(Player player) {
         potatoHolder = player.getUniqueId();
         player.sendMessage(MessageUtils.colorize("&cYou have the Potato!"));
@@ -167,10 +173,14 @@ public class HotPotato extends Game {
 
         @Override
         public void removePlayer(UUID uid, boolean list) {
-            if (getHolder().equals(uid)) {
+            if (getHolder() != null && getHolder().equals(uid)) {
                 List<UUID> teamMembers = getPlayers(Team.NONE);
-                if (!teamMembers.isEmpty())
-                    setHolder(Bukkit.getPlayer(teamMembers.get(new Random().nextInt(teamMembers.size()))));
+                if (!teamMembers.isEmpty()) {
+                    UUID uid2 = teamMembers.get(new Random().nextInt(teamMembers.size()));
+                    while (uid2.equals(uid))
+                        uid2 = teamMembers.get(new Random().nextInt(teamMembers.size()));
+                    setHolder(Bukkit.getPlayer(uid2));
+                }
             }
             super.removePlayer(uid, list);
         }

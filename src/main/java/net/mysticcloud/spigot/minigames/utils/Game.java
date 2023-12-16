@@ -6,6 +6,8 @@ import net.mysticcloud.spigot.core.utils.accounts.AccountManager;
 import net.mysticcloud.spigot.core.utils.accounts.MysticPlayer;
 import net.mysticcloud.spigot.core.utils.gui.GuiInventory;
 import net.mysticcloud.spigot.core.utils.gui.GuiManager;
+import net.mysticcloud.spigot.core.utils.npc.Npc;
+import net.mysticcloud.spigot.core.utils.npc.NpcManager;
 import net.mysticcloud.spigot.core.utils.placeholder.PlaceholderUtils;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
 
@@ -37,6 +39,7 @@ public class Game {
     private boolean generated = false;
     private boolean friendlyFire = true;
     protected GuiInventory shop = null;
+    private final List<Npc> npcs = new ArrayList<>();
 
 
     public Game(String gameName, Arena arena) {
@@ -104,6 +107,10 @@ public class Game {
     public void sendMessage(Team team, String message) {
         for (UUID uid : getGameState().getPlayers(team))
             Bukkit.getPlayer(uid).sendMessage(MessageUtils.colorize(PlaceholderUtils.replace(Bukkit.getPlayer(uid), message)));
+    }
+
+    public void addNpc(Npc npc) {
+        npcs.add(npc);
     }
 
     public void close() {
@@ -351,9 +358,14 @@ public class Game {
                 gameResults.put("game_specific", controller.end());
                 Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
 
-                    for (UUID uid : players.keySet()) {
+                    for (UUID uid : players.keySet())
                         removePlayer(uid, false);
-                    }
+
+                    for(Npc npc : npcs)
+                        NpcManager.removeNpc(npc.getUid());
+
+                    npcs.clear();
+
                     players.clear();
                     teamScores.clear();
                     playerScores.clear();

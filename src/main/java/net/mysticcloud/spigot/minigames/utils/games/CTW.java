@@ -41,7 +41,7 @@ public class CTW extends Game {
     int MAX_LIVES = 10;
 
     List<ItemGenerator> generators = new ArrayList<ItemGenerator>();
-    List<Npc> shops = new ArrayList<>();
+
 
     private final long MAX_DURATION = TimeUnit.MILLISECONDS.convert(10, TimeUnit.MINUTES);
 
@@ -184,7 +184,7 @@ public class CTW extends Game {
                         npc.setCustomName(MessageUtils.colorize("&c&lShop"));
                         npc.setCustomNameVisible(true);
                         npc.setMetadata("shop", new FixedMetadataValue(Utils.getPlugin(), npc));
-
+                        addNpc(npc);
                     }
                 }
             }
@@ -193,12 +193,16 @@ public class CTW extends Game {
         });
     }
 
+
+
+
     private void buildShop() {
         shop = new GuiInventory(getId() + "_shop", "&3&l  Shop", 36, "XXXXXXXXXXXAXXXBXXXXXXXXXXXXXXXYXXXX");
         shop.addItem("X", new GuiItem("X").setMaterial(Material.GRAY_STAINED_GLASS_PANE).setDisplayName(""));
         shop.addItem("Y", new GuiItem("Y").setMaterial(Material.BARRIER).setDisplayName("&cClose Menu").setActions(new JSONArray().put(new JSONObject("{\"action\":\"close_gui\"}"))));
         shop.addItem("A", new GuiItem("A").setMaterial(Material.ENDER_PEARL).setDisplayName("&rEnder Pearls").setAmount(2).setLore((List<String>) Arrays.asList(new String[]{"&1", "&e1 Emerald"})).setActions(new JSONArray().put(new JSONObject("{\"action\":\"buy\",\"buy_type\":\"inventory\",\"item\":\"EMERALD\",\"price\":1}")).put(new JSONObject("{\"action\":\"command\",\"command\":\"give %name% minecraft:ender_pearl 2\",\"sender\":\"CONSOLE\"}"))));
         shop.addItem("B", new GuiItem("B").setMaterial(Material.DIAMOND_AXE).setDisplayName("&rDiamond Axe").setLore(Arrays.asList(new String[]{"&1", "&e4 Emeralds"})).setActions(new JSONArray().put(new JSONObject("{\"action\":\"buy\",\"buy_type\":\"inventory\",\"item\":\"EMERALD\",\"price\":4}")).put(new JSONObject("{\"action\":\"command\",\"command\":\"give %name% minecraft:diamond_axe 1\",\"sender\":\"CONSOLE\"}"))));
+//        shop.addItem("C", new GuiItem("B").setMaterial(Material.DIAMOND_AXE).setDisplayName("&rDiamond Axe").setLore(Arrays.asList(new String[]{"&1", "&e4 Emeralds"})).setActions(new JSONArray().put(new JSONObject("{\"action\":\"buy\",\"buy_type\":\"inventory\",\"item\":\"EMERALD\",\"price\":4}")).put(new JSONObject("{\"action\":\"command\",\"command\":\"give %name% minecraft:diamond_axe 1\",\"sender\":\"CONSOLE\"}"))));
 
 
     }
@@ -211,6 +215,11 @@ public class CTW extends Game {
     public class CTWGameState extends GameState {
 
         Map<Team, Item> flags = new HashMap<>();
+
+        @Override
+        public void end() {
+            super.end();
+        }
 
         public void returnFlag(Team team, boolean message) {
             if (flags.containsKey(team)) flags.get(team).remove();
@@ -348,9 +357,9 @@ public class CTW extends Game {
 
         @Override
         public int score(Player player, int amount) {
-            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.5f);
-            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.11f);
-            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 0.95f);
+            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, 1f, 0.9f);
+            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.6f);
+            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, 1f);
             return super.score(player, amount);
         }
 
@@ -358,9 +367,9 @@ public class CTW extends Game {
         public int score(Team team, int amount) {
             for (UUID uid : getPlayers(team)) {
                 Player player = Bukkit.getPlayer(uid);
-                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.5f);
-                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.11f);
-                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 0.95f);
+                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, 1.5f);
+                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, 1f, 1.11f);
+                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, 0.95f);
             }
             return super.score(team, amount);
         }

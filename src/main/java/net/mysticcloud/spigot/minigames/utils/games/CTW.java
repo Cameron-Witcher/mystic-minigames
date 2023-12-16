@@ -1,13 +1,11 @@
 package net.mysticcloud.spigot.minigames.utils.games;
 
-import dev.sergiferry.playernpc.api.NPC;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.mysticcloud.spigot.core.utils.MessageUtils;
 import net.mysticcloud.spigot.core.utils.gui.GuiInventory;
 import net.mysticcloud.spigot.core.utils.gui.GuiItem;
-import net.mysticcloud.spigot.core.utils.gui.GuiManager;
 import net.mysticcloud.spigot.core.utils.npc.Npc;
 import net.mysticcloud.spigot.core.utils.npc.NpcManager;
 import net.mysticcloud.spigot.core.utils.placeholder.Symbols;
@@ -27,7 +25,6 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.util.Vector;
 import org.json2.JSONArray;
 import org.json2.JSONObject;
-import org.w3c.dom.Text;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;

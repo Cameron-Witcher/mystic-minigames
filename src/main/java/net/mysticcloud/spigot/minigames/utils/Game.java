@@ -13,6 +13,7 @@ import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
 
 import net.mysticcloud.spigot.minigames.utils.misc.ScoreboardManager;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
@@ -218,6 +219,12 @@ public class Game {
         if(shop!=null)
             GuiManager.openGui(player,shop);
 
+
+    }
+
+    public void explodeBlocks(List<Block> blocks) {
+        for(Block block : blocks)
+            block.setType(Material.AIR);
 
     }
 

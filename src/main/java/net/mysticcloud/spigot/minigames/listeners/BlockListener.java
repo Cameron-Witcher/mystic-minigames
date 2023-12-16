@@ -70,19 +70,34 @@ public class BlockListener implements Listener {
     @EventHandler
     public void onBlockChange(EntityExplodeEvent e) {
         if (e.getEntity().getWorld().hasMetadata("game")) {
+            e.setCancelled(true);
             for (MetadataValue value : e.getEntity().getWorld().getMetadata("game")) {
                 Game game = (Game) value.value();
+                List<Block> remove = new ArrayList<>();
                 for (Location location : game.getNoBuildZones()) {
-                    Map<Location, BlockData> remove = new HashMap<>();
                     for (Block block : e.blockList())
-                        if (CoreUtils.distance(block.getLocation(), location) <= 5) remove.put(block.getLocation(), block.getBlockData());
-                    Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
-                        for (Map.Entry<Location, BlockData> entry : remove.entrySet()) {
-                            entry.getKey().getBlock().setBlockData(entry.getValue());
-                        }
-                    }, 2);
-                    remove.clear();
+                        if (CoreUtils.distance(block.getLocation(), location) >= 5) remove.add(block);
                 }
+                e.blockList().removeAll(remove);
+                game.explodeBlocks(e.blockList());
+
+            }
+        }
+    }
+
+    @EventHandler
+    public void onBlockChange(BlockExplodeEvent e) {
+        if (e.getBlock().getWorld().hasMetadata("game")) {
+            e.setCancelled(true);
+            for (MetadataValue value : e.getBlock().getWorld().getMetadata("game")) {
+                Game game = (Game) value.value();
+                List<Block> remove = new ArrayList<>();
+                for (Location location : game.getNoBuildZones()) {
+                    for (Block block : e.blockList())
+                        if (CoreUtils.distance(block.getLocation(), location) >= 5) remove.add(block);
+                }
+                e.blockList().removeAll(remove);
+                game.explodeBlocks(e.blockList());
 
             }
         }

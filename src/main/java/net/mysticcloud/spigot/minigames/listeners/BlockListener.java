@@ -94,7 +94,7 @@ public class BlockListener implements Listener {
                 List<Block> remove = new ArrayList<>();
                 for (Location location : game.getNoBuildZones()) {
                     for (Block block : e.blockList())
-                        if (CoreUtils.distance(block.getLocation(), location) >= 5) remove.add(block);
+                        if (CoreUtils.distance(block.getLocation(), location) <= 5) remove.add(block);
                 }
                 e.blockList().removeAll(remove);
                 game.explodeBlocks(e.blockList());

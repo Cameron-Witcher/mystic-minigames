@@ -584,7 +584,11 @@ public class Game {
                 Entity perp = null;
                 if (victim.hasMetadata("last_damager")) {
                     perp = Bukkit.getEntity((UUID) victim.getMetadata("last_damager").get(0).value());
-                    if (perp == null) return;
+                    if (perp == null) {
+                        victim.setMetadata("do_damage", new FixedMetadataValue(Utils.getPlugin(), damage));
+                        victim.damage(damage);
+                        return;
+                    }
                     if (perp instanceof Player) {
                         Player perp1 = (Player) perp;
                         if (perp1.equals(victim) || (!isFriendlyFire() && getPlayer(victim.getUniqueId()).getTeam().equals(getPlayer(perp1.getUniqueId()).getTeam())))

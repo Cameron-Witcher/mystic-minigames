@@ -7,8 +7,10 @@ import net.mysticcloud.spigot.minigames.utils.Game;
 import net.mysticcloud.spigot.minigames.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
@@ -60,8 +62,11 @@ public class BlockListener implements Listener {
                 for (Location location : game.getNoBuildZones())
                     if (CoreUtils.distance(location, e.getBlock().getLocation()) <= 5) {
                         e.setCancelled(true);
-                        if (e.getPlayer() != null)
-                            e.getPlayer().sendMessage(MessageUtils.colorize("&3Sorry, you can't edit blocks right here."));
+                        e.getPlayer().sendMessage(MessageUtils.colorize("&3Sorry, you can't edit blocks right here."));
+                    } else if(e.getBlock().getType().equals(Material.TNT)){
+                        e.setCancelled(true);
+                        TNTPrimed tnt = e.getBlock().getWorld().spawn(e.getBlock().getLocation().clone().add(0.5,0,0.5), TNTPrimed.class);
+                        tnt.setFuseTicks(60);
                     }
             }
         }

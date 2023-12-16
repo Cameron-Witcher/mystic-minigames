@@ -78,10 +78,10 @@ public class BlockListener implements Listener {
                         if (CoreUtils.distance(block.getLocation(), location) <= 5) remove.add(block);
                 }
                 e.blockList().removeAll(remove);
-                game.explodeBlocks(e.blockList());
+//                game.explodeBlocks(e.blockList());
 
             }
-            e.setCancelled(true);
+//            e.setCancelled(true);
         }
     }
 
@@ -97,11 +97,11 @@ public class BlockListener implements Listener {
                         if (CoreUtils.distance(block.getLocation(), location) <= 5) remove.add(block);
                 }
                 e.blockList().removeAll(remove);
-                game.explodeBlocks(e.blockList());
+//                game.explodeBlocks(e.blockList());
 
 
             }
-            e.setCancelled(true);
+//            e.setCancelled(true);
         }
     }
 

@@ -229,6 +229,7 @@ public class CTW extends Game {
             item.setMetadata("flag", new FixedMetadataValue(Utils.getPlugin(), team));
             item.setInvulnerable(true);
             flags.put(team, item);
+            Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new FlagTracker(item), 0);
             if (message)
                 sendMessage(MessageUtils.colorize("&eThe " + team.chatColor() + "&l" + team.name() + "&r&e flag has been returned!"));
         }

@@ -19,6 +19,8 @@ public class EntityListener implements Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
+
+
     @EventHandler
     public void onEntitySpawn(CreatureSpawnEvent e) {
         if (e.getLocation().getWorld().hasMetadata("game") && e.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.NATURAL)) {

@@ -394,6 +394,27 @@ public class CTW extends Game {
                 } else Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), this, 1);
             }
         }
+
+        private class FlagTracker implements Runnable {
+            Item item;
+            Team team;
+            long DROPPED;
+
+            public FlagTracker(Item item) {
+                this.item = item;
+                this.team = (Team) item.getMetadata("flag").get(0).value();
+                this.DROPPED = new Date().getTime();
+            }
+
+            @Override
+            public void run() {
+
+                if(flags.get(team).equals(item)){
+                    item.teleport(((Location) getData().get(team.name().toLowerCase() + "_flag")));
+                    Bukkit.getScheduler().runTaskLater(Utils.getPlugin(),this,15);
+                }
+            }
+        }
     }
 
 

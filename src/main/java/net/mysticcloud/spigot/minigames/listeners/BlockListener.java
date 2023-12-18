@@ -33,7 +33,7 @@ public class BlockListener implements Listener {
         if (e.getBlock().getWorld().hasMetadata("game")) {
             for (MetadataValue value : e.getBlock().getWorld().getMetadata("game")) {
                 Game game = (Game) value.value();
-                for (Location location : game.getNoBuildZones())
+                if (game.getGameState().hasStarted()) for (Location location : game.getNoBuildZones())
                     if (CoreUtils.distance(location, e.getBlock().getLocation()) <= 5) e.setCancelled(true);
 
             }
@@ -45,7 +45,7 @@ public class BlockListener implements Listener {
         if (e.getBlock().getWorld().hasMetadata("game")) {
             for (MetadataValue value : e.getBlock().getWorld().getMetadata("game")) {
                 Game game = (Game) value.value();
-                for (Location location : game.getNoBuildZones())
+                if (game.getGameState().hasStarted()) for (Location location : game.getNoBuildZones())
                     if (CoreUtils.distance(location, e.getBlock().getLocation()) <= 5) {
                         e.setCancelled(true);
                         if (e.getPlayer() != null)
@@ -60,24 +60,27 @@ public class BlockListener implements Listener {
         if (e.getBlock().getWorld().hasMetadata("game")) {
             for (MetadataValue value : e.getBlock().getWorld().getMetadata("game")) {
                 Game game = (Game) value.value();
-                boolean canPlace = true;
-                for (Location location : game.getNoBuildZones())
-                    if (CoreUtils.distance(location, e.getBlock().getLocation()) <= 5) {
-                        canPlace = false;
-                        break;
+                if (game.getGameState().hasStarted()) {
+                    boolean canPlace = true;
+                    for (Location location : game.getNoBuildZones())
+                        if (CoreUtils.distance(location, e.getBlock().getLocation()) <= 5) {
+                            canPlace = false;
+                            break;
+                        }
+                    if (!canPlace) {
+                        e.setCancelled(true);
+                        e.getPlayer().sendMessage(MessageUtils.colorize("&3Sorry, you can't edit blocks right here."));
+                        return;
                     }
-                if (!canPlace) {
-                    e.setCancelled(true);
-                    e.getPlayer().sendMessage(MessageUtils.colorize("&3Sorry, you can't edit blocks right here."));
-                    return;
+                    if (e.getBlock().getType().equals(Material.TNT)) {
+                        e.setCancelled(true);
+                        TNTPrimed tnt = e.getBlock().getWorld().spawn(e.getBlock().getLocation().clone().add(0.5, 0, 0.5), TNTPrimed.class);
+                        tnt.setFuseTicks(60);
+                        tnt.setMetadata("register", new FixedMetadataValue(Utils.getPlugin(), true));
+                        CoreUtils.consumeItem(e.getPlayer(), 1, Material.TNT);
+                    }
                 }
-                if (e.getBlock().getType().equals(Material.TNT)) {
-                    e.setCancelled(true);
-                    TNTPrimed tnt = e.getBlock().getWorld().spawn(e.getBlock().getLocation().clone().add(0.5, 0, 0.5), TNTPrimed.class);
-                    tnt.setFuseTicks(60);
-                    tnt.setMetadata("register", new FixedMetadataValue(Utils.getPlugin(),true));
-                     CoreUtils.consumeItem(e.getPlayer(), 1, Material.TNT);
-                }
+
             }
         }
     }
@@ -87,12 +90,15 @@ public class BlockListener implements Listener {
         if (e.getEntity().getWorld().hasMetadata("game")) {
             for (MetadataValue value : e.getEntity().getWorld().getMetadata("game")) {
                 Game game = (Game) value.value();
-                List<Block> remove = new ArrayList<>();
-                for (Location location : game.getNoBuildZones()) {
-                    for (Block block : e.blockList())
-                        if (CoreUtils.distance(block.getLocation(), location) <= 5) remove.add(block);
+                if (game.getGameState().hasStarted()) {
+                    List<Block> remove = new ArrayList<>();
+                    for (Location location : game.getNoBuildZones()) {
+                        for (Block block : e.blockList())
+                            if (CoreUtils.distance(block.getLocation(), location) <= 5) remove.add(block);
+                    }
+                    e.blockList().removeAll(remove);
                 }
-                e.blockList().removeAll(remove);
+
 //                game.explodeBlocks(e.blockList());
 
             }
@@ -106,12 +112,15 @@ public class BlockListener implements Listener {
 
             for (MetadataValue value : e.getBlock().getWorld().getMetadata("game")) {
                 Game game = (Game) value.value();
-                List<Block> remove = new ArrayList<>();
-                for (Location location : game.getNoBuildZones()) {
-                    for (Block block : e.blockList())
-                        if (CoreUtils.distance(block.getLocation(), location) <= 5) remove.add(block);
+                if (game.getGameState().hasStarted()) {
+                    List<Block> remove = new ArrayList<>();
+                    for (Location location : game.getNoBuildZones()) {
+                        for (Block block : e.blockList())
+                            if (CoreUtils.distance(block.getLocation(), location) <= 5) remove.add(block);
+                    }
+                    e.blockList().removeAll(remove);
                 }
-                e.blockList().removeAll(remove);
+
 //                game.explodeBlocks(e.blockList());
 
 
@@ -125,7 +134,7 @@ public class BlockListener implements Listener {
         if (e.getBlock().getWorld().hasMetadata("game")) {
             for (MetadataValue value : e.getBlock().getWorld().getMetadata("game")) {
                 Game game = (Game) value.value();
-                for (Location location : game.getNoBuildZones())
+                if (game.getGameState().hasStarted()) for (Location location : game.getNoBuildZones())
                     if (CoreUtils.distance(location, e.getBlock().getLocation()) <= 5) e.setCancelled(true);
             }
         }
@@ -136,7 +145,7 @@ public class BlockListener implements Listener {
         if (e.getBlock().getWorld().hasMetadata("game")) {
             for (MetadataValue value : e.getBlock().getWorld().getMetadata("game")) {
                 Game game = (Game) value.value();
-                for (Location location : game.getNoBuildZones())
+                if (game.getGameState().hasStarted()) for (Location location : game.getNoBuildZones())
                     if (CoreUtils.distance(location, e.getBlock().getLocation()) <= 5) {
                         e.setCancelled(true);
                         if (e.getPlayer() != null)

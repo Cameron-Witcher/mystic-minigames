@@ -66,11 +66,15 @@ public class DeathListener implements Listener {
                     e.getEntity().setVelocity(new Vector(0, 0, 0));
                     return;
                 }
-                if(e.getDamager().hasMetadata("register")){
-                    e.setCancelled(false);
-                    return;
-                }
+
                 if (e.getEntity() instanceof Player) {
+                    Player player = (Player)e.getEntity();
+                    if(e.getDamager() instanceof TNTPrimed){
+                        e.setCancelled(true);
+                        player.setMetadata("do_damage",new FixedMetadataValue(Utils.getPlugin(),true));
+                        Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), ()->{player.damage(e.getDamage(),e.getDamager());},1);
+                        return;
+                    }
                     if (e.getEntity().hasMetadata("last_damager")) {
                         e.getEntity().removeMetadata("last_damager", Utils.getPlugin());
                         Bukkit.getScheduler().cancelTask(((BukkitTask) e.getEntity().getMetadata("last_damager_timer").get(0).value()).getTaskId());

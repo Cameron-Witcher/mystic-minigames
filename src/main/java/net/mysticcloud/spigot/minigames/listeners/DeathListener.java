@@ -66,7 +66,8 @@ public class DeathListener implements Listener {
                     e.getEntity().setVelocity(new Vector(0, 0, 0));
                     return;
                 }
-                if(e.getDamager() instanceof TNTPrimed){
+                if(e.getDamager().hasMetadata("register")){
+                    e.setCancelled(false);
                     return;
                 }
                 if (e.getEntity() instanceof Player) {

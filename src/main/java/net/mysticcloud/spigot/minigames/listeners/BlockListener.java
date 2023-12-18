@@ -15,6 +15,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 
 import java.util.ArrayList;
@@ -74,6 +75,8 @@ public class BlockListener implements Listener {
                     e.setCancelled(true);
                     TNTPrimed tnt = e.getBlock().getWorld().spawn(e.getBlock().getLocation().clone().add(0.5, 0, 0.5), TNTPrimed.class);
                     tnt.setFuseTicks(60);
+                    tnt.setMetadata("register", new FixedMetadataValue(Utils.getPlugin(),true));
+                     CoreUtils.consumeItem(e.getPlayer(), 1, Material.TNT);
                 }
             }
         }

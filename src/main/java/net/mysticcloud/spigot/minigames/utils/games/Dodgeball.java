@@ -35,7 +35,7 @@ public class Dodgeball extends Game {
         setGameState(new DodgeballGameState());
         setTEAMS(teams);
         setMIN_PLAYERS(teams);
-        setMAX_PLAYERS(teams * 4);
+        setMAX_PLAYERS(teams * 8);
         setFriendlyFire(false);
         setController(new GameController() {
 

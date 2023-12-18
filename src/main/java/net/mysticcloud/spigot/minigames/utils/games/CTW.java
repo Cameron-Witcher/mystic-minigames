@@ -189,6 +189,7 @@ public class CTW extends Game {
 
         });
     }
+
     private void buildShop() {
         shop = new GuiInventory(getId() + "_shop", "&3&l  Shop", 36, "XXXXXXXXXXXAXBXCXXXXXXXXXXXXXXXYXXXX");
         shop.addItem("X", new GuiItem("X").setMaterial(Material.LIGHT_GRAY_STAINED_GLASS_PANE).setDisplayName(""));
@@ -405,11 +406,15 @@ public class CTW extends Game {
 
             @Override
             public void run() {
-
-                if (flags.get(team).equals(item)) {
-                    item.teleport(((Location) getData().get(team.name().toLowerCase() + "_flag")).getBlock().getLocation().clone().add(0.5, 1.51, 0.5));
-                    Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), this, 15);
+                try {
+                    if (flags.get(team).equals(item)) {
+                        item.teleport(((Location) getData().get(team.name().toLowerCase() + "_flag")).getBlock().getLocation().clone().add(0.5, 1.51, 0.5));
+                        Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), this, 7*20);
+                    }
+                } catch (Exception ex) {
+                    Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), this, 7*20);
                 }
+
             }
         }
     }

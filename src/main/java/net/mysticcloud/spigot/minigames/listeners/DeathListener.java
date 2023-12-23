@@ -50,7 +50,7 @@ public class DeathListener implements Listener {
             e.getEntity().removeMetadata("do_damage", Utils.getPlugin());
             return;
         }
-        if(e.getEntity().hasMetadata("shop") || e.getEntity().hasMetadata("do_not_damage")){
+        if (e.getEntity().hasMetadata("shop") || e.getEntity().hasMetadata("do_not_damage")) {
             e.setCancelled(true);
             return;
         }
@@ -68,11 +68,10 @@ public class DeathListener implements Listener {
                 }
 
                 if (e.getEntity() instanceof Player) {
-                    Player player = (Player)e.getEntity();
-                    if(e.getDamager() instanceof TNTPrimed){
+                    Player player = (Player) e.getEntity();
+                    if (e.getDamager() instanceof TNTPrimed) {
+                        game.getGameState().processDamage(player, e.getDamage(), EntityDamageEvent.DamageCause.BLOCK_EXPLOSION);
                         e.setCancelled(true);
-                        player.setMetadata("do_damage",new FixedMetadataValue(Utils.getPlugin(),true));
-                        Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), ()->{player.damage(e.getDamage(),e.getDamager());},1);
                         return;
                     }
                     if (e.getEntity().hasMetadata("last_damager")) {
@@ -101,7 +100,7 @@ public class DeathListener implements Listener {
 
             Game game = (Game) e.getEntity().getWorld().getMetadata("game").get(0).value();
             if (!game.getGameState().hasStarted()) e.setCancelled(true);
-            game.getGameState().processDamage((Player)e.getEntity(), e.getDamage(), e.getCause());
+            game.getGameState().processDamage((Player) e.getEntity(), e.getDamage(), e.getCause());
             e.setCancelled(true);
 
 

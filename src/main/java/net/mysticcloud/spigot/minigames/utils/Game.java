@@ -217,14 +217,13 @@ public class Game {
     }
 
     public void openShop(Player player) {
-        if(shop!=null)
-            GuiManager.openGui(player,shop);
+        if (shop != null) GuiManager.openGui(player, shop);
 
 
     }
 
     public void explodeBlocks(List<Block> blocks) {
-        for(Block block : blocks)
+        for (Block block : blocks)
             block.setType(Material.AIR);
 
     }
@@ -369,7 +368,7 @@ public class Game {
                     for (UUID uid : players.keySet())
                         removePlayer(uid, false);
 
-                    for(Npc npc : npcs)
+                    for (Npc npc : npcs)
                         NpcManager.removeNpc(npc.getUid());
 
                     npcs.clear();
@@ -582,27 +581,35 @@ public class Game {
 
 
             Bukkit.getScheduler().runTaskLaterAsynchronously(Utils.getPlugin(), () -> {
-                Entity perp = null;
-                if (victim.hasMetadata("last_damager")) {
-                    perp = (Entity) (victim.getMetadata("last_damager").get(0).value());
-                    if (perp == null) {
-                        victim.setMetadata("do_damage", new FixedMetadataValue(Utils.getPlugin(), damage));
-                        victim.damage(damage);
-                        return;
-                    }
-                    if (perp instanceof Player) {
-                        Player perp1 = (Player) perp;
-                        if (perp1.equals(victim) || (!isFriendlyFire() && getPlayer(victim.getUniqueId()).getTeam().equals(getPlayer(perp1.getUniqueId()).getTeam())))
-                            return;
 
-                    }
-                }
                 if (victim.getHealth() - damage <= 0 || cause.equals(EntityDamageEvent.DamageCause.VOID)) {
                     kill(victim, cause);
                     return;
                 }
-                victim.setMetadata("do_damage", new FixedMetadataValue(Utils.getPlugin(), damage));
-                victim.damage(damage, perp);
+
+                if (victim.hasMetadata("last_damager")) {
+                    try {
+                        Entity perp = (Entity) (victim.getMetadata("last_damager").get(0).value());
+                        if (perp instanceof Player) {
+                            Player perp1 = (Player) perp;
+                            if (perp1.equals(victim) || (!isFriendlyFire() && getPlayer(victim.getUniqueId()).getTeam().equals(getPlayer(perp1.getUniqueId()).getTeam())))
+                                return;
+
+                        }
+                        victim.setMetadata("do_damage", new FixedMetadataValue(Utils.getPlugin(), damage));
+                        Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+                            victim.damage(damage, perp);
+                        }, 0);
+                    } catch (ClassCastException ex) {
+                        victim.setMetadata("do_damage", new FixedMetadataValue(Utils.getPlugin(), damage));
+                        Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+                            victim.damage(damage);
+                        }, 0);
+                        return;
+                    }
+                }
+
+
             }, 0);
         }
 

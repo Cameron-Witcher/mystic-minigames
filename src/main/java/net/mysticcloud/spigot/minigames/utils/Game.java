@@ -16,6 +16,7 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Firework;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
@@ -583,7 +584,7 @@ public class Game {
             Bukkit.getScheduler().runTaskLaterAsynchronously(Utils.getPlugin(), () -> {
                 Entity perp = null;
                 if (victim.hasMetadata("last_damager")) {
-                    perp = Bukkit.getEntity((UUID) victim.getMetadata("last_damager").get(0).value());
+                    perp = (Entity) (victim.getMetadata("last_damager").get(0).value());
                     if (perp == null) {
                         victim.setMetadata("do_damage", new FixedMetadataValue(Utils.getPlugin(), damage));
                         victim.damage(damage);

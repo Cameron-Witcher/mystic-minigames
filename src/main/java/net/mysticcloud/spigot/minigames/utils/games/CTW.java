@@ -331,8 +331,8 @@ public class CTW extends Game {
         @Override
         public void kill(Player player, EntityDamageEvent.DamageCause cause) {
             GamePlayer gamePlayer = getPlayer(player.getUniqueId());
-            Entity entity = player.hasMetadata("last_damager") ? Bukkit.getEntity((UUID) player.getMetadata("last_damager").get(0).value()) : null;
-            if (entity instanceof Player) score(Bukkit.getPlayer(entity.getUniqueId()));
+            Entity entity = player.hasMetadata("last_damager") ? (Entity) (player.getMetadata("last_damager").get(0).value()) : null;
+            if (entity instanceof Player) score((Player)entity);
 
             defaultDeathMessages(player, cause);
             if (player.hasMetadata("flag")) {

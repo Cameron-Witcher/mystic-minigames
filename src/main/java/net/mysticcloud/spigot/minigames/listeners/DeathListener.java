@@ -81,7 +81,7 @@ public class DeathListener implements Listener {
                         Bukkit.getScheduler().cancelTask(((BukkitTask) e.getEntity().getMetadata("last_damager_timer").get(0).value()).getTaskId());
                         e.getEntity().removeMetadata("last_damager_timer", Utils.getPlugin());
                     }
-                    e.getEntity().setMetadata("last_damager", new FixedMetadataValue(Utils.getPlugin(), (e.getDamager() instanceof Projectile && ((Projectile) e.getDamager()).getShooter() instanceof LivingEntity ? ((LivingEntity) ((Projectile) e.getDamager()).getShooter()).getUniqueId() : e.getDamager().getUniqueId())));
+                    e.getEntity().setMetadata("last_damager", new FixedMetadataValue(Utils.getPlugin(), (e.getDamager() instanceof Projectile && ((Projectile) e.getDamager()).getShooter() instanceof LivingEntity ? ((LivingEntity) ((Projectile) e.getDamager()).getShooter()) : e.getDamager())));
                     e.getEntity().setMetadata("last_damager_timer", new FixedMetadataValue(Utils.getPlugin(), Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
                         e.getEntity().removeMetadata("last_damager", Utils.getPlugin());
                         e.getEntity().removeMetadata("last_damager_timer", Utils.getPlugin());
@@ -101,7 +101,10 @@ public class DeathListener implements Listener {
         if (e.getEntity() instanceof Player && e.getEntity().getWorld().hasMetadata("game")) {
 
             Game game = (Game) e.getEntity().getWorld().getMetadata("game").get(0).value();
-            if (!game.getGameState().hasStarted()) e.setCancelled(true);
+            if (!game.getGameState().hasStarted()) {
+                e.setCancelled(true);
+                return;
+            }
             game.getGameState().processDamage((Player) e.getEntity(), e.getDamage(), e.getCause());
             e.setCancelled(true);
 

@@ -158,7 +158,7 @@ public class Game {
 
     public void defaultDeathMessages(Player player, EntityDamageEvent.DamageCause cause) {
         GamePlayer gamePlayer = gameState.getPlayer(player.getUniqueId());
-        Entity entity = player.hasMetadata("last_damager") ? Bukkit.getEntity((UUID) player.getMetadata("last_damager").get(0).value()) : null;
+        Entity entity = player.hasMetadata("last_damager") ? (Entity) (player.getMetadata("last_damager").get(0).value()) : null;
 
         String victim = (gamePlayer.getTeam().equals(Team.NONE) ? "&3" : gamePlayer.getTeam().chatColor()) + player.getName();
         String action = " was killed";

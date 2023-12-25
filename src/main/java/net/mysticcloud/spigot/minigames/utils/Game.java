@@ -583,7 +583,9 @@ public class Game {
             Bukkit.getScheduler().runTaskLaterAsynchronously(Utils.getPlugin(), () -> {
 
                 if (victim.getHealth() - damage <= 0 || cause.equals(EntityDamageEvent.DamageCause.VOID)) {
-                    kill(victim, cause);
+                    Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+                        kill(victim, cause);
+                    }, 0);
                     return;
                 }
 

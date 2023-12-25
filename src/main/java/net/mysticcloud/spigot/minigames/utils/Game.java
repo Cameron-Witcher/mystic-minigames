@@ -602,7 +602,7 @@ public class Game {
                 }
                 victim.setMetadata("do_damage", new FixedMetadataValue(Utils.getPlugin(), damage));
                 victim.damage(damage, perp);
-            }, 1);
+            }, 0);
         }
 
         public void reset() {

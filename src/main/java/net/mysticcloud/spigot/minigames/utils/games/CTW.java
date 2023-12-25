@@ -226,7 +226,6 @@ public class CTW extends Game {
             item.setMetadata("flag", new FixedMetadataValue(Utils.getPlugin(), team));
             item.setInvulnerable(true);
             flags.put(team, item);
-            Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), new FlagTracker(item), 0);
             if (message)
                 sendMessage(MessageUtils.colorize("&eThe " + team.chatColor() + "&l" + team.name() + "&r&e flag has been returned!"));
         }
@@ -393,30 +392,7 @@ public class CTW extends Game {
             }
         }
 
-        private class FlagTracker implements Runnable {
-            Item item;
-            Team team;
-            long DROPPED;
 
-            public FlagTracker(Item item) {
-                this.item = item;
-                this.team = (Team) item.getMetadata("flag").get(0).value();
-                this.DROPPED = new Date().getTime();
-            }
-
-            @Override
-            public void run() {
-                try {
-                    if (flags.get(team).equals(item)) {
-                        item.teleport(((Location) getData().get(team.name().toLowerCase() + "_flag")).getBlock().getLocation().clone().add(0.5, 1.51, 0.5));
-                        Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), this, 7*20);
-                    }
-                } catch (Exception ex) {
-                    Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), this, 7*20);
-                }
-
-            }
-        }
     }
 
 

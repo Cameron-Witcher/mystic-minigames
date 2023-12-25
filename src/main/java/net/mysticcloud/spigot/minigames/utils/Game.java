@@ -580,6 +580,7 @@ public class Game {
         public void processDamage(Player victim, double damage, EntityDamageEvent.DamageCause cause) {
 
 
+            Bukkit.getScheduler().runTaskLaterAsynchronously(Utils.getPlugin(), () -> {
                 Entity perp = null;
                 if (victim.hasMetadata("last_damager")) {
                     perp = Bukkit.getEntity((UUID) victim.getMetadata("last_damager").get(0).value());
@@ -601,6 +602,7 @@ public class Game {
                 }
                 victim.setMetadata("do_damage", new FixedMetadataValue(Utils.getPlugin(), damage));
                 victim.damage(damage, perp);
+            }, 0);
         }
 
         public void reset() {

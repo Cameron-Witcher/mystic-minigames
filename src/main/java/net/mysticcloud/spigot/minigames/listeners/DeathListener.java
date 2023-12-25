@@ -45,6 +45,7 @@ public class DeathListener implements Listener {
 
     @EventHandler
     public void onPlayerDamage(EntityDamageByEntityEvent e) {
+
         if (e.getEntity().hasMetadata("do_damage")) {
             e.setCancelled(false);
             e.getEntity().removeMetadata("do_damage", Utils.getPlugin());
@@ -69,7 +70,8 @@ public class DeathListener implements Listener {
 
                 if (e.getEntity() instanceof Player) {
                     Player player = (Player) e.getEntity();
-                    if (e.getDamager() instanceof TNTPrimed) {
+
+                    if (e.getCause().equals(EntityDamageEvent.DamageCause.BLOCK_EXPLOSION) || e.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_EXPLOSION)) {
                         game.getGameState().processDamage(player, e.getDamage(), EntityDamageEvent.DamageCause.BLOCK_EXPLOSION);
                         e.setCancelled(true);
                         return;

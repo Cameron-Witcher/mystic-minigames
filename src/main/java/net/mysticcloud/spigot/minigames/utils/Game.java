@@ -164,6 +164,14 @@ public class Game {
         String action = " was killed";
         String ending = "!";
         switch (cause) {
+            case FALL:
+                action = " fell to their death";
+                ending = ".";
+                if (entity != null) {
+                    action = "was pushed off a cliff by ";
+                    ending = gameState.getPlayers().containsKey(entity.getUniqueId()) ? (gameState.getPlayer(entity.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : gameState.getPlayer(entity.getUniqueId()).getTeam().chatColor()) + entity.getName() + "&e." : "&3" + entity.getName() + "&e.";
+                }
+                break;
             case ENTITY_EXPLOSION:
             case BLOCK_EXPLOSION:
                 action = " blew up";

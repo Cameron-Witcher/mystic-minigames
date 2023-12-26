@@ -621,7 +621,7 @@ public class Game {
                         victim.damage(damage);
                     }, 0);
                 }
-                if (victim.getHealth() - damage <= 0 || cause.equals(EntityDamageEvent.DamageCause.VOID)) {
+                if ((victim.getHealth() - damage <= 0 && (victim.getInventory().getItemInOffHand().getType().equals(Material.TOTEM_OF_UNDYING) || victim.getInventory().getItemInMainHand().getType().equals(Material.TOTEM_OF_UNDYING)))|| cause.equals(EntityDamageEvent.DamageCause.VOID)) {
                     Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
                         kill(victim, cause);
                     }, 0);

@@ -90,7 +90,7 @@ public class DeathListener implements Listener {
                 e.setCancelled(true);
                 return;
             }
-            game.getGameState().processDamage((Player) e.getEntity(), e.getDamage(), e.getCause());
+            game.getGameState().processDamage((Player) e.getEntity(), e.getFinalDamage(), e.getCause());
             e.setCancelled(true);
 
 

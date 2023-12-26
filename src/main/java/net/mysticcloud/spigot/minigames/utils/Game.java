@@ -532,10 +532,12 @@ public class Game {
         }
 
         public void kill(Player player, EntityDamageEvent.DamageCause cause) {
+
             GamePlayer gamePlayer = getPlayers().get(player.getUniqueId());
             gamePlayer.setLives(gamePlayer.getLives() - 1);
             player.setHealth(player.getHealthScale());
             player.setFoodLevel(20);
+            player.removeMetadata("do_damage", Utils.getPlugin());
             if (gamePlayer.getLives() > 0) {
                 player.setGameMode(GameMode.SPECTATOR);
                 if (player.getLocation().getY() < 0)
@@ -601,8 +603,7 @@ public class Game {
 
                     }
                     Bukkit.broadcastMessage(perp.toString() + "");
-                    if(perp instanceof Firework)
-                        return;
+                    if (perp instanceof Firework) return;
                     victim.setMetadata("do_damage", new FixedMetadataValue(Utils.getPlugin(), damage));
                     if (victim.getHealth() - damage > 0) Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
                         victim.damage(damage, perp);

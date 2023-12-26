@@ -45,20 +45,24 @@ public class DeathListener implements Listener {
 
     @EventHandler
     public void onPlayerDamage(EntityDamageByEntityEvent e) {
-
+        Bukkit.broadcastMessage(e.getEntity().getName() + "1-1");
         if (e.getEntity().hasMetadata("do_damage")) {
+            Bukkit.broadcastMessage(e.getEntity().getName() + "1-2");
             e.setCancelled(false);
             e.getEntity().removeMetadata("do_damage", Utils.getPlugin());
             return;
         }
+        Bukkit.broadcastMessage(e.getEntity().getName() + "1-3");
         if (e.getEntity().hasMetadata("shop") || e.getEntity().hasMetadata("do_not_damage")) {
             e.setCancelled(true);
             return;
         }
         if (e.getEntity().getWorld().hasMetadata("game")) {
+            Bukkit.broadcastMessage(e.getEntity().getName() + "1-4");
             for (MetadataValue data : e.getEntity().getWorld().getMetadata("game")) {
                 Game game = (Game) data.value();
                 if (e.getDamager().hasMetadata("game_rocket")) {
+                    Bukkit.broadcastMessage(e.getEntity().getName() + "1-5");
                     e.setCancelled(true);
                     return;
                 }
@@ -68,10 +72,10 @@ public class DeathListener implements Listener {
                     e.getEntity().setVelocity(new Vector(0, 0, 0));
                     return;
                 }
-
+                Bukkit.broadcastMessage(e.getEntity().getName() + "1-6");
 
                 if (e.getEntity() instanceof Player) {
-
+                    Bukkit.broadcastMessage(e.getEntity().getName() + "1-7");
                     Player player = (Player) e.getEntity();
                     if (e.getEntity().hasMetadata("last_damager")) {
                         e.getEntity().removeMetadata("last_damager", Utils.getPlugin());
@@ -90,18 +94,24 @@ public class DeathListener implements Listener {
 
     @EventHandler
     public void onPlayerDeath(EntityDamageEvent e) {
+        Bukkit.broadcastMessage(e.getEntity().getName() + "3-1");
         if (e.getEntity().hasMetadata("do_damage")) {
+            Bukkit.broadcastMessage(e.getEntity().getName() + "3-2");
             e.setCancelled(false);
             e.getEntity().removeMetadata("do_damage", Utils.getPlugin());
             return;
         }
+        Bukkit.broadcastMessage(e.getEntity().getName() + "3-3");
         if (e.getEntity() instanceof Player && e.getEntity().getWorld().hasMetadata("game")) {
+            Bukkit.broadcastMessage(e.getEntity().getName() + "3-4");
             Game game = (Game) e.getEntity().getWorld().getMetadata("game").get(0).value();
             if (!game.getGameState().hasStarted()) {
                 e.setCancelled(true);
                 return;
             }
+            Bukkit.broadcastMessage(e.getEntity().getName() + "3-5");
             game.getGameState().processDamage((Player) e.getEntity(), e.getDamage(), e.getCause());
+            Bukkit.broadcastMessage(e.getEntity().getName() + "3-6");
             e.setCancelled(true);
 
 

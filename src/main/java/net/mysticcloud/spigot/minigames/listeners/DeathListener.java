@@ -46,12 +46,7 @@ public class DeathListener implements Listener {
     @EventHandler
     public void onPlayerDamage(EntityDamageByEntityEvent e) {
         Bukkit.broadcastMessage(e.getEntity().getName() + "1-1");
-        if (e.getEntity().hasMetadata("do_damage")) {
-            Bukkit.broadcastMessage(e.getEntity().getName() + "1-2");
-            e.setCancelled(false);
-            e.getEntity().removeMetadata("do_damage", Utils.getPlugin());
-            return;
-        }
+        Bukkit.broadcastMessage(e.getEntity().getName() + "1-2");
         Bukkit.broadcastMessage(e.getEntity().getName() + "1-3");
         if (e.getEntity().hasMetadata("shop") || e.getEntity().hasMetadata("do_not_damage")) {
             e.setCancelled(true);
@@ -61,10 +56,6 @@ public class DeathListener implements Listener {
             Bukkit.broadcastMessage(e.getEntity().getName() + "1-4");
             for (MetadataValue data : e.getEntity().getWorld().getMetadata("game")) {
                 Game game = (Game) data.value();
-                if (e.getDamager().hasMetadata("game_rocket")) {
-                    Bukkit.broadcastMessage(e.getEntity().getName() + "1-5");
-                    e.setCancelled(true);
-                }
 
                 if (e.getEntity() instanceof Item && e.getEntity().hasMetadata("flag")) {
                     e.setCancelled(true);

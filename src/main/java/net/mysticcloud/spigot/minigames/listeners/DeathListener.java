@@ -73,6 +73,7 @@ public class DeathListener implements Listener {
                     Bukkit.broadcastMessage("2");
                     Player player = (Player) e.getEntity();
                     Bukkit.broadcastMessage("3");
+                    Bukkit.broadcastMessage("Cause: " + e.getCause());
                     if (e.getCause().equals(EntityDamageEvent.DamageCause.BLOCK_EXPLOSION) || e.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_EXPLOSION)) {
                         Bukkit.broadcastMessage("4");
                         game.getGameState().processDamage(player, e.getDamage(), EntityDamageEvent.DamageCause.BLOCK_EXPLOSION);

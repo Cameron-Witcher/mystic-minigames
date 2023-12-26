@@ -113,7 +113,17 @@ public class GameCommands implements CommandExecutor {
                 return true;
             }
             if (args[0].equalsIgnoreCase("end")) {
-
+                if(sender instanceof Player){
+                    Player player = (Player) sender;
+                    if(player.getWorld().hasMetadata("game")){
+                        Game game = (Game) player.getWorld().getMetadata("game").get(0).value();
+                        game.getGameState().end();
+                    } else {
+                        player.sendMessage(MessageUtils.prefixes("game") + "You aren't in a game it seems.");
+                    }
+                }else {
+                    sender.sendMessage(MessageUtils.prefixes("admin") + "Sorry that is a player only command.");
+                }
             }
             if (args[0].equalsIgnoreCase("create")) {
                 //Syntax: /game create <game> <arena> [teams]

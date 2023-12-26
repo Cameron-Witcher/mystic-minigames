@@ -168,9 +168,10 @@ public class Game {
             case BLOCK_EXPLOSION:
                 action = " blew up";
                 ending = "!";
-                if(entity != null && entity.hasMetadata("placer")){
+                if (entity != null && entity.hasMetadata("placer")) {
                     action = " was blown up";
-                    ending = entity.hasMetadata("placer") ? " by " + ((Entity)entity.getMetadata("placer").get(0).value()).getName() + "!" : "!";
+                    ending = " by " + (gameState.getPlayer(entity.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : gameState.getPlayer(entity.getUniqueId()).getTeam().chatColor()) + entity.getName() + "&e.";
+
                 }
                 break;
             case PROJECTILE:
@@ -597,6 +598,9 @@ public class Game {
                 }
                 try {
                     Entity perp = (Entity) (victim.getMetadata("last_damager").get(0).value());
+                    if(perp.hasMetadata("placer")){
+                        perp = (Entity) perp.getMetadata("placer").get(0).value();
+                    }
                     if (perp instanceof Player) {
                         Player perp1 = (Player) perp;
                         if (perp1.equals(victim) || (!isFriendlyFire() && getPlayer(victim.getUniqueId()).getTeam().equals(getPlayer(perp1.getUniqueId()).getTeam())))
@@ -604,8 +608,9 @@ public class Game {
 
                     }
                     victim.setMetadata("do_damage", new FixedMetadataValue(Utils.getPlugin(), damage));
+                    Entity finalPerp = perp;
                     Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
-                        victim.damage(damage, perp);
+                        victim.damage(damage, finalPerp);
                     }, 0);
                 } catch (IndexOutOfBoundsException ex) {
                     victim.setMetadata("do_damage", new FixedMetadataValue(Utils.getPlugin(), damage));

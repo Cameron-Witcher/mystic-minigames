@@ -597,10 +597,7 @@ public class Game {
                     return;
                 }
                 try {
-                    Entity perp = (Entity) (victim.getMetadata("last_damager").get(0).value());
-                    if(perp.hasMetadata("placer")){
-                        perp = (Entity) perp.getMetadata("placer").get(0).value();
-                    }
+                    Entity perp = ((Entity) (victim.getMetadata("last_damager").get(0).value())).hasMetadata("placer") ? (Entity) ((Entity) victim.getMetadata("last_damager").get(0).value()).getMetadata("placer").get(0).value() : (Entity) victim.getMetadata("last_damager").get(0).value();
                     if (perp instanceof Player) {
                         Player perp1 = (Player) perp;
                         if (perp1.equals(victim) || (!isFriendlyFire() && getPlayer(victim.getUniqueId()).getTeam().equals(getPlayer(perp1.getUniqueId()).getTeam())))
@@ -608,9 +605,9 @@ public class Game {
 
                     }
                     victim.setMetadata("do_damage", new FixedMetadataValue(Utils.getPlugin(), damage));
-                    Entity finalPerp = perp;
+
                     Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
-                        victim.damage(damage, finalPerp);
+                        victim.damage(damage, perp);
                     }, 0);
                 } catch (IndexOutOfBoundsException ex) {
                     victim.setMetadata("do_damage", new FixedMetadataValue(Utils.getPlugin(), damage));

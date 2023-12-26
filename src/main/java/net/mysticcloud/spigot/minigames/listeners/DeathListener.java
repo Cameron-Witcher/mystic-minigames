@@ -46,6 +46,8 @@ public class DeathListener implements Listener {
     @EventHandler
     public void onPlayerDamage(EntityDamageByEntityEvent e) {
 
+        Bukkit.broadcastMessage("Uhh");
+
         if (e.getEntity().hasMetadata("do_damage")) {
             e.setCancelled(false);
             e.getEntity().removeMetadata("do_damage", Utils.getPlugin());
@@ -99,6 +101,7 @@ public class DeathListener implements Listener {
 
     @EventHandler
     public void onPlayerDeath(EntityDamageEvent e) {
+        Bukkit.broadcastMessage("what");
         if (e.getEntity().hasMetadata("do_damage")) {
             e.setCancelled(false);
             e.getEntity().removeMetadata("do_damage", Utils.getPlugin());

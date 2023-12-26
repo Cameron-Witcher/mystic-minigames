@@ -613,7 +613,7 @@ public class Game {
                     victim.setMetadata("do_damage", new FixedMetadataValue(Utils.getPlugin(), damage));
                     if (victim.getHealth() - damage > 0) Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
                         victim.damage(damage, ((Entity) (victim.getMetadata("last_damager").get(0).value())));
-                        Bukkit.broadcastMessage("did the thing");
+
                     }, 0);
                 } catch (IndexOutOfBoundsException ex) {
                     victim.setMetadata("do_damage", new FixedMetadataValue(Utils.getPlugin(), damage));

@@ -600,6 +600,9 @@ public class Game {
                             return;
 
                     }
+                    Bukkit.broadcastMessage(perp.toString() + "");
+                    if(perp instanceof Firework)
+                        return;
                     victim.setMetadata("do_damage", new FixedMetadataValue(Utils.getPlugin(), damage));
                     if (victim.getHealth() - damage > 0) Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
                         victim.damage(damage, perp);

@@ -68,14 +68,19 @@ public class DeathListener implements Listener {
                     return;
                 }
 
+                Bukkit.broadcastMessage("1");
                 if (e.getEntity() instanceof Player) {
+                    Bukkit.broadcastMessage("2");
                     Player player = (Player) e.getEntity();
-
+                    Bukkit.broadcastMessage("3");
                     if (e.getCause().equals(EntityDamageEvent.DamageCause.BLOCK_EXPLOSION) || e.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_EXPLOSION)) {
+                        Bukkit.broadcastMessage("4");
                         game.getGameState().processDamage(player, e.getDamage(), EntityDamageEvent.DamageCause.BLOCK_EXPLOSION);
+                        Bukkit.broadcastMessage("4-1");
                         e.setCancelled(true);
                         return;
                     }
+                    Bukkit.broadcastMessage("4-2");
                     if (e.getEntity().hasMetadata("last_damager")) {
                         e.getEntity().removeMetadata("last_damager", Utils.getPlugin());
                         Bukkit.getScheduler().cancelTask(((BukkitTask) e.getEntity().getMetadata("last_damager_timer").get(0).value()).getTaskId());

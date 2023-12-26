@@ -599,9 +599,12 @@ public class Game {
         }
 
         public void processDamage(Player victim, double damage, EntityDamageEvent.DamageCause cause) {
+            Bukkit.broadcastMessage(victim.getName() + "2-1");
 
             Bukkit.getScheduler().runTaskLaterAsynchronously(Utils.getPlugin(), () -> {
+                Bukkit.broadcastMessage(victim.getName() + "2-2");
                 try {
+                    Bukkit.broadcastMessage(victim.getName() + "2-3");
                     Entity perp = ((Entity) (victim.getMetadata("last_damager").get(0).value())).hasMetadata("placer") ? (Entity) ((Entity) victim.getMetadata("last_damager").get(0).value()).getMetadata("placer").get(0).value() : (Entity) victim.getMetadata("last_damager").get(0).value();
                     if (perp instanceof Player) {
                         Player perp1 = (Player) perp;
@@ -609,18 +612,24 @@ public class Game {
                             return;
 
                     }
+                    Bukkit.broadcastMessage(perp.toString() + "");
                     if (perp instanceof Firework) return;
                     victim.setMetadata("do_damage", new FixedMetadataValue(Utils.getPlugin(), damage));
                     if (victim.getHealth() - damage > 0) Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
                         victim.damage(damage, perp);
                     }, 0);
+                    Bukkit.broadcastMessage(victim.getName() + "2-4");
                 } catch (IndexOutOfBoundsException ex) {
+                    Bukkit.broadcastMessage(victim.getName() + "2-5");
                     victim.setMetadata("do_damage", new FixedMetadataValue(Utils.getPlugin(), damage));
                     if (victim.getHealth() - damage > 0) Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
                         victim.damage(damage);
                     }, 0);
+                    Bukkit.broadcastMessage(victim.getName() + "2-6");
                 }
+                Bukkit.broadcastMessage(victim.getName() + "2-7");
                 if (victim.getHealth() - damage <= 0 || cause.equals(EntityDamageEvent.DamageCause.VOID)) {
+                    Bukkit.broadcastMessage(victim.getName() + "2-8");
                     Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
                         kill(victim, cause);
                     }, 0);

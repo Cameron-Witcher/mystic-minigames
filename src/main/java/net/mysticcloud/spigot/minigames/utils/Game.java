@@ -613,7 +613,6 @@ public class Game {
                     if (victim.getHealth() - damage > 0) Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
                         victim.damage(damage);
                     }, 0);
-                    return;
                 }
                 if (victim.getHealth() - damage <= 0 || cause.equals(EntityDamageEvent.DamageCause.VOID)) {
                     Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {

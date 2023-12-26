@@ -60,6 +60,7 @@ public class DeathListener implements Listener {
                 Game game = (Game) data.value();
                 if (e.getDamager() instanceof Firework && e.getDamager().hasMetadata("game")) {
                     e.setCancelled(true);
+                    return;
                 }
 
                 if (e.getEntity() instanceof Item && e.getEntity().hasMetadata("flag")) {

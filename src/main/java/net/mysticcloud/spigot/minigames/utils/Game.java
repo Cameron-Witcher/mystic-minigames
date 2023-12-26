@@ -604,7 +604,7 @@ public class Game {
                     Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
                         victim.damage(damage, perp);
                     }, 0);
-                } catch (ArrayIndexOutOfBoundsException ex) {
+                } catch (IndexOutOfBoundsException ex) {
                     Bukkit.broadcastMessage("11");
                     victim.setMetadata("do_damage", new FixedMetadataValue(Utils.getPlugin(), damage));
                     Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {

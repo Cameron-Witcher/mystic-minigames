@@ -5,10 +5,7 @@ import net.mysticcloud.spigot.core.utils.misc.EmptyChunkGenerator;
 import net.mysticcloud.spigot.minigames.utils.Game;
 import net.mysticcloud.spigot.minigames.utils.Team;
 import net.mysticcloud.spigot.minigames.utils.Utils;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.WorldCreator;
+import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -67,6 +64,7 @@ public class Arena {
 //        wc.generator(new EmptyChunkGenerator());
 
         world = Bukkit.getServer().createWorld(wc);
+        world.setDifficulty(Difficulty.HARD);
     }
 
     public World getWorld() {

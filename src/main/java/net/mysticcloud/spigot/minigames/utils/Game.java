@@ -579,20 +579,14 @@ public class Game {
 
         public void processDamage(Player victim, double damage, EntityDamageEvent.DamageCause cause) {
 
-            Bukkit.broadcastMessage("5");
             Bukkit.getScheduler().runTaskLaterAsynchronously(Utils.getPlugin(), () -> {
-                Bukkit.broadcastMessage("6");
                 if (victim.getHealth() - damage <= 0 || cause.equals(EntityDamageEvent.DamageCause.VOID)) {
-                    Bukkit.broadcastMessage("7");
                     Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
                         kill(victim, cause);
                     }, 0);
                     return;
                 }
-                Bukkit.broadcastMessage("8");
-                Bukkit.broadcastMessage("9");
                 try {
-                    Bukkit.broadcastMessage("10");
                     Entity perp = (Entity) (victim.getMetadata("last_damager").get(0).value());
                     if (perp instanceof Player) {
                         Player perp1 = (Player) perp;
@@ -605,16 +599,12 @@ public class Game {
                         victim.damage(damage, perp);
                     }, 0);
                 } catch (IndexOutOfBoundsException ex) {
-                    Bukkit.broadcastMessage("11");
                     victim.setMetadata("do_damage", new FixedMetadataValue(Utils.getPlugin(), damage));
                     Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
                         victim.damage(damage);
                     }, 0);
                     return;
                 }
-
-
-                Bukkit.broadcastMessage("12");
             }, 0);
         }
 

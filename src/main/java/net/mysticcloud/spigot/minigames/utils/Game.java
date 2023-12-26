@@ -612,7 +612,7 @@ public class Game {
                     if (perp instanceof Firework) return;
                     victim.setMetadata("do_damage", new FixedMetadataValue(Utils.getPlugin(), damage));
                     if (victim.getHealth() - damage > 0) Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
-                        victim.damage(damage, perp);
+                        victim.damage(damage, ((Entity) (victim.getMetadata("last_damager").get(0).value())));
                     }, 0);
                 } catch (IndexOutOfBoundsException ex) {
                     victim.setMetadata("do_damage", new FixedMetadataValue(Utils.getPlugin(), damage));

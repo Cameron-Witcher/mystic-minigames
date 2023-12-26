@@ -219,7 +219,7 @@ public class Game {
         meta.clearEffects();
         meta.addEffect(effect);
         rocket.setFireworkMeta(meta);
-        rocket.setMetadata("game", new FixedMetadataValue(Utils.getPlugin(), this));
+        rocket.setMetadata("game_rocket", new FixedMetadataValue(Utils.getPlugin(), this));
         return rocket;
     }
 

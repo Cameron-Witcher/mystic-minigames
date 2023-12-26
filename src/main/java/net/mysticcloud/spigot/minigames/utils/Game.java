@@ -164,6 +164,15 @@ public class Game {
         String action = " was killed";
         String ending = "!";
         switch (cause) {
+            case ENTITY_EXPLOSION:
+            case BLOCK_EXPLOSION:
+                action = " blew up";
+                ending = "!";
+                if(entity != null && entity.hasMetadata("placer")){
+                    action = " was blown up";
+                    ending = entity.hasMetadata("placer") ? " by " + ((Entity)entity.getMetadata("placer").get(0).value()).getName() + "!" : "!";
+                }
+                break;
             case PROJECTILE:
                 action = " was shot";
                 ending = (entity == null ? " by a projectile!" : " by " + (entity instanceof Player ? (gameState.getPlayer(entity.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : gameState.getPlayer(entity.getUniqueId()).getTeam().chatColor()) : "&7") + entity.getName() + "&e!&7 (" + CoreUtils.distance(player.getLocation(), entity.getLocation()).intValue() + " blocks)");

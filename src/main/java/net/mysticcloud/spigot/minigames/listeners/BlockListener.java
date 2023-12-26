@@ -76,7 +76,7 @@ public class BlockListener implements Listener {
                         e.setCancelled(true);
                         TNTPrimed tnt = e.getBlock().getWorld().spawn(e.getBlock().getLocation().clone().add(0.5, 0, 0.5), TNTPrimed.class);
                         tnt.setFuseTicks(60);
-                        tnt.setMetadata("register", new FixedMetadataValue(Utils.getPlugin(), true));
+                        tnt.setMetadata("placer", new FixedMetadataValue(Utils.getPlugin(), e.getPlayer()));
                         CoreUtils.consumeItem(e.getPlayer(), 1, Material.TNT);
                     }
                 }

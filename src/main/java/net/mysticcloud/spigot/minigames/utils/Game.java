@@ -590,30 +590,29 @@ public class Game {
                     return;
                 }
                 Bukkit.broadcastMessage("8");
-                if (victim.hasMetadata("last_damager")) {
-                    Bukkit.broadcastMessage("9");
-                    try {
-                        Bukkit.broadcastMessage("10");
-                        Entity perp = (Entity) (victim.getMetadata("last_damager").get(0).value());
-                        if (perp instanceof Player) {
-                            Player perp1 = (Player) perp;
-                            if (perp1.equals(victim) || (!isFriendlyFire() && getPlayer(victim.getUniqueId()).getTeam().equals(getPlayer(perp1.getUniqueId()).getTeam())))
-                                return;
+                Bukkit.broadcastMessage("9");
+                try {
+                    Bukkit.broadcastMessage("10");
+                    Entity perp = (Entity) (victim.getMetadata("last_damager").get(0).value());
+                    if (perp instanceof Player) {
+                        Player perp1 = (Player) perp;
+                        if (perp1.equals(victim) || (!isFriendlyFire() && getPlayer(victim.getUniqueId()).getTeam().equals(getPlayer(perp1.getUniqueId()).getTeam())))
+                            return;
 
-                        }
-                        victim.setMetadata("do_damage", new FixedMetadataValue(Utils.getPlugin(), damage));
-                        Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
-                            victim.damage(damage, perp);
-                        }, 0);
-                    } catch (ClassCastException ex) {
-                        Bukkit.broadcastMessage("11");
-                        victim.setMetadata("do_damage", new FixedMetadataValue(Utils.getPlugin(), damage));
-                        Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
-                            victim.damage(damage);
-                        }, 0);
-                        return;
                     }
+                    victim.setMetadata("do_damage", new FixedMetadataValue(Utils.getPlugin(), damage));
+                    Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+                        victim.damage(damage, perp);
+                    }, 0);
+                } catch (ArrayIndexOutOfBoundsException ex) {
+                    Bukkit.broadcastMessage("11");
+                    victim.setMetadata("do_damage", new FixedMetadataValue(Utils.getPlugin(), damage));
+                    Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+                        victim.damage(damage);
+                    }, 0);
+                    return;
                 }
+
 
                 Bukkit.broadcastMessage("12");
             }, 0);

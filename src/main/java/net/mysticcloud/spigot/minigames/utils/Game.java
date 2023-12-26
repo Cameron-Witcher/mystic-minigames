@@ -169,8 +169,9 @@ public class Game {
                 action = " blew up";
                 ending = "!";
                 if (entity != null && entity.hasMetadata("placer")) {
+                    Entity placer = (Entity) entity.getMetadata("placer").get(0).value();
                     action = " was blown up";
-                    ending = " by " + (gameState.getPlayer(entity.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : gameState.getPlayer(entity.getUniqueId()).getTeam().chatColor()) + entity.getName() + "&e.";
+                    ending = " by " + (gameState.getPlayer(placer.getUniqueId()).getTeam().equals(Team.NONE) ? "&3" : gameState.getPlayer(placer.getUniqueId()).getTeam().chatColor()) + placer.getName() + "&e.";
 
                 }
                 break;

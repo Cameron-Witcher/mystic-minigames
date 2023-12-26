@@ -248,7 +248,7 @@ public class Game {
     }
 
 
-    public class GameState {
+    public class GameState implements Cloneable {
 
         private Map<UUID, Integer> playerScores = new HashMap<>();
         private Map<Team, Integer> teamScores = new HashMap<>();
@@ -357,6 +357,7 @@ public class Game {
         }
 
         public void end() {
+            scoreboards.clear();
             if (!isEnding()) {
                 JSONObject gameResults = new JSONObject("{}");
                 startEnding();
@@ -640,20 +641,7 @@ public class Game {
             ending = false;
         }
 
-        public GameState clone() {
-            GameState state = new GameState();
-            state.playerScores = playerScores;
-            state.teamScores = teamScores;
-            state.players = players;
 
-            state.lobbyOpen = lobbyOpen;
-            state.gameRunning = gameRunning;
-            state.countdown = countdown;
-            state.ending = ending;
-            state.STARTED = STARTED;
-
-            return state;
-        }
 
         public long getCurrentDuration() {
             return new Date().getTime() - getStarted();
@@ -661,6 +649,17 @@ public class Game {
 
         public long getStarted() {
             return STARTED;
+        }
+
+        @Override
+        public GameState clone() {
+            try {
+                GameState clone = (GameState) super.clone();
+                // TODO: copy mutable state here, so the clone can't change the internals of the original
+                return clone;
+            } catch (CloneNotSupportedException e) {
+                throw new AssertionError();
+            }
         }
     }
 

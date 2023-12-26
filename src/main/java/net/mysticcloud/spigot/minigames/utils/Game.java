@@ -591,12 +591,7 @@ public class Game {
         public void processDamage(Player victim, double damage, EntityDamageEvent.DamageCause cause) {
 
             Bukkit.getScheduler().runTaskLaterAsynchronously(Utils.getPlugin(), () -> {
-                if (victim.getHealth() - damage <= 0 || cause.equals(EntityDamageEvent.DamageCause.VOID)) {
-                    Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
-                        kill(victim, cause);
-                    }, 0);
-                    return;
-                }
+
                 try {
                     Entity perp = ((Entity) (victim.getMetadata("last_damager").get(0).value())).hasMetadata("placer") ? (Entity) ((Entity) victim.getMetadata("last_damager").get(0).value()).getMetadata("placer").get(0).value() : (Entity) victim.getMetadata("last_damager").get(0).value();
                     if (perp instanceof Player) {
@@ -606,14 +601,19 @@ public class Game {
 
                     }
                     victim.setMetadata("do_damage", new FixedMetadataValue(Utils.getPlugin(), damage));
-
-                    Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+                    if (victim.getHealth() - damage > 0) Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
                         victim.damage(damage, perp);
                     }, 0);
                 } catch (IndexOutOfBoundsException ex) {
                     victim.setMetadata("do_damage", new FixedMetadataValue(Utils.getPlugin(), damage));
-                    Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+                    if (victim.getHealth() - damage > 0) Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
                         victim.damage(damage);
+                    }, 0);
+                    return;
+                }
+                if (victim.getHealth() - damage <= 0 || cause.equals(EntityDamageEvent.DamageCause.VOID)) {
+                    Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
+                        kill(victim, cause);
                     }, 0);
                     return;
                 }

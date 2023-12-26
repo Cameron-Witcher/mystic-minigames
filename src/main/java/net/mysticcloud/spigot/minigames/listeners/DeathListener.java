@@ -64,7 +64,6 @@ public class DeathListener implements Listener {
                 if (e.getDamager().hasMetadata("game_rocket")) {
                     Bukkit.broadcastMessage(e.getEntity().getName() + "1-5");
                     e.setCancelled(true);
-                    return;
                 }
 
                 if (e.getEntity() instanceof Item && e.getEntity().hasMetadata("flag")) {

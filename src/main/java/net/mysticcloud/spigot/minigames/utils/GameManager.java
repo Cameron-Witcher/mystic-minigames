@@ -2,7 +2,7 @@ package net.mysticcloud.spigot.minigames.utils;
 
 import net.mysticcloud.spigot.core.utils.MessageUtils;
 import net.mysticcloud.spigot.core.utils.placeholder.PlaceholderUtils;
-import net.mysticcloud.spigot.minigames.utils.games.Dodgebolt;
+import net.mysticcloud.spigot.minigames.utils.games.CTW;
 import net.mysticcloud.spigot.minigames.utils.games.Dodgeball;
 import net.mysticcloud.spigot.minigames.utils.games.HotPotato;
 import net.mysticcloud.spigot.minigames.utils.games.OITQ;
@@ -94,7 +94,7 @@ public class GameManager {
         if (data == null) data = new JSONObject("{}");
         switch (gameName.toLowerCase()) {
             case "ctw":
-                game = new Dodgebolt(arena, teams);
+                game = new CTW(arena, teams);
                 break;
             case "oitq":
                 game = new OITQ(arena);

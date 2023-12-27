@@ -38,7 +38,7 @@ public class Utils {
     private static void registerScoreboard() {
         JSONObject sidebar = new JSONObject("{}");
         sidebar.put("title", "   &3&lMYSTIC&7&lCLOUD   ");
-        sidebar.put("lines", Arrays.asList(new String[]{"&1", "&a&lPLAYER&8:", "&7 Points&8: &a%points%" + Symbols.STAR_1, "&2", "&c&lSERVER&8:", "&7 Online: &c%online%", "&3"}));
+        sidebar.put("lines", (List<String>) Arrays.asList(new String[]{"&1", "&a&lPLAYER&8:", "&7 Points&8: &a%points%" + Symbols.STAR_1, "&2", "&c&lSERVER&8:", "&7 Online: &c%online%", "&3"}));
 
         customScoreboard = new ScoreboardBuilder().set("sidebar", sidebar).build();
     }

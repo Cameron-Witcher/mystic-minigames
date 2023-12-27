@@ -56,7 +56,7 @@ public class ScoreboardBuilder {
 
         public void createGlobalObjective(String key, DisplaySlot slot, String display) {
             for (Map.Entry<UUID, Scoreboard> e : boards.entrySet()) {
-                e.getValue().registerNewObjective(key, Criteria.DUMMY, display);
+                if(e.getValue().getObjective(key) == null) e.getValue().registerNewObjective(key, Criteria.DUMMY, display);
                 e.getValue().getObjective(key).setDisplaySlot(slot);
 
             }

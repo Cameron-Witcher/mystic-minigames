@@ -54,8 +54,8 @@ public class ScoreboardBuilder {
                 board.getObjective(key).getScore(who.getName()).setScore(score);
         }
 
-        public void createGlobalObjective(String key, DisplaySlot slot, String display){
-            for(Map.Entry<UUID, Scoreboard> e : boards.entrySet()){
+        public void createGlobalObjective(String key, DisplaySlot slot, String display) {
+            for (Map.Entry<UUID, Scoreboard> e : boards.entrySet()) {
                 e.getValue().registerNewObjective(key, Criteria.DUMMY, display);
                 e.getValue().getObjective(key).setDisplaySlot(slot);
 
@@ -74,6 +74,7 @@ public class ScoreboardBuilder {
             if (properties.containsKey("below_name")) {
                 JSONObject json = (JSONObject) properties.get("below_name");
                 createGlobalObjective(json.getString("key"), DisplaySlot.BELOW_NAME, MessageUtils.colorize(PlaceholderUtils.replace(player, json.getString("display"))));
+                board.registerNewObjective(json.getString("key"), Criteria.DUMMY, MessageUtils.colorize(PlaceholderUtils.replace(player, json.getString("display"))));
                 board.getObjective(json.getString("key")).getScore(player.getName()).setScore(0);
             }
 
@@ -113,7 +114,7 @@ public class ScoreboardBuilder {
             if (properties.containsKey("sidebar")) {
                 JSONObject json = (JSONObject) properties.get("sidebar");
                 String[] lines = (String[]) json.get("lines");
-                for(Map.Entry<UUID, Scoreboard> e : boards.entrySet()){
+                for (Map.Entry<UUID, Scoreboard> e : boards.entrySet()) {
                     int i = lines.length + 1;
                     for (String s : lines) {
                         e.getValue().getTeam(i + "").setPrefix(MessageUtils.colorize(PlaceholderUtils.replace(Bukkit.getPlayer(e.getKey()), s)));
@@ -124,7 +125,7 @@ public class ScoreboardBuilder {
 
         }
 
-        public void clearBoards(){
+        public void clearBoards() {
             boards.clear();
         }
     }

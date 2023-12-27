@@ -74,10 +74,10 @@ public class ScoreboardBuilder {
                 Objective obj = board.registerNewObjective("sidebar", Criteria.DUMMY, MessageUtils.colorize(PlaceholderUtils.markup(player, PlaceholderUtils.replace(player, json.getString("title")))));
                 obj.setDisplaySlot(DisplaySlot.SIDEBAR);
 
-                List<String> lines = (List<String>) json.get("lines");
+                String[] lines = (String[]) json.get("lines");
 
                 List<String> usedColors = new ArrayList<>();
-                int i = lines.size() + 1;
+                int i = lines.length + 1;
                 for (String s : lines) {
                     String color = "";
                     boolean go = true;
@@ -104,9 +104,9 @@ public class ScoreboardBuilder {
         public void update() {
             if (properties.containsKey("sidebar")) {
                 JSONObject json = (JSONObject) properties.get("sidebar");
-                List<String> lines = (List<String>) json.get("lines");
+                String[] lines = (String[]) json.get("lines");
                 for(Map.Entry<UUID, Scoreboard> e : boards.entrySet()){
-                    int i = lines.size() + 1;
+                    int i = lines.length + 1;
                     for (String s : lines) {
                         e.getValue().getTeam(i + "").setPrefix(MessageUtils.colorize(PlaceholderUtils.replace(Bukkit.getPlayer(e.getKey()), s)));
                         i = i - 1;

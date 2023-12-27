@@ -96,7 +96,7 @@ public class ScoreboardBuilder {
                 }
             }
 
-
+            player.setScoreboard(board);
             boards.put(player.getUniqueId(), board);
         }
 

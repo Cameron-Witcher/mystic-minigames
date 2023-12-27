@@ -30,6 +30,7 @@ public class ServerListener implements Listener {
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent e) {
         e.setQuitMessage(null);
+        Utils.getCustomScoreboard().removePlayer(e.getPlayer().getUniqueId());
         e.getPlayer().setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
         for (Player player : Bukkit.getOnlinePlayers())
             if (!player.getWorld().hasMetadata("game"))

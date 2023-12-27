@@ -9,6 +9,7 @@ import net.mysticcloud.spigot.minigames.utils.Team;
 import net.mysticcloud.spigot.minigames.utils.Utils;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
 import net.mysticcloud.spigot.minigames.utils.Game;
+import net.mysticcloud.spigot.minigames.utils.misc.ScoreboardBuilder;
 import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Firework;
@@ -38,6 +39,13 @@ public class OITQ extends Game {
 
         setFriendlyFire(true);
 
+        JSONObject json = new JSONObject("{}");
+        json.put("key", "lives");
+        json.put("display", "&c" + Symbols.HEART_1.toString());
+        ScoreboardBuilder builder = new ScoreboardBuilder();
+        builder.set("below_name", json);
+        setCustomScoreboard(builder.build());
+
 
         setController(new GameController() {
 
@@ -46,12 +54,10 @@ public class OITQ extends Game {
             @Override
             public void start() {
                 for (UUID uid : getGameState().getPlayers().keySet()) {
-                    Objective ob = getScoreboards().get(uid).getScoreboard().registerNewObjective("lives", Criteria.DUMMY, "lives");
-                    ob.setDisplaySlot(DisplaySlot.BELOW_NAME);
-                    ob.setDisplayName(ChatColor.RED + Symbols.HEART_1.toString());
-                    ob.getScore(Bukkit.getPlayer(uid).getName()).setScore(MAX_LIVES);
+                    Player player = Bukkit.getPlayer(uid);
+                    getCustomScoreboard().updateObjective("lives", player, MAX_LIVES);
                     getGameState().getPlayer(uid).setMaxLives(MAX_LIVES);
-                    getGameState().spawnPlayer(Bukkit.getPlayer(uid));
+                    getGameState().spawnPlayer(player);
                 }
             }
 
@@ -171,7 +177,7 @@ public class OITQ extends Game {
             Firework rocket = spawnFirework(player.getLocation().clone().add(0, 1, 0), FireworkEffect.builder().flicker(true).with(FireworkEffect.Type.BALL).withColor(Color.RED).build());
             rocket.detonate();
             super.kill(player, cause);
-            getScoreboards().get(player.getUniqueId()).getScoreboard().getObjective("lives").getScore(player.getName()).setScore(gamePlayer.getLives());
+            getCustomScoreboard().updateObjective("lives", player, gamePlayer.getLives());
         }
     }
 

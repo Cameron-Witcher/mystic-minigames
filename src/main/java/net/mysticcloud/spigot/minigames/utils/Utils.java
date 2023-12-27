@@ -10,7 +10,7 @@ import net.mysticcloud.spigot.core.utils.placeholder.Symbols;
 import net.mysticcloud.spigot.core.utils.sql.SQLUtils;
 import net.mysticcloud.spigot.minigames.MysticMinigames;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.ArenaManager;
-import net.mysticcloud.spigot.minigames.utils.misc.ScoreboardManager;
+import net.mysticcloud.spigot.minigames.utils.misc.ScoreboardBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -22,11 +22,12 @@ import java.util.*;
 public class Utils {
 
     private static MysticMinigames plugin;
-    private static Map<UUID, ScoreboardManager> scoreboards = new HashMap<>();
+    private static ScoreboardBuilder.CustomScoreboard customScoreboard;
 
     public static void init(MysticMinigames mainClass) {
         plugin = mainClass;
 
+        registerScoreboard();
         registerPlaceholders();
         ArenaManager.registerArenas();
         GameManager.init();
@@ -34,17 +35,24 @@ public class Utils {
         registerPalpitations();
     }
 
+    private static void registerScoreboard() {
+        JSONObject sidebar = new JSONObject("{}");
+        sidebar.put("title", "   &3&lMYSTIC&7&lCLOUD   ");
+        sidebar.put("lines", Arrays.asList(new String[]{"&1", "&a&lPLAYER&8:", "&7 Points&8: &a%points%" + Symbols.STAR_1, "&2", "&c&lSERVER&8:", "&7 Online: &c%online%", "&3"}));
+
+        customScoreboard = new ScoreboardBuilder().set("sidebar", sidebar).build();
+    }
+
     private static void registerPalpitations() {
         CoreUtils.addPalpitation(() -> {
             for (World world : Bukkit.getWorlds()) {
-                for (Player player : world.getPlayers()) {
-                    if (world.hasMetadata("game")) {
-                        Game game = (Game) world.getMetadata("game").get(0).value();
-                        game.getScoreboardManager(player.getUniqueId()).update();
-                    } else Utils.getScoreboardManager(player.getUniqueId()).update();
+                if (world.hasMetadata("game")) {
+                    Game game = (Game) world.getMetadata("game").get(0).value();
+                    game.getCustomScoreboard().update();
                 }
 
             }
+            Utils.getCustomScoreboard().update();
 
             for (Game game : GameManager.getGames().values()) {
                 if (game.getController().check()) game.getGameState().end();
@@ -94,14 +102,9 @@ public class Utils {
 
     }
 
-    public static ScoreboardManager getScoreboardManager(UUID uid) {
-        if (scoreboards.containsKey(uid)) return scoreboards.get(uid);
-        ScoreboardManager manager = new ScoreboardManager(Bukkit.getPlayer(uid));
-        manager.sidebar("&3&lMYSTIC&7&lCLOUD", Arrays.asList(new String[]{"&1", "&a&lPLAYER&8:", "&7 Points&8: &a%points%" + Symbols.STAR_1, "&2", "&c&lSERVER&8:", "&7 Online: &c%online%", "&3"}));
-        scoreboards.put(uid, manager);
-        return manager;
+
+    public static ScoreboardBuilder.CustomScoreboard getCustomScoreboard() {
+        return customScoreboard;
     }
-
-
 }
 

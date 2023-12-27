@@ -11,7 +11,7 @@ import net.mysticcloud.spigot.core.utils.npc.NpcManager;
 import net.mysticcloud.spigot.core.utils.placeholder.PlaceholderUtils;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
 
-import net.mysticcloud.spigot.minigames.utils.misc.ScoreboardManager;
+import net.mysticcloud.spigot.minigames.utils.misc.ScoreboardBuilder;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -34,7 +34,7 @@ public class Game {
     private GameState gameState = new GameState();
     private final JSONObject data = new JSONObject("{}");
     private final List<Location> noBuildZones = new ArrayList<>();
-    private final Map<UUID, ScoreboardManager> scoreboards = new HashMap<UUID, ScoreboardManager>();
+    private ScoreboardBuilder.CustomScoreboard customScoreboard = new ScoreboardBuilder().build();
     private final Map<UUID, ItemStack[]> inventoryList = new HashMap<>();
     private int TEAMS = 0, MIN_PLAYERS = 2, MAX_PLAYERS = 10;
     private GameController controller = null;
@@ -142,15 +142,6 @@ public class Game {
         return json;
     }
 
-    public Map<UUID, ScoreboardManager> getScoreboards() {
-        return scoreboards;
-    }
-
-    public ScoreboardManager getScoreboardManager(UUID uid) {
-        if (!scoreboards.containsKey(uid)) scoreboards.put(uid, new ScoreboardManager(Bukkit.getPlayer(uid)));
-        return scoreboards.get(uid);
-    }
-
     public GameController getController() {
         return controller;
     }
@@ -247,12 +238,20 @@ public class Game {
 
     }
 
+    public ScoreboardBuilder.CustomScoreboard getCustomScoreboard() {
+        return customScoreboard;
+    }
+
+    public void setCustomScoreboard(ScoreboardBuilder.CustomScoreboard customScoreboard) {
+        this.customScoreboard = customScoreboard;
+    }
+
 
     public class GameState implements Cloneable {
 
-        private Map<UUID, Integer> playerScores = new HashMap<>();
-        private Map<Team, Integer> teamScores = new HashMap<>();
-        private Map<UUID, GamePlayer> players = new HashMap<>();
+        private final Map<UUID, Integer> playerScores = new HashMap<>();
+        private final Map<Team, Integer> teamScores = new HashMap<>();
+        private final Map<UUID, GamePlayer> players = new HashMap<>();
 
         boolean lobbyOpen = true;
         boolean gameRunning = false;
@@ -342,7 +341,9 @@ public class Game {
             player.setGameMode(GameMode.SURVIVAL);
             if (inventoryList.containsKey(player.getUniqueId()))
                 player.getInventory().setContents(inventoryList.get(player.getUniqueId()));
-            Utils.getScoreboardManager(uid).set();
+            customScoreboard.removePlayer(uid);
+            if (Bukkit.getPlayer(uid) != null)
+                Utils.getCustomScoreboard().addPlayer(Bukkit.getPlayer(uid));
             inventoryList.remove(player.getUniqueId());
             player.removeMetadata("original_team", Utils.getPlugin());
             player.setDisplayName(ChatColor.RESET + player.getName());
@@ -357,7 +358,7 @@ public class Game {
         }
 
         public void end() {
-            scoreboards.clear();
+            customScoreboard.clearBoards();
             if (!isEnding()) {
                 JSONObject gameResults = new JSONObject("{}");
                 startEnding();
@@ -416,7 +417,7 @@ public class Game {
                 player.sendMessage(MessageUtils.prefixes("game") + "You can't join a game while you're already in one!");
                 return;
             }
-            getScoreboardManager(uid).set();
+            customScoreboard.addPlayer(player);
             if (players.size() >= MAX_PLAYERS || !gameState.acceptingPlayers()) {
                 player.setGameMode(GameMode.SPECTATOR);
                 UUID[] uids = getPlayers().keySet().toArray(new UUID[getPlayers().keySet().size()]);
@@ -642,7 +643,6 @@ public class Game {
         }
 
 
-
         public long getCurrentDuration() {
             return new Date().getTime() - getStarted();
         }
@@ -755,6 +755,7 @@ public class Game {
 
         public void setTeam(Team team) {
             this.team = team;
+            getCustomScoreboard().setTeam(Bukkit.getPlayer(uid), team);
 //            Game.this.getScoreboardManager(uid).getScoreboard().getTeam(team.name()).addEntry(Bukkit.getPlayer(uid).getName());
             setDisplayName(team.chatColor() + "[" + team.name() + "] ", ChatColor.RESET + "");
         }

@@ -32,7 +32,7 @@ public class MysticMinigames extends JavaPlugin {
 
         //For reloading
         for (Player player : Bukkit.getOnlinePlayers()) {
-            Utils.getScoreboardManager(player.getUniqueId()).set();
+            Utils.getCustomScoreboard().addPlayer(player);
         }
 
 

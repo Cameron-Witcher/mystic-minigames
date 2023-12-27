@@ -9,6 +9,7 @@ import net.mysticcloud.spigot.minigames.utils.Team;
 import net.mysticcloud.spigot.minigames.utils.Utils;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
 import net.mysticcloud.spigot.minigames.utils.Game;
+import net.mysticcloud.spigot.minigames.utils.misc.ScoreboardBuilder;
 import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -39,6 +40,13 @@ public class HotPotato extends Game {
 
         setFriendlyFire(true);
 
+        JSONObject json = new JSONObject("{}");
+        json.put("key", "score");
+        json.put("display", "&c" + Symbols.STAR_1.toString());
+        ScoreboardBuilder builder = new ScoreboardBuilder();
+        builder.set("below_name", json);
+        setCustomScoreboard(builder.build());
+
 
         setController(new GameController() {
 
@@ -50,11 +58,9 @@ public class HotPotato extends Game {
             @Override
             public void start() {
                 for (UUID uid : getGameState().getPlayers().keySet()) {
-                    getGameState().spawnPlayer(Bukkit.getPlayer(uid));
-                    Objective ob = getScoreboards().get(uid).getScoreboard().registerNewObjective("score", Criteria.DUMMY, "score");
-                    ob.setDisplaySlot(DisplaySlot.BELOW_NAME);
-                    ob.setDisplayName(ChatColor.GREEN + Symbols.STAR_1.toString());
-                    ob.getScore(Bukkit.getPlayer(uid).getName()).setScore(0);
+                    Player player = Bukkit.getPlayer(uid);
+                    getGameState().spawnPlayer(player);
+                    getCustomScoreboard().updateObjective("lives", player, 0);
                 }
 
 
@@ -85,7 +91,6 @@ public class HotPotato extends Game {
                 }
                 for (GamePlayer gamePlayer : getGameState().getPlayers().values()) {
                     Player player = Bukkit.getPlayer(gamePlayer.getUUID());
-                    getScoreboards().get(gamePlayer.getUUID()).getScoreboard().getObjective("score").getScore(player.getName()).setScore(getGameState().getScore(player));
                     if (CHECK_SCORE && !potatoHolder.equals(gamePlayer.getUUID())) getGameState().score(player);
                     player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.DARK_AQUA + MessageUtils.formatTimeRaw(DURATION - LASTED) + " | " + (getHolder().equals(gamePlayer.getUUID()) ? ChatColor.RED + "You have the potato!" : ChatColor.GREEN + "You don't have the potato!") + ChatColor.DARK_AQUA + " | " + getGameState().getScore(player) + " " + ChatColor.GREEN + Symbols.STAR_1));
                 }
@@ -183,6 +188,15 @@ public class HotPotato extends Game {
                 }
             }
             super.removePlayer(uid, list);
+        }
+
+
+        @Override
+        public int score(Player player, int amount) {
+            super.score(player, amount);
+            int score = getScore(player);
+            getCustomScoreboard().updateObjective("score", player, score);
+            return score;
         }
     }
 

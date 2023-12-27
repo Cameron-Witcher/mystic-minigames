@@ -13,15 +13,13 @@ import net.mysticcloud.spigot.minigames.utils.Team;
 import net.mysticcloud.spigot.minigames.utils.Utils;
 import net.mysticcloud.spigot.minigames.utils.games.arenas.Arena;
 import net.mysticcloud.spigot.minigames.utils.Game;
+import net.mysticcloud.spigot.minigames.utils.misc.ScoreboardBuilder;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.scoreboard.Criteria;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
 import org.bukkit.util.Vector;
 import org.json2.JSONArray;
 import org.json2.JSONObject;
@@ -53,6 +51,9 @@ public class CTW extends Game {
 
         buildShop();
 
+        setupScoreboard();
+
+
 
         setController(new GameController() {
 
@@ -61,21 +62,11 @@ public class CTW extends Game {
 
             @Override
             public void start() {
-                LinkedList<String> sidebarList = new LinkedList<>();
-                sidebarList.add("&1");
-                sidebarList.add("&7&lSCORES&8:");
-                for (int i = 0; i != teams; i++) {
-                    Team team = Team.values()[i];
-                    sidebarList.add(" " + team.chatColor() + "&l" + team.name() + "&8: " + team.chatColor() + "%team_" + team.name() + "_score%");
-                }
-                sidebarList.add("&2");
+
                 Map<UUID, Team> teamAssignments = Team.sort(getGameState().getPlayers().keySet(), getTEAMS(), CTW.this);
                 for (UUID uid : getGameState().getPlayers().keySet()) {
-                    Objective ob1 = getScoreboards().get(uid).getScoreboard().registerNewObjective("lives", Criteria.DUMMY, "lives");
-                    ob1.setDisplaySlot(DisplaySlot.BELOW_NAME);
-                    ob1.setDisplayName(ChatColor.RED + Symbols.HEART_1.toString());
-                    ob1.getScore(Bukkit.getPlayer(uid).getName()).setScore(MAX_LIVES);
-                    getScoreboards().get(uid).sidebar(MessageUtils.colorize("&6" + getName() + " - " + arena.getName()), sidebarList);
+
+                    getCustomScoreboard().updateObjective("lives", Bukkit.getPlayer(uid), MAX_LIVES);
                     getGameState().getPlayer(uid).setMaxLives(MAX_LIVES);
                     getGameState().spawnPlayer(Bukkit.getPlayer(uid));
                 }
@@ -95,7 +86,6 @@ public class CTW extends Game {
 
                 teamListMap.clear();
                 for (GamePlayer player : getGameState().getPlayers().values()) {
-                    getScoreboards().get(player.getUUID()).update();
                     if (player.getTeam().equals(Team.NONE) || player.getTeam().equals(Team.SPECTATOR)) continue;
                     if (getGameState().getScore(player.getTeam()) >= MAX_SCORE) return true;
                     Bukkit.getPlayer(player.getUUID()).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(player.getTeam().chatColor() + "Lives: " + player.getLives() + " | " + MessageUtils.formatTimeRaw(MAX_DURATION - getGameState().getCurrentDuration()) + " | Team Score: " + getGameState().getScore(player.getTeam()) + "/" + MAX_SCORE));
@@ -188,6 +178,25 @@ public class CTW extends Game {
 
 
         });
+    }
+
+    private void setupScoreboard() {
+        JSONObject below_name = new JSONObject("{}");
+        below_name.put("key", "lives");
+        below_name.put("display", "&c" + Symbols.HEART_1.toString());
+        JSONObject sidebar = new JSONObject("{}");
+        sidebar.put("title", "&6" + getName() + " - " + getArena().getName());
+        LinkedList<String> sidebarList = new LinkedList<>();
+        sidebarList.add("&1");
+        sidebarList.add("&7&lSCORES&8:");
+        for (int i = 0; i != getTEAMS(); i++) {
+            Team team = Team.values()[i];
+            sidebarList.add(" " + team.chatColor() + "&l" + team.name() + "&8: " + team.chatColor() + "%team_" + team.name() + "_score%");
+        }
+        sidebarList.add("&2");
+        sidebar.put("lines", sidebarList);
+        sidebar.put("display", "&c" + Symbols.HEART_1.toString());
+        setCustomScoreboard(new ScoreboardBuilder().set("sidebar", sidebar).set("below_name", below_name).build());
     }
 
     private void buildShop() {
@@ -350,7 +359,7 @@ public class CTW extends Game {
             Firework rocket = spawnFirework(player.getLocation().clone().add(0, 1, 0), FireworkEffect.builder().flicker(true).with(FireworkEffect.Type.BALL).withColor(gamePlayer.getTeam().getDyeColor()).build());
             rocket.detonate();
             super.kill(player, cause);
-            getScoreboards().get(player.getUniqueId()).getScoreboard().getObjective("lives").getScore(player.getName()).setScore(gamePlayer.getLives());
+            getCustomScoreboard().updateObjective("lives", player, gamePlayer.getLives());
         }
 
         @Override

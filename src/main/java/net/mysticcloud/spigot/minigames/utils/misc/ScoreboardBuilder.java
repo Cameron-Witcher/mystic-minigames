@@ -54,6 +54,14 @@ public class ScoreboardBuilder {
                 board.getObjective(key).getScore(who.getName()).setScore(score);
         }
 
+        public void createGlobalObjective(String key, DisplaySlot slot, String display){
+            for(Map.Entry<UUID, Scoreboard> e : boards.entrySet()){
+                e.getValue().registerNewObjective(key, Criteria.DUMMY, display);
+                e.getValue().getObjective(key).setDisplaySlot(slot);
+
+            }
+        }
+
         public void removePlayer(UUID uid) {
             boards.remove(uid);
         }
@@ -65,7 +73,7 @@ public class ScoreboardBuilder {
 
             if (properties.containsKey("below_name")) {
                 JSONObject json = (JSONObject) properties.get("below_name");
-                board.registerNewObjective(json.getString("key"), Criteria.DUMMY, MessageUtils.colorize(PlaceholderUtils.replace(player, json.getString("display"))));
+                createGlobalObjective(json.getString("key"), DisplaySlot.BELOW_NAME, MessageUtils.colorize(PlaceholderUtils.replace(player, json.getString("display"))));
                 board.getObjective(json.getString("key")).getScore(player.getName()).setScore(0);
             }
 

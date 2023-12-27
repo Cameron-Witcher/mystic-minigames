@@ -194,7 +194,7 @@ public class Dodgeball extends Game {
             sidebarList.add(" " + team.chatColor() + "&l" + team.name() + "&8: " + team.chatColor() + "%team_" + team.name() + "_score%");
         }
         sidebarList.add("&2");
-        sidebar.put("lines", sidebarList);
+        sidebar.put("lines", sidebarList.toArray(new String[sidebarList.size()]));
         sidebar.put("display", "&c" + Symbols.HEART_1.toString());
         setCustomScoreboard(new ScoreboardBuilder().set("sidebar", sidebar).set("below_name", below_name).build());
     }

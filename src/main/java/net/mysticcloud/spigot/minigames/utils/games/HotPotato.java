@@ -170,7 +170,7 @@ public class HotPotato extends Game {
         public void processDamage(Player victim, double damage, EntityDamageEvent.DamageCause cause) {
             Bukkit.getScheduler().runTaskLater(Utils.getPlugin(), () -> {
                 if (victim.hasMetadata("last_damager")) {
-                    Entity perp = Bukkit.getEntity((UUID) victim.getMetadata("last_damager").get(0).value());
+                    Entity perp = (Entity) victim.getMetadata("last_damager").get(0).value();
                     if (getHolder().equals(perp.getUniqueId())) swapHolder(((Player) perp), victim);
                 }
                 super.processDamage(victim, 0, cause);

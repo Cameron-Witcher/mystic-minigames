@@ -58,7 +58,7 @@ public class HotPotato extends Game {
                 for (UUID uid : getGameState().getPlayers().keySet()) {
                     Player player = Bukkit.getPlayer(uid);
                     getGameState().spawnPlayer(player);
-                    getCustomScoreboard().updateObjective("lives", player, 0);
+                    getCustomScoreboard().updateObjective("score", player, 0);
                 }
 
 

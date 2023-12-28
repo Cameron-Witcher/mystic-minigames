@@ -14,9 +14,6 @@ import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.scoreboard.Criteria;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
 import org.json2.JSONArray;
 import org.json2.JSONObject;
 
@@ -27,13 +24,14 @@ public class HotPotato extends Game {
 
     private long STARTED;
     private final long DURATION = TimeUnit.MILLISECONDS.convert(2, TimeUnit.MINUTES);
+    private long LAST_TAG = 0;
 
     private UUID potatoHolder = null;
 
 
     public HotPotato(Arena arena) {
         super("HotPotato", arena);
-        setGameState(new HotPotatoGameState());
+        setGameState(new CustomGameState());
         setTEAMS(1);
         setMIN_PLAYERS(2);
         setMAX_PLAYERS(20);
@@ -148,6 +146,7 @@ public class HotPotato extends Game {
     private void setHolder(Player player) {
         potatoHolder = player.getUniqueId();
         player.sendMessage(MessageUtils.colorize("&cYou have the Potato!"));
+        LAST_TAG = new Date().getTime();
     }
 
     public UUID getHolder() {
@@ -155,14 +154,17 @@ public class HotPotato extends Game {
     }
 
     public void swapHolder(Player from, Player to) {
-        from.sendMessage(MessageUtils.colorize("&aYou have passed the Potato to " + to.getName()));
-        from.playSound(from, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-        to.playSound(to, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-        to.setVelocity(from.getVelocity().setY(0.3));
-        setHolder(to);
+        if (new Date().getTime() - LAST_TAG >= TimeUnit.MILLISECONDS.convert(2, TimeUnit.SECONDS)) {
+            from.sendMessage(MessageUtils.colorize("&aYou have passed the Potato to " + to.getName()));
+            from.playSound(from, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+            to.playSound(to, Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+            to.setVelocity(from.getEyeLocation().getDirection().multiply(2).setY(0.3));
+            setHolder(to);
+        }
+
     }
 
-    public class HotPotatoGameState extends GameState {
+    public class CustomGameState extends GameState {
 
         @Override
         public void processDamage(Player victim, double damage, EntityDamageEvent.DamageCause cause) {

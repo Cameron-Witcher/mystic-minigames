@@ -28,13 +28,13 @@ public class ItemListener implements Listener {
 
                         if (!flag.equals(player.getTeam())) {
                             if (!e.getEntity().hasMetadata("flag"))
-                                ((CTW.CTWGameState) game.getGameState()).pickupFlag(((Player) e.getEntity()), e.getItem());
+                                ((CTW.CustomGameState) game.getGameState()).pickupFlag(((Player) e.getEntity()), e.getItem());
                         } else {
                             if (e.getEntity().hasMetadata("flag")) {
-                                ((CTW.CTWGameState) game.getGameState()).captureFlag(((Player) e.getEntity()), ((Team) e.getEntity().getMetadata("flag").get(0).value()));
+                                ((CTW.CustomGameState) game.getGameState()).captureFlag(((Player) e.getEntity()), ((Team) e.getEntity().getMetadata("flag").get(0).value()));
                             }
                             if (e.getItem().hasMetadata("rogue_flag")) {
-                                ((CTW.CTWGameState) game.getGameState()).returnFlag(flag, true);
+                                ((CTW.CustomGameState) game.getGameState()).returnFlag(flag, true);
                             }
                         }
                     }

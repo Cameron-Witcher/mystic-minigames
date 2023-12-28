@@ -16,9 +16,6 @@ import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scoreboard.Criteria;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
 import org.json2.JSONArray;
 import org.json2.JSONObject;
 
@@ -32,7 +29,7 @@ public class OITQ extends Game {
 
     public OITQ(Arena arena) {
         super("OITQ", arena);
-        setGameState(new OITQGameState());
+        setGameState(new CustomGameState());
         setTEAMS(1);
         setMIN_PLAYERS(2);
         setMAX_PLAYERS(20);
@@ -127,7 +124,8 @@ public class OITQ extends Game {
 
 
 
-    public class OITQGameState extends GameState {
+    public class CustomGameState extends GameState {
+
         @Override
         public int score(Player player, int amount) {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.5f);

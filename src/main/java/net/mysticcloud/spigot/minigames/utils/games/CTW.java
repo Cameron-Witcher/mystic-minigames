@@ -43,7 +43,7 @@ public class CTW extends Game {
 
     public CTW(Arena arena, int teams) {
         super("CTW", arena);
-        setGameState(new CTWGameState());
+        setGameState(new CustomGameState());
         setTEAMS(teams);
         setMIN_PLAYERS(teams);
         setMAX_PLAYERS(teams * 4);
@@ -71,7 +71,7 @@ public class CTW extends Game {
                     getGameState().spawnPlayer(Bukkit.getPlayer(uid));
                 }
                 for (Team team : teamAssignments.values()) {
-                    ((CTWGameState) getGameState()).returnFlag(team, false);
+                    ((CustomGameState) getGameState()).returnFlag(team, false);
 
                 }
             }
@@ -215,7 +215,7 @@ public class CTW extends Game {
     }
 
 
-    public class CTWGameState extends GameState {
+    public class CustomGameState extends GameState {
 
         Map<Team, Item> flags = new HashMap<>();
 
@@ -397,7 +397,7 @@ public class CTW extends Game {
 
                 if (new Date().getTime() - DROPPED >= TimeUnit.MILLISECONDS.convert(30, TimeUnit.SECONDS)) {
                     if (!item.isDead() || !item.isEmpty()) {
-                        ((CTWGameState) getGameState()).returnFlag(team, true);
+                        ((CustomGameState) getGameState()).returnFlag(team, true);
                     } else {
                         returnFlag(team, false);
                     }

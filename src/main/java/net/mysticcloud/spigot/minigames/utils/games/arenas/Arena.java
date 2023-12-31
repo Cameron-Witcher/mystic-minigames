@@ -2,12 +2,15 @@ package net.mysticcloud.spigot.minigames.utils.games.arenas;
 
 import net.mysticcloud.spigot.core.utils.CoreUtils;
 import net.mysticcloud.spigot.core.utils.misc.EmptyChunkGenerator;
+import net.mysticcloud.spigot.core.utils.world.WorldManager;
 import net.mysticcloud.spigot.minigames.utils.Game;
 import net.mysticcloud.spigot.minigames.utils.Team;
 import net.mysticcloud.spigot.minigames.utils.Utils;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.json2.JSONArray;
 import org.json2.JSONObject;
@@ -58,6 +61,7 @@ public class Arena {
     public void startGeneration() {
         File newWorld = new File(name + "_" + new Date().getTime());
         newWorld.mkdirs();
+//        WorldManager.copyWorld(masterWorld, newWorld);
         CoreUtils.copyWorld(masterWorld, newWorld);
 
         WorldCreator wc = new WorldCreator(newWorld.getName());
@@ -65,6 +69,22 @@ public class Arena {
 
         world = Bukkit.getServer().createWorld(wc);
         world.setDifficulty(Difficulty.HARD);
+        world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
+        world.setGameRule(GameRule.DISABLE_RAIDS, true);
+        if (data.has("world_time")) world.setTime(data.getLong("world_time"));
+        else world.setTime(6000);
+        if (data.has("storm")) {
+            world.setStorm(true);
+            world.setWeatherDuration(1000000000);
+            world.setThundering(data.getString("storm").equalsIgnoreCase("thunder"));
+
+        } else {
+            world.setStorm(false);
+            world.setWeatherDuration(0);
+            world.setThundering(false);
+            world.setClearWeatherDuration(1000000000);
+        }
+
     }
 
     public World getWorld() {
@@ -103,7 +123,8 @@ public class Arena {
 
 
     public void regenerate() {
-        CoreUtils.deleteWorld(world.getWorldFolder());
+        WorldManager.deleteWorld(world);
+//        CoreUtils.deleteWorld(world.getWorldFolder());
         startGeneration();
         game.getController().generate();
 
@@ -115,7 +136,7 @@ public class Arena {
     }
 
     public void delete() {
-        if (world != null) CoreUtils.deleteWorld(world.getWorldFolder());
+        if (world != null) WorldManager.deleteWorld(world);
         world = null;
     }
 

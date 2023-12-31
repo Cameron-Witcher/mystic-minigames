@@ -14,6 +14,8 @@ import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.json2.JSONArray;
 import org.json2.JSONObject;
 
@@ -40,7 +42,7 @@ public class HotPotato extends Game {
 
         JSONObject json = new JSONObject("{}");
         json.put("key", "score");
-        json.put("display", "&c" + Symbols.STAR_1.toString());
+        json.put("display", "&a" + Symbols.STAR_1.toString());
         ScoreboardBuilder builder = new ScoreboardBuilder();
         builder.set("below_name", json);
         setCustomScoreboard(builder.build());
@@ -94,6 +96,8 @@ public class HotPotato extends Game {
                 }
 
                 CHECK_SCORE = false;
+                if (potatoHolder != null)
+                    Bukkit.getPlayer(potatoHolder).addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 1, 1));
                 return LASTED >= DURATION;
             }
 
@@ -184,8 +188,7 @@ public class HotPotato extends Game {
                 List<UUID> teamMembers = getPlayers(Team.NONE);
                 if (!teamMembers.isEmpty()) {
                     UUID uid2 = teamMembers.get(new Random().nextInt(teamMembers.size()));
-                    while (uid2.equals(uid))
-                        uid2 = teamMembers.get(new Random().nextInt(teamMembers.size()));
+                    while (uid2.equals(uid)) uid2 = teamMembers.get(new Random().nextInt(teamMembers.size()));
                     setHolder(Bukkit.getPlayer(uid2));
                 }
             }

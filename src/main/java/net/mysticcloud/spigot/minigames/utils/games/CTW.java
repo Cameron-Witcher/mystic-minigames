@@ -80,9 +80,9 @@ public class CTW extends Game {
             public boolean check() {
                 if (!getGameState().hasStarted()) return false;
 
-                for (ItemGenerator gen : getGenerators()) {
+                for (ItemGenerator gen : getGenerators())
                     gen.check();
-                }
+                
 
                 teamListMap.clear();
                 for (GamePlayer player : getGameState().getPlayers().values()) {
@@ -132,6 +132,40 @@ public class CTW extends Game {
 
             @Override
             public void generate() {
+
+                List<Entity> entities = new ArrayList<>();
+                for(Entity entity : arena.getWorld().getEntities()){
+                    if(entity instanceof ArmorStand){
+                        ArmorStand stand = (ArmorStand) entity;
+                        if(stand.getCustomName().equalsIgnoreCase("shop")){
+                            Location loc = stand.getLocation();
+                            addNoBuildZone(loc);
+                            Npc npc = NpcManager.createNpc(loc);
+                            npc.setCustomName(MessageUtils.colorize("&c&lShop"));
+                            npc.setCustomNameVisible(true);
+                            npc.setMetadata("shop", new FixedMetadataValue(Utils.getPlugin(), npc));
+                            addNpc(npc);
+                        }
+                        if(stand.getCustomName().equalsIgnoreCase("generator")){
+                            Location loc = stand.getLocation();
+                            addNoBuildZone(loc);
+                            getGenerators().add(new ItemGenerator(loc));
+                        }
+                        if(stand.getCustomName().equalsIgnoreCase("spawn")){
+                            Location loc = stand.getLocation();
+                            addNoBuildZone(loc);
+                            getGenerators().add(new ItemGenerator(loc));
+                        }
+
+//                        entities.add(stand);
+                        stand.remove();
+                    }
+                }
+//                for(Entity entity : entities)
+//                    entity.remove();
+
+
+
                 JSONObject data = arena.getData();
                 JSONArray spawns = arena.getData().getJSONArray("spawns");
                 for (int i = 0; i < spawns.length(); i++) {

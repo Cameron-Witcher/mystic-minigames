@@ -137,7 +137,7 @@ public class CTW extends Game {
                 for(Entity entity : arena.getWorld().getEntities()){
                     if(entity instanceof ArmorStand){
                         ArmorStand stand = (ArmorStand) entity;
-                        if(stand.getCustomName().equalsIgnoreCase("shop")){
+                        if(stand.getName().equalsIgnoreCase("shop")){
                             Location loc = stand.getLocation();
                             addNoBuildZone(loc);
                             Npc npc = NpcManager.createNpc(loc);
@@ -146,12 +146,12 @@ public class CTW extends Game {
                             npc.setMetadata("shop", new FixedMetadataValue(Utils.getPlugin(), npc));
                             addNpc(npc);
                         }
-                        if(stand.getCustomName().equalsIgnoreCase("generator")){
+                        if(stand.getName().equalsIgnoreCase("generator")){
                             Location loc = stand.getLocation();
                             addNoBuildZone(loc);
                             getGenerators().add(new ItemGenerator(loc));
                         }
-                        if(stand.getCustomName().equalsIgnoreCase("spawn")){
+                        if(stand.getName().equalsIgnoreCase("spawn")){
                             Location loc = stand.getLocation();
                             addNoBuildZone(loc);
                             getGenerators().add(new ItemGenerator(loc));
